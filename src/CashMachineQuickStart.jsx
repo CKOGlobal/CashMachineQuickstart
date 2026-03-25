@@ -138,8 +138,8 @@ function PhaseIntake({ state, setState, onNext }) {
     <div>
       <PhaseHeader
         badge="STEP 1 OF 4  ·  ABOUT YOU"
-        title={<>Let's find money in what you <span style={st.gold}>already know.</span></>}
-        sub="No fancy degrees. No huge investment. Just you, your skills, and a plan to get paid."
+        title={<>Let's find the money hiding in what you <span style={st.gold}>already know how to do.</span></>}
+        sub="You don't need a fancy degree or a trust fund. You need to get paid for stuff you can do right now."
       />
       <div style={st.formGroup}>
         <label style={st.label}>First name</label>
@@ -147,9 +147,9 @@ function PhaseIntake({ state, setState, onNext }) {
           onChange={(e) => setState((p) => ({ ...p, name: e.target.value }))} />
       </div>
       <div style={st.formGroup}>
-        <label style={st.label}>What do you do, and what are you good at?</label>
+        <label style={st.label}>What do you do, and what are you actually good at?</label>
         <textarea style={{ ...st.input, ...st.textarea }} rows={3}
-          placeholder="e.g. I'm a college sophomore studying marketing. I run my school's Instagram page and people always ask me for social media help."
+          placeholder="Be real. e.g. I'm a sophomore who runs my school's IG and people pay me for social media help. Or: I fix computers and everyone thinks I'm a wizard."
           value={background}
           onChange={(e) => setState((p) => ({ ...p, background: e.target.value }))} />
       </div>
@@ -165,11 +165,11 @@ function PhaseIntake({ state, setState, onNext }) {
         </div>
         <div style={{ ...st.formGroup, marginTop: "0.85rem" }}>
           <label style={st.label}>
-            Got a specific idea already? Tell us.{" "}
-            <span style={st.optional}>(optional but helpful)</span>
+            Got a specific money idea already? Spill it.{" "}
+            <span style={st.optional}>(optional but helps us help you)</span>
           </label>
           <textarea style={{ ...st.input, ...st.textarea }} rows={2}
-            placeholder="e.g. I want to tutor high schoolers in math. Or: I flip thrift store clothes on Depop. Or: No clue, just need money."
+            placeholder="e.g. I want to tutor high schoolers in calculus. Or: I flip vintage sneakers on Depop. Or: Honestly? No clue. Just show me options."
             value={state.otherSkills || ""}
             onChange={(e) => setState((p) => ({ ...p, otherSkills: e.target.value }))} />
           {skills.includes("other") && !state.otherSkills?.trim() && (
@@ -203,7 +203,7 @@ function PhaseIntake({ state, setState, onNext }) {
         <div />
         <button onClick={onNext} disabled={!ok}
           style={{ ...st.btnPrimary, ...(!ok ? st.btnDisabled : {}) }}>
-          Show Me My Fast Cash Ideas →
+          Show Me The Money Ideas →
         </button>
       </div>
     </div>
@@ -319,9 +319,9 @@ function PhaseIdeas({ name, ideas, onSelect, onBack }) {
   return (
     <div>
       <PhaseHeader
-        badge="STEP 2 OF 4  ·  YOUR IDEAS"
-        title={<>{name}, here are your <span style={st.gold}>8 fast cash paths</span> — ranked best to reach.</>}
-        sub="Each shows what you'll make NOW + what it could become in 18 months. Tap any card for details."
+        badge="STEP 2 OF 4  ·  YOUR MONEY IDEAS"
+        title={<>{name}, here are your <span style={st.gold}>8 ways to get paid</span> — ranked easiest to hardest.</>}
+        sub="Each shows what you'll bank in Month 1 + what it becomes in 18 months if you don't quit. Click any card to see the real talk."
       />
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "1.25rem" }}>
         {[
@@ -356,14 +356,23 @@ function PaymentGate({ onUnlock, testMode, onEnableTestMode }) {
       <p style={paySt.sub}>
         Get your personalized 90-day roadmap, pricing strategy, marketing scripts, and 3 months of daily accountability — all for $67.
       </p>
+      <div style={paySt.accountabilityBox}>
+        <div style={paySt.accountabilityIcon}>🤝</div>
+        <div style={paySt.accountabilityText}>
+          <strong>Why Accountability Matters:</strong> When you're building something on your own — no boss, no professor, no one checking in — 
+          it's easy to let things slide. That's where we come in. Think of this as your accountability partner: 
+          weekly check-ins, progress tracking, and someone who actually cares if you hit your milestones. 
+          You've got this. We've got your back.
+        </div>
+      </div>
       <div style={paySt.includes}>
         <div style={paySt.includesLabel}>What You Get:</div>
         <div style={paySt.checkList}>
           <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>Custom pricing strategy (3 tiers + revenue math)</div>
           <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>Month-by-month action plan (Weeks 1-12)</div>
           <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>Marketing playbook (scripts, channels, outreach)</div>
-          <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>90 days of daily motivation (SMS/Email)</div>
-          <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>12 weekly accountability check-ins</div>
+          <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>90 days of accountability check-ins (SMS/Email)</div>
+          <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>Weekly progress coaching (12 weeks of support)</div>
           <div style={paySt.checkItem}><span style={paySt.checkDot}>✓</span>Downloadable PDF + email copy</div>
         </div>
       </div>
@@ -403,6 +412,9 @@ const paySt = {
   badge:         { fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.62rem", letterSpacing: "0.18em", color: "#C9A84C", marginBottom: "1rem" },
   title:         { fontSize: "clamp(1.3rem,3vw,1.75rem)", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.02em", marginBottom: "0.75rem", lineHeight: 1.2 },
   sub:           { fontSize: "0.9rem", color: "#94a3b8", lineHeight: 1.65, marginBottom: "1.75rem" },
+  accountabilityBox: { background: "rgba(232,168,56,0.08)", border: "1px solid rgba(232,168,56,0.25)", borderRadius: "12px", padding: "1.25rem 1.5rem", marginBottom: "1.75rem", display: "flex", gap: "1rem", alignItems: "flex-start", textAlign: "left" },
+  accountabilityIcon: { fontSize: "1.75rem", flexShrink: 0, marginTop: "2px" },
+  accountabilityText: { fontSize: "0.88rem", color: "#e2e8f0", lineHeight: 1.65 },
   includes:      { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "1.25rem 1.5rem", marginBottom: "1.5rem", textAlign: "left" },
   includesLabel: { fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A84C", marginBottom: "0.75rem" },
   checkList:     { display: "flex", flexDirection: "column", gap: "0.5rem" },
@@ -635,6 +647,19 @@ function PhasePlan({ plan, idea, name, intake, onReset }) {
       </div>
 
       <div style={planSt2.footer}>
+        <div style={planSt2.accountabilityNote}>
+          <div style={planSt2.accountabilityNoteIcon}>🎯</div>
+          <div>
+            <div style={planSt2.accountabilityNoteTitle}>Your Accountability Coach (Once Payment is Live)</div>
+            <div style={planSt2.accountabilityNoteText}>
+              For the next 90 days, you'll get regular check-ins from your accountability partner.
+              Every Monday: "What's your win for this week?"
+              Every Wednesday: "How's progress on your milestone?"
+              Every Friday: "Where are you at — on track, almost there, or stuck?"
+              This is your coach in your corner, helping you stay focused when life gets busy.
+            </div>
+          </div>
+        </div>
         <div style={planSt2.footerQuote}>
           "The only plan that doesn't work is the one you never start. Pick one idea. Say yes. Do it this week."
         </div>
@@ -661,7 +686,11 @@ const planSt2 = {
   activeLabel:  { display: "flex", alignItems: "center", gap: "0.5rem", fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.68rem", color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "1.25rem", paddingBottom: "0.75rem", borderBottom: "1px solid rgba(255,255,255,0.06)" },
   activeDot:    { width: 6, height: 6, borderRadius: "50%", background: "#C9A84C", flexShrink: 0, boxShadow: "0 0 6px rgba(201,168,76,0.6)" },
   content:      { minHeight: 280, animation: "fadeUp 0.22s ease both" },
-  footer:       { marginTop: "2rem", paddingTop: "1.25rem", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" },
+  footer:       { marginTop: "2rem", paddingTop: "1.25rem", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: "1.25rem" },
+  accountabilityNote: { background: "rgba(232,168,56,0.08)", border: "1px solid rgba(232,168,56,0.25)", borderRadius: "10px", padding: "1.25rem 1.5rem", display: "flex", gap: "1rem", alignItems: "flex-start" },
+  accountabilityNoteIcon: { fontSize: "1.5rem", flexShrink: 0, marginTop: "2px" },
+  accountabilityNoteTitle: { fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.7rem", fontWeight: 700, color: "#E8A838", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.5rem" },
+  accountabilityNoteText: { fontSize: "0.85rem", color: "#cbd5e1", lineHeight: 1.65 },
   footerQuote:  { fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.7rem", color: "#94a3b8", fontStyle: "italic", maxWidth: 420 },
 };
 
@@ -808,10 +837,10 @@ export default function CashMachineQuickStart() {
       <div style={st.hero}>
         <div style={st.heroBadge}>LORAL LANGEMEIER + KELLI OWENS  ·  CASH MACHINE QUICKSTART</div>
         <h1 style={st.heroTitle}>
-          Stop saving pennies.<br />
-          <span style={st.gold}>Go make actual money.</span>
+          You're broke.<br />
+          <span style={st.gold}>We get it. Let's fix that.</span>
         </h1>
-        <p style={st.heroSub}>Turn what you already know into cash — this week. No business plan. No investment. Just you and a plan that works.</p>
+        <p style={st.heroSub}>Turn what you already know into actual money — this week. No MBA required. No trust fund needed. Just you, your skills, and a plan that actually works.</p>
       </div>
 
       <div style={st.stepper}>
