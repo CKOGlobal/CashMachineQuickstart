@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 // ============================================================================
 // CASH MACHINE QUICKSTART - Complete Component
+// Fixed: Input focus bug + 11 skill boxes + A2P compliance footer
 // Real payment link: https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed
 // ============================================================================
 
@@ -69,7 +70,7 @@ const CashMachineQuickStart = () => {
       timeAvailable, incomeGoal, ideas, selectedIdea, pricingOptions,
       selectedPricing, plan]);
 
-  // ========== SKILL CATEGORIES ==========
+  // ========== SKILL CATEGORIES (11 total) ==========
   const skillCategories = [
     { id: 'creative', label: 'Creative & Arts', emoji: '🎨', desc: 'Design, writing, music, photography' },
     { id: 'tech', label: 'Tech & Digital', emoji: '💻', desc: 'Coding, social media, software, AI' },
@@ -81,6 +82,7 @@ const CashMachineQuickStart = () => {
     { id: 'health', label: 'Health & Wellness', emoji: '🏃', desc: 'Fitness, nutrition, therapy, beauty' },
     { id: 'operations', label: 'Operations & Logistics', emoji: '📦', desc: 'Driving, organizing, planning, admin' },
     { id: 'food', label: 'Food & Hospitality', emoji: '🍳', desc: 'Cooking, catering, bartending, events' },
+    { id: 'none', label: 'None of these', emoji: '🤷', desc: 'I have something else' },
   ];
 
   // ========== AI CALLS ==========
@@ -800,7 +802,7 @@ No preamble.`
     );
   };
 
-  // ========== STYLES ========== 
+  // ========== STYLES (DEFINED ONCE - FIXES INPUT BUG) ==========
   const st = {
     container: {
       minHeight: '100vh',
@@ -1273,6 +1275,15 @@ No preamble.`
       padding: '25px',
       marginBottom: '30px',
     },
+    footer: {
+      maxWidth: '900px',
+      margin: '40px auto 0',
+      padding: '30px',
+      borderTop: '1px solid rgba(255,255,255,0.1)',
+      textAlign: 'center',
+      fontSize: '0.9rem',
+      color: 'rgba(255,255,255,0.6)',
+    },
   };
 
   // ========== RENDER ==========
@@ -1294,6 +1305,22 @@ No preamble.`
       {phase === 2 && <Phase2 />}
       {phase === 3 && <Phase3 />}
       {phase === 4 && <Phase4 />}
+
+      {/* A2P Compliance Footer */}
+      <div style={st.footer}>
+        <div style={{marginBottom: '15px'}}>
+          <strong style={{color: '#C9A84C'}}>Cash Machine QuickStart</strong>
+        </div>
+        <div>
+          CKO Global LLC<br/>
+          Email: <a href="mailto:Kelli@proactively-lazy.com" style={{color: '#C9A84C', textDecoration: 'none'}}>Kelli@proactively-lazy.com</a><br/>
+          Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{color: '#C9A84C', textDecoration: 'none'}}>proactively-lazy.com</a>
+        </div>
+        <div style={{marginTop: '15px', fontSize: '0.85rem'}}>
+          <a href="/terms.html" target="_blank" style={{color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px'}}>Terms of Service</a>
+          <a href="/privacy.html" target="_blank" style={{color: 'rgba(255,255,255,0.5)', textDecoration: 'none'}}>Privacy Policy</a>
+        </div>
+      </div>
     </div>
   );
 };
