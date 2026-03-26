@@ -633,6 +633,7 @@ const CashMachineQuickStart = () => {
 
   const [ideas, setIdeas] = useState([]);
   const [selectedIdea, setSelectedIdea] = useState(null);
+  const [expandedIdea, setExpandedIdea] = useState(null);
 
   const [pricingOptions, setPricingOptions] = useState([]);
   const [selectedPricing, setSelectedPricing] = useState(null);
@@ -768,13 +769,18 @@ Time: ${timeAvailable}
 
 Return ONLY valid JSON array:
 [{
-  "name": "Starter" | "Sweet Spot" | "Premium" | "Tiered" | "AI Suggests",
+  "name": "Starter" | "Sweet Spot" | "Premium" | "Tiered" | "Package Deal",
   "price": "$X/hr or $X each",
   "monthly": "$X-$Y/mo potential",
   "rationale": "Why this works",
   "pros": ["benefit 1", "benefit 2"],
-  "cons": ["limitation 1"]
+  "cons": ["limitation 1"],
+  "growthPath": "→ Raise to $X-Y after [specific milestone]"
 }]
+
+CRITICAL: Each pricing model MUST include a "growthPath" field showing the next price increase and when.
+Format: "→ Raise to $X-Y after [milestone]"
+Milestones should be tangible: "10-15 successful projects", "fully booked 2 weeks out", "portfolio of 5 clients", "consistent 5-star reviews", "waiting list started"
 
 No preamble.`
           }]
@@ -875,8 +881,15 @@ Return ONLY valid JSON:
   },
   "marketing": {
     "channels": ["Low-cost channel 1", "channel 2", "channel 3"],
-    "content": "What to post/say to get customers",
-    "budget": "Free/under $50 strategies"
+    "dmScript": "Hey [Name]! 👋 [Personalized opener]. I just started [SERVICE] and I'm looking for a few people to work with. I'd love to help you with [SPECIFIC THING]. My rate is [PRICE]. Would you be open to a quick chat?",
+    "socialPost": "📣 Post template with emojis and structure they can copy/paste",
+    "emailTemplate": "Subject: [SUBJECT]\\n\\nHi [Name],\\n\\n[Body with specific value prop]\\n\\nWould you be open to a 10-minute call?",
+    "objections": {
+      "tooExpensive": "Response script",
+      "needToThink": "Response script",
+      "doItMyself": "Response script"
+    },
+    "budget": "Free strategies + platforms"
   },
   "milestones": [
     {"day": 7, "goal": "First gig income + business accounts set up"},
@@ -1073,7 +1086,10 @@ No preamble.`
                       ...styles.ideaCard,
                       ...(selectedIdea?.title === idea.title ? styles.ideaCardSelected : {})
                     }}
-                    onClick={() => setSelectedIdea(idea)}
+                    onClick={() => {
+                      setSelectedIdea(idea);
+                      setExpandedIdea(idx); // Auto-expand when selected
+                    }}
                   >
                     <div style={styles.ideaHeader}>
                       <h3 style={styles.ideaTitle}>{idea.title}</h3>
@@ -1112,23 +1128,56 @@ No preamble.`
                         <div style={styles.earningAmount}>{idea.yearTwo}</div>
                       </div>
                     </div>
-                    <div style={styles.quickStart}>
-                      <strong>Quick Start:</strong> {idea.quickStart}
-                    </div>
-                    <div style={styles.proscons}>
-                      <div>
-                        <strong style={{color: '#3ECFAB'}}>Pros:</strong>
-                        <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
-                          {idea.pros.map((pro, i) => <li key={i}>{pro}</li>)}
-                        </ul>
-                      </div>
-                      <div>
-                        <strong style={{color: '#F06292'}}>Cons:</strong>
-                        <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
-                          {idea.cons.map((con, i) => <li key={i}>{con}</li>)}
-                        </ul>
-                      </div>
-                    </div>
+
+                    {/* Toggle Details Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedIdea(expandedIdea === idx ? null : idx);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '6px',
+                        color: 'rgba(255,255,255,0.7)',
+                        fontSize: '0.85rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: '5px',
+                        transition: 'all 0.2s',
+                        marginBottom: expandedIdea === idx ? '15px' : '0',
+                      }}
+                    >
+                      {expandedIdea === idx ? '▼ Hide Details' : '► See Details'}
+                    </button>
+
+                    {/* Collapsible Details Section */}
+                    {expandedIdea === idx && (
+                      <>
+                        <div style={styles.quickStart}>
+                          <strong>Quick Start:</strong> {idea.quickStart}
+                        </div>
+                        <div style={styles.proscons}>
+                          <div>
+                            <strong style={{color: '#3ECFAB'}}>Pros:</strong>
+                            <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
+                              {idea.pros.map((pro, i) => <li key={i}>{pro}</li>)}
+                            </ul>
+                          </div>
+                          <div>
+                            <strong style={{color: '#F06292'}}>Cons:</strong>
+                            <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
+                              {idea.cons.map((con, i) => <li key={i}>{con}</li>)}
+                            </ul>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1246,6 +1295,20 @@ No preamble.`
                   <div style={{marginTop: '5px'}}>
                     <strong style={{color: '#F06292'}}>⚠</strong> {option.cons.join(', ')}
                   </div>
+                  {option.growthPath && (
+                    <div style={{
+                      marginTop: '10px',
+                      padding: '8px',
+                      background: 'rgba(201,168,76,0.1)',
+                      border: '1px solid rgba(201,168,76,0.3)',
+                      borderRadius: '6px',
+                      fontSize: '0.85rem',
+                      color: '#C9A84C',
+                      fontWeight: '600',
+                    }}>
+                      {option.growthPath}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -1388,10 +1451,79 @@ No preamble.`
 
             {activeTab === 'marketing' && (
               <div>
-                <h3 style={styles.sectionTitle}>Marketing Strategy</h3>
-                <p style={styles.sectionText}><strong>Channels:</strong> {plan.marketing.channels.join(', ')}</p>
-                <p style={styles.sectionText}><strong>Content:</strong> {plan.marketing.content}</p>
-                <p style={styles.sectionText}><strong>Budget:</strong> {plan.marketing.budget}</p>
+                <h3 style={styles.sectionTitle}>Marketing Roadmap + Scripts</h3>
+                
+                <div style={{marginBottom: '20px'}}>
+                  <p style={styles.sectionText}><strong>Best Channels:</strong> {plan.marketing.channels.join(', ')}</p>
+                  <p style={styles.sectionText}><strong>Budget:</strong> {plan.marketing.budget}</p>
+                </div>
+
+                {plan.marketing.dmScript && (
+                  <div style={{
+                    padding: '15px',
+                    background: 'rgba(96,184,232,0.1)',
+                    border: '1px solid rgba(96,184,232,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '15px',
+                  }}>
+                    <h4 style={{color: '#60B8E8', fontSize: '0.95rem', marginBottom: '10px'}}>📱 DM Script (Copy + Personalize)</h4>
+                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
+                      {plan.marketing.dmScript}
+                    </p>
+                  </div>
+                )}
+
+                {plan.marketing.socialPost && (
+                  <div style={{
+                    padding: '15px',
+                    background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '15px',
+                  }}>
+                    <h4 style={{color: '#C9A84C', fontSize: '0.95rem', marginBottom: '10px'}}>📣 Social Post Template</h4>
+                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
+                      {plan.marketing.socialPost}
+                    </p>
+                  </div>
+                )}
+
+                {plan.marketing.emailTemplate && (
+                  <div style={{
+                    padding: '15px',
+                    background: 'rgba(62,207,171,0.1)',
+                    border: '1px solid rgba(62,207,171,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '15px',
+                  }}>
+                    <h4 style={{color: '#3ECFAB', fontSize: '0.95rem', marginBottom: '10px'}}>📧 Email Template</h4>
+                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
+                      {plan.marketing.emailTemplate}
+                    </p>
+                  </div>
+                )}
+
+                {plan.marketing.objections && (
+                  <div style={{
+                    padding: '15px',
+                    background: 'rgba(240,98,146,0.1)',
+                    border: '1px solid rgba(240,98,146,0.3)',
+                    borderRadius: '8px',
+                  }}>
+                    <h4 style={{color: '#F06292', fontSize: '0.95rem', marginBottom: '10px'}}>🛡️ Objection Handling</h4>
+                    <div style={{fontSize: '0.9rem'}}>
+                      <p style={{marginBottom: '8px'}}>
+                        <strong>"You're too expensive":</strong> {plan.marketing.objections.tooExpensive}
+                      </p>
+                      <p style={{marginBottom: '8px'}}>
+                        <strong>"I need to think about it":</strong> {plan.marketing.objections.needToThink}
+                      </p>
+                      <p>
+                        <strong>"I can do it myself":</strong> {plan.marketing.objections.doItMyself}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
