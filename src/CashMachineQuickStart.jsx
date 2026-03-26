@@ -999,24 +999,7 @@ No preamble.`
             </p>
           </div>
 
-          {!hasPaid && !testMode && (
-            <>
-              <div style={styles.lockedOverlay}>
-                <div style={{fontSize: '3rem', marginBottom: '15px'}}>🔒</div>
-                <h3 style={{fontSize: '1.3rem', marginBottom: '10px'}}>
-                  Your Ideas Are Ready
-                </h3>
-                <p style={{fontSize: '1rem', marginBottom: '30px', color: 'rgba(255,255,255,0.7)'}}>
-                  Complete your purchase to unlock your personalized cash machine ideas and 90-day action plan
-                </p>
-              </div>
-              <PaymentGate />
-            </>
-          )}
-
-          {(hasPaid || testMode) && (
-            <>
-              <div style={styles.ideasGrid}>
+          <div style={styles.ideasGrid}>
                 {ideas.map((idea, idx) => (
                   <div
                     key={idx}
@@ -1072,10 +1055,71 @@ No preamble.`
                 </button>
                 <button
                   style={{...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {})}}
-                  onClick={generatePricing}
+                  onClick={() => {
+                    if (!hasPaid && !testMode) {
+                      setPhase(2.5); // Trigger payment gate
+                    } else {
+                      generatePricing();
+                    }
+                  }}
                   disabled={loading || !selectedIdea}
                 >
-                  {loading ? '🤖 Generating Pricing...' : 'Next: Price It →'}
+                  {loading ? '🤖 Generating Pricing...' : 'Get Your Complete Plan →'}
+                </button>
+              </div>
+        </div>
+      )}
+
+      {phase === 2.5 && (
+        <div style={styles.phase}>
+          {(hasPaid || testMode) ? (
+            <>
+              {/* Auto-advance to Phase 3 and generate pricing */}
+              {(() => {
+                if (pricingOptions.length === 0 && !loading) {
+                  generatePricing();
+                } else if (pricingOptions.length > 0) {
+                  setPhase(3);
+                }
+                return (
+                  <div style={{textAlign: 'center', padding: '60px 20px'}}>
+                    <div style={{fontSize: '3rem', marginBottom: '20px'}}>🎉</div>
+                    <h2 style={{fontSize: '1.5rem', marginBottom: '15px'}}>Welcome back!</h2>
+                    <p style={{color: 'rgba(255,255,255,0.7)'}}>
+                      {loading ? 'Generating your pricing strategies...' : 'Loading your plan...'}
+                    </p>
+                  </div>
+                );
+              })()}
+            </>
+          ) : (
+            <>
+              <div style={styles.phaseHeader}>
+                <span style={{fontSize: '2rem'}}>💡</span>
+                <h2 style={styles.phaseTitle}>
+                  You've Seen What's Possible.<br/>
+                  <span style={{color: '#C9A84C'}}>Now Let's Make It Happen.</span>
+                </h2>
+                <p style={styles.phaseSubtitle}>
+                  You picked: <strong>{selectedIdea?.title}</strong>
+                </p>
+              </div>
+
+              <div style={styles.lockedOverlay}>
+                <div style={{fontSize: '3rem', marginBottom: '15px'}}>🔒</div>
+                <h3 style={{fontSize: '1.3rem', marginBottom: '10px'}}>
+                  Ready for the How-To?
+                </h3>
+                <p style={{fontSize: '1rem', marginBottom: '30px', color: 'rgba(255,255,255,0.7)'}}>
+                  Get the complete implementation guide: pricing strategy, marketing plan, 90-day action plan, and 90 days of accountability coaching.
+                </p>
+              </div>
+
+              <PaymentGate />
+
+              <div style={styles.buttonRow}>
+                <button style={styles.buttonSecondary} onClick={() => setPhase(2)}>
+                  ← Back to Ideas
                 </button>
               </div>
             </>
@@ -1083,7 +1127,7 @@ No preamble.`
         </div>
       )}
 
-      {phase === 3 && (
+      {phase === 3 && (hasPaid || testMode) && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{fontSize: '2rem'}}>💰</span>
@@ -1138,7 +1182,7 @@ No preamble.`
         </div>
       )}
 
-      {phase === 4 && plan && (
+      {phase === 4 && plan && (hasPaid || testMode) && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{fontSize: '2rem'}}>🎉</span>
