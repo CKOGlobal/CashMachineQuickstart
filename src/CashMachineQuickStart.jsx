@@ -638,7 +638,7 @@ const CashMachineQuickStart = () => {
   const [selectedPricing, setSelectedPricing] = useState(null);
 
   const [plan, setPlan] = useState(null);
-  const [activeTab, setActiveTab] = useState('pricing');
+  const [activeTab, setActiveTab] = useState('dualtrack');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -689,36 +689,51 @@ const CashMachineQuickStart = () => {
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Generate 8 FAST CASH ideas for someone who needs money NOW - not long-term business building.
+            content: `Generate 8 cash machine ideas using the DUAL-TRACK system for: ${name}
 
-Person: ${name}
 Background: ${background}
 Skills: ${selectedSkills.join(', ')}
 ${specificIdea ? `Specific idea: ${specificIdea}` : ''}
 Time: ${timeAvailable}
 Goal: ${incomeGoal}
 
-CRITICAL REQUIREMENTS:
-- They can start making money TOMORROW or within 48 hours
-- NO network required, NO audience building, NO relationship marketing
-- Focus on: gig economy platforms, service work, cash jobs, local opportunities
-- Real examples: TaskRabbit, DoorDash, Rover, Fiverr quick gigs, local cleaning/handyman, Facebook Marketplace flips, babysitting, tutoring, event work
-- Month 1 earnings = realistic first WEEK earnings (they need cash NOW)
-- Ideas must work for someone starting from ZERO connections
+DUAL-TRACK FRAMEWORK:
+Generate exactly 8 ideas in this order:
 
-Return ONLY valid JSON array with 8 objects:
+IDEAS 1-2: BRIDGE IDEAS (Survival Income)
+- Gig economy platforms they can start TODAY
+- Examples: DoorDash, TaskRabbit, Rover, Instacart, Fiverr quick gigs
+- Be honest: "This isn't a business. This pays bills while you build the real thing."
+- First week earnings: realistic gig platform income
+- Set category: "bridge"
+
+IDEAS 3-7: BUSINESS IDEAS (Real Business)
+- Skills-based services they can start within 2-6 weeks
+- Must be scalable, have exit potential, based on their actual skills
+- Examples: social media management, tutoring, video editing, pet training, house cleaning, meal prep, photography, graphic design, personal training, tech support
+- NOT: MLM, "build an audience first", high-capital businesses, drop shipping
+- First client within 2-6 weeks, $500-2000/mo by month 3
+- Set category: "business"
+
+IDEA 8: WILDCARD (Creative/Unique)
+- Something creative or unique based on their specific background
+- Could be bridge OR business depending on what fits
+- Set category: "wildcard"
+
+Return ONLY valid JSON array:
 [{
-  "title": "Idea name (specific, actionable)",
-  "tagline": "One sentence - what you do and how fast you get paid",
-  "monthOne": "$X-$Y realistic FIRST WEEK (not month)",
+  "title": "Specific, actionable idea name",
+  "tagline": "One sentence - what you do and speed to first dollar",
+  "category": "bridge" | "business" | "wildcard",
+  "monthOne": "$X-$Y realistic first week (bridge) or first month (business)",
   "yearTwo": "18-month potential if they scale",
-  "quickStart": "Step 1: Sign up/do this TODAY. Step 2: First job/gig. Step 3: Get paid.",
+  "quickStart": "Step 1: Do this today. Step 2: First customer/gig. Step 3: Get paid.",
   "pros": ["benefit 1", "benefit 2", "benefit 3"],
   "cons": ["challenge 1", "challenge 2"],
   "fitScore": 85
 }]
 
-Rank by fitScore (best=95, stretch=75). Prioritize SPEED TO CASH. Be realistic. No preamble.`
+Rank by fitScore within each category. Bridge ideas = 70-80 fit (they're temporary). Business ideas = 80-95 fit (based on skills match). Be realistic and honest. No preamble.`
           }]
         })
       });
@@ -788,47 +803,87 @@ No preamble.`
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Create 90-day plan for: ${selectedIdea.title}
+            content: `Create a DUAL-TRACK 90-day plan for: ${selectedIdea.title}
 
 Pricing: ${selectedPricing.name} at ${selectedPricing.price}
 Person: ${name}
 Background: ${background}
 Time: ${timeAvailable}
+Idea Category: ${selectedIdea.category || 'business'}
+
+DUAL-TRACK SYSTEM:
+${selectedIdea.category === 'bridge' ? 
+`This is a BRIDGE idea. The 90-day plan should focus on maximizing gig income while setting up a REAL business on the side.
+
+Track A (Gig Income): ${selectedIdea.title} - Start high, maintain as needed
+Track B (Business Setup): Identify and launch a scalable business based on their skills
+
+Goal: By Day 90, have a real business generating $500-1000/mo` :
+`This is a BUSINESS idea. The 90-day plan should show the transition from gig work to full business.
+
+Track A (Gig Income - DECREASING): Start with gig platforms for survival cash
+Track B (Business Income - INCREASING): ${selectedIdea.title}
+
+Goal: Crossover by Day 60-90 where business income > gig income`}
 
 Return ONLY valid JSON:
 {
+  "dualTrack": {
+    "trackA": {
+      "name": "Gig Income (Survival)",
+      "weeks1_4": "Gig platforms + hours/week + expected income",
+      "weeks5_8": "Reduced hours as business grows",
+      "weeks9_12": "Minimal or phased out - business supports you"
+    },
+    "trackB": {
+      "name": "${selectedIdea.title}",
+      "weeks1_4": "Setup + first customers + learning",
+      "weeks5_8": "Scale customers + refine offer",
+      "weeks9_12": "Consistent income + growth systems"
+    },
+    "crossover": "Day 60-90: Business income replaces gig income"
+  },
   "pricing": {
     "model": "${selectedPricing.name}",
     "rate": "${selectedPricing.price}",
-    "breakdown": "Cost analysis",
-    "adjustments": "When to raise prices"
+    "breakdown": "Cost analysis + when to adjust",
+    "adjustments": "Pricing evolution over 90 days"
   },
   "month1": {
-    "goal": "First revenue",
-    "weeks": ["Week 1 tasks", "Week 2 tasks", "Week 3 tasks", "Week 4 tasks"],
-    "metrics": "What to track"
+    "goal": "Survival income + business foundation",
+    "weeks": [
+      "Week 1: Start gig work (20hrs) + business setup (10hrs)",
+      "Week 2: Gig work (20hrs) + launch business offer (10hrs)",
+      "Week 3: Gig work (15hrs) + first 1-2 customers (15hrs)",
+      "Week 4: Gig work (15hrs) + 3-5 customers (15hrs)"
+    ],
+    "metrics": "Gig income + Business customers + Hours split"
   },
   "month2": {
-    "goal": "Scale operations",
-    "weeks": ["Week 5-8 tasks"],
-    "metrics": "Growth KPIs"
+    "goal": "Scale business, reduce gig dependency",
+    "weeks": [
+      "Weeks 5-8: Reduce gig hours to 10-15/week, business 15-20/week, 5-10 paying customers, refine systems"
+    ],
+    "metrics": "Customer count + Revenue split (gig vs business) + Repeat rate"
   },
   "month3": {
-    "goal": "Optimize & expand",
-    "weeks": ["Week 9-12 tasks"],
-    "metrics": "Efficiency metrics"
+    "goal": "Business income > gig income",
+    "weeks": [
+      "Weeks 9-12: Gig 0-10hrs/week (only if needed), business 20-30hrs/week, 10-15 customers, consistent $500-1000/mo from business"
+    ],
+    "metrics": "Business revenue stable + Gig phased out + Growth trajectory"
   },
   "marketing": {
-    "channels": ["channel 1", "channel 2", "channel 3"],
-    "content": "What to post",
-    "budget": "Free/low-cost options"
+    "channels": ["Low-cost channel 1", "channel 2", "channel 3"],
+    "content": "What to post/say to get customers",
+    "budget": "Free/under $50 strategies"
   },
   "milestones": [
-    {"day": 7, "goal": "First action"},
-    {"day": 14, "goal": "First customer contact"},
-    {"day": 30, "goal": "First revenue"},
-    {"day": 60, "goal": "Repeat customer"},
-    {"day": 90, "goal": "Consistent income"}
+    {"day": 7, "goal": "First gig income + business accounts set up"},
+    {"day": 14, "goal": "First business customer + $200+ from gigs"},
+    {"day": 30, "goal": "3-5 business customers + reducing gig hours"},
+    {"day": 60, "goal": "Business generating $300-500/mo consistently"},
+    {"day": 90, "goal": "Business $500-1000/mo + gigs phased out"}
   ]
 }
 
@@ -855,8 +910,8 @@ No preamble.`
         <div style={styles.brandLine}>Loral Langemeier + Kelli Owens — Cash Machine QuickStart</div>
         <h1 style={styles.hero}>You're broke.<br/>We get it. Let's <span style={{color: '#C9A84C'}}>fix that.</span></h1>
         <p style={styles.tagline}>
-          Turn what you already know into actual money — this week. No MBA required. No trust fund needed. 
-          Just you, your skills, and a plan that actually works.
+          Get cash this week doing gig work. Build a real business over 90 days. 
+          No MBA required. No trust fund needed. Just you, your skills, and a plan that actually works.
         </p>
       </div>
 
@@ -1001,10 +1056,12 @@ No preamble.`
           <div style={styles.phaseHeader}>
             <span style={{fontSize: '2rem'}}>💡</span>
             <h2 style={styles.phaseTitle}>
-              Here are <span style={{color: '#C9A84C'}}>8 ways you could start making money</span> based on what you told us.
+              Here's Your <span style={{color: '#C9A84C'}}>Dual-Track System</span>
             </h2>
             <p style={styles.phaseSubtitle}>
-              We ranked them Best Fit → Stretch Goal. Pick one. You can always pivot later.
+              <strong style={{color: '#60B8E8'}}>Bridge Ideas</strong> = Cash this week (pays bills while you build).<br/>
+              <strong style={{color: '#C9A84C'}}>Business Ideas</strong> = What you're actually building (scalable, exit potential).<br/>
+              Pick ONE business idea. Use bridge ideas as needed.
             </p>
           </div>
 
@@ -1020,8 +1077,28 @@ No preamble.`
                   >
                     <div style={styles.ideaHeader}>
                       <h3 style={styles.ideaTitle}>{idea.title}</h3>
-                      <div style={styles.fitBadge}>
-                        {idea.fitScore}% fit
+                      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                        <div style={{
+                          padding: '4px 10px',
+                          background: idea.category === 'bridge' ? 'rgba(96,184,232,0.2)' : 
+                                     idea.category === 'wildcard' ? 'rgba(168,216,76,0.2)' : 
+                                     'rgba(201,168,76,0.2)',
+                          border: `1px solid ${idea.category === 'bridge' ? '#60B8E8' : 
+                                               idea.category === 'wildcard' ? '#A8D84C' : 
+                                               '#C9A84C'}`,
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          color: idea.category === 'bridge' ? '#60B8E8' : 
+                                 idea.category === 'wildcard' ? '#A8D84C' : 
+                                 '#C9A84C',
+                          textTransform: 'uppercase',
+                        }}>
+                          {idea.category || 'business'}
+                        </div>
+                        <div style={styles.fitBadge}>
+                          {idea.fitScore}% fit
+                        </div>
                       </div>
                     </div>
                     <p style={styles.ideaTagline}>{idea.tagline}</p>
@@ -1107,20 +1184,20 @@ No preamble.`
                 <span style={{fontSize: '2rem'}}>💡</span>
                 <h2 style={styles.phaseTitle}>
                   You've Seen What's Possible.<br/>
-                  <span style={{color: '#C9A84C'}}>Now Let's Make It Happen.</span>
+                  <span style={{color: '#C9A84C'}}>Now Let's Build It.</span>
                 </h2>
                 <p style={styles.phaseSubtitle}>
-                  You picked: <strong>{selectedIdea?.title}</strong>
+                  You picked: <strong>{selectedIdea?.title}</strong> {selectedIdea?.category && `(${selectedIdea.category.toUpperCase()})`}
                 </p>
               </div>
 
               <div style={styles.lockedOverlay}>
-                <div style={{fontSize: '3rem', marginBottom: '15px'}}>🔒</div>
+                <div style={{fontSize: '3rem', marginBottom: '15px'}}>🎯</div>
                 <h3 style={{fontSize: '1.3rem', marginBottom: '10px'}}>
-                  Ready for the How-To?
+                  Ready for Your Dual-Track 90-Day Plan?
                 </h3>
                 <p style={{fontSize: '1rem', marginBottom: '30px', color: 'rgba(255,255,255,0.7)'}}>
-                  Get the complete implementation guide: pricing strategy, marketing plan, 90-day action plan, and 90 days of accountability coaching.
+                  Get the complete roadmap: pricing strategy, dual-track implementation (gig income + business building), marketing plan, and 90 days of accountability coaching (3x/week check-ins).
                 </p>
               </div>
 
@@ -1205,6 +1282,7 @@ No preamble.`
 
           <div style={styles.tabs}>
             {[
+              { id: 'dualtrack', label: 'Dual-Track Plan', emoji: '🎯' },
               { id: 'pricing', label: 'Pricing', emoji: '💰' },
               { id: 'month1', label: 'Month 1', emoji: '🚀' },
               { id: 'month2', label: 'Month 2', emoji: '📈' },
@@ -1226,6 +1304,43 @@ No preamble.`
           </div>
 
           <div style={styles.tabContent}>
+            {activeTab === 'dualtrack' && plan.dualTrack && (
+              <div>
+                <h3 style={styles.sectionTitle}>Your 90-Day Dual-Track System</h3>
+                <p style={styles.sectionText}>{plan.dualTrack.crossover}</p>
+                
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px'}}>
+                  <div style={{
+                    padding: '20px',
+                    background: 'rgba(96,184,232,0.1)',
+                    border: '1px solid rgba(96,184,232,0.3)',
+                    borderRadius: '12px'
+                  }}>
+                    <h4 style={{fontSize: '1.1rem', color: '#60B8E8', marginBottom: '10px'}}>
+                      Track A: {plan.dualTrack.trackA.name}
+                    </h4>
+                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackA.weeks1_4}</p>
+                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackA.weeks5_8}</p>
+                    <p style={{fontSize: '0.9rem'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackA.weeks9_12}</p>
+                  </div>
+
+                  <div style={{
+                    padding: '20px',
+                    background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: '12px'
+                  }}>
+                    <h4 style={{fontSize: '1.1rem', color: '#C9A84C', marginBottom: '10px'}}>
+                      Track B: {plan.dualTrack.trackB.name}
+                    </h4>
+                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackB.weeks1_4}</p>
+                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackB.weeks5_8}</p>
+                    <p style={{fontSize: '0.9rem'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackB.weeks9_12}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {activeTab === 'pricing' && (
               <div>
                 <h3 style={styles.sectionTitle}>Your Pricing Model: {plan.pricing.model}</h3>
