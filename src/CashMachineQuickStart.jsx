@@ -2,10 +2,511 @@ import React, { useState, useEffect } from 'react';
 
 // ============================================================================
 // CASH MACHINE QUICKSTART - Complete Component
-// Fixed: Input focus bug + 11 skill boxes + A2P compliance footer
+// PROPERLY FIXED: Styles defined outside component, scroll-to-top on load
 // Real payment link: https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed
 // ============================================================================
 
+// ========== STYLES DEFINED OUTSIDE COMPONENT (FIXES INPUT BUG) ==========
+const styles = {
+  container: {
+    minHeight: '100vh',
+    background: '#0d1117',
+    color: '#ffffff',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    padding: '20px',
+  },
+  header: {
+    maxWidth: '900px',
+    margin: '0 auto 30px',
+    textAlign: 'center',
+    padding: '20px',
+  },
+  brandLine: {
+    fontSize: '0.85rem',
+    fontFamily: '"IBM Plex Mono", monospace',
+    color: '#C9A84C',
+    textTransform: 'uppercase',
+    letterSpacing: '2px',
+    marginBottom: '15px',
+  },
+  hero: {
+    fontSize: '2.5rem',
+    fontWeight: '800',
+    lineHeight: '1.2',
+    marginBottom: '15px',
+  },
+  tagline: {
+    fontSize: '1.1rem',
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: '1.6',
+  },
+  testToggle: {
+    textAlign: 'center',
+    marginBottom: '20px',
+  },
+  testLabel: {
+    fontSize: '0.9rem',
+    color: 'rgba(255,255,255,0.6)',
+    cursor: 'pointer',
+  },
+  progressBar: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '40px',
+    maxWidth: '700px',
+    margin: '30px auto',
+    padding: '0 20px',
+  },
+  progressStep: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '8px',
+    opacity: 0.4,
+  },
+  progressStepActive: {
+    opacity: 1,
+  },
+  progressStepCurrent: {
+    opacity: 1,
+  },
+  progressCircle: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    background: 'rgba(255,255,255,0.1)',
+    border: '2px solid rgba(255,255,255,0.3)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: '700',
+    fontSize: '1.1rem',
+  },
+  progressLabel: {
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  phase: {
+    maxWidth: '900px',
+    margin: '0 auto',
+    background: 'rgba(255,255,255,0.025)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '16px',
+    padding: '40px',
+  },
+  phaseHeader: {
+    textAlign: 'center',
+    marginBottom: '40px',
+  },
+  phaseTitle: {
+    fontSize: '1.8rem',
+    fontWeight: '700',
+    lineHeight: '1.3',
+    marginBottom: '10px',
+  },
+  phaseSubtitle: {
+    fontSize: '1rem',
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: '1.6',
+  },
+  formGroup: {
+    marginBottom: '30px',
+  },
+  label: {
+    display: 'block',
+    fontSize: '0.95rem',
+    fontWeight: '600',
+    marginBottom: '10px',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  input: {
+    width: '100%',
+    padding: '12px 16px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '1rem',
+    outline: 'none',
+    transition: 'border 0.2s',
+    boxSizing: 'border-box',
+  },
+  chipGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '12px',
+  },
+  chipRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '12px',
+  },
+  chip: {
+    padding: '10px 16px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    outline: 'none',
+  },
+  chipSelected: {
+    background: 'rgba(201,168,76,0.2)',
+    border: '1px solid #C9A84C',
+    color: '#C9A84C',
+  },
+  button: {
+    width: '100%',
+    padding: '16px',
+    background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+    color: '#0d1117',
+    fontSize: '1.1rem',
+    fontWeight: '700',
+    border: 'none',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
+  buttonSecondary: {
+    padding: '12px 24px',
+    background: 'rgba(255,255,255,0.1)',
+    color: '#ffffff',
+    fontSize: '1rem',
+    fontWeight: '600',
+    border: '1px solid rgba(255,255,255,0.2)',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  buttonRow: {
+    display: 'flex',
+    gap: '15px',
+    marginTop: '30px',
+  },
+  error: {
+    padding: '15px',
+    background: 'rgba(240,98,146,0.1)',
+    border: '1px solid rgba(240,98,146,0.3)',
+    borderRadius: '8px',
+    color: '#F06292',
+    fontSize: '0.95rem',
+    marginBottom: '20px',
+  },
+  paymentGate: {
+    maxWidth: '600px',
+    margin: '30px auto',
+    padding: '30px',
+  },
+  paymentHeader: {
+    textAlign: 'center',
+    marginBottom: '30px',
+  },
+  paymentTitle: {
+    fontSize: '1.8rem',
+    fontWeight: '700',
+    color: '#ffffff',
+    marginBottom: '10px',
+  },
+  paymentSubtitle: {
+    fontSize: '1rem',
+    color: 'rgba(255,255,255,0.7)',
+  },
+  pricingCard: {
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '20px',
+    marginBottom: '20px',
+  },
+  priceRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 0',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+  },
+  priceTotal: {
+    borderBottom: 'none',
+    marginTop: '10px',
+    paddingTop: '15px',
+    borderTop: '2px solid #C9A84C',
+  },
+  priceAmount: {
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  includesBox: {
+    background: 'rgba(201,168,76,0.1)',
+    border: '1px solid rgba(201,168,76,0.3)',
+    borderRadius: '12px',
+    padding: '20px',
+    marginBottom: '20px',
+  },
+  accountabilityBox: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '20px',
+    marginBottom: '30px',
+  },
+  purchaseButton: {
+    display: 'block',
+    width: '100%',
+    padding: '18px',
+    background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+    color: '#0d1117',
+    fontSize: '1.2rem',
+    fontWeight: '700',
+    textAlign: 'center',
+    textDecoration: 'none',
+    borderRadius: '12px',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    marginBottom: '20px',
+  },
+  consentNotice: {
+    textAlign: 'center',
+    marginTop: '20px',
+  },
+  lockedOverlay: {
+    textAlign: 'center',
+    padding: '40px',
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    marginBottom: '30px',
+  },
+  ideasGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+    gap: '20px',
+    marginBottom: '30px',
+  },
+  ideaCard: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '2px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '20px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  ideaCardSelected: {
+    border: '2px solid #C9A84C',
+    background: 'rgba(201,168,76,0.1)',
+  },
+  ideaHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'start',
+    marginBottom: '10px',
+  },
+  ideaTitle: {
+    fontSize: '1.2rem',
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  fitBadge: {
+    padding: '4px 10px',
+    background: 'rgba(62,207,171,0.2)',
+    border: '1px solid #3ECFAB',
+    borderRadius: '6px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    color: '#3ECFAB',
+  },
+  ideaTagline: {
+    fontSize: '0.95rem',
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: '15px',
+    lineHeight: '1.5',
+  },
+  ideaEarnings: {
+    display: 'flex',
+    gap: '20px',
+    marginBottom: '15px',
+  },
+  earningLabel: {
+    fontSize: '0.8rem',
+    color: 'rgba(255,255,255,0.5)',
+    marginBottom: '3px',
+  },
+  earningAmount: {
+    fontSize: '1.1rem',
+    fontWeight: '700',
+    color: '#C9A84C',
+  },
+  quickStart: {
+    fontSize: '0.9rem',
+    padding: '10px',
+    background: 'rgba(255,255,255,0.05)',
+    borderRadius: '6px',
+    marginBottom: '15px',
+  },
+  proscons: {
+    fontSize: '0.9rem',
+    lineHeight: '1.5',
+  },
+  pricingGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '20px',
+    marginBottom: '30px',
+  },
+  pricingCard2: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '2px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '20px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  pricingCardSelected: {
+    border: '2px solid #C9A84C',
+    background: 'rgba(201,168,76,0.1)',
+  },
+  pricingName: {
+    fontSize: '1.2rem',
+    fontWeight: '700',
+    color: '#C9A84C',
+    marginBottom: '10px',
+  },
+  pricingPrice: {
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    color: '#ffffff',
+    marginBottom: '5px',
+  },
+  pricingMonthly: {
+    fontSize: '0.9rem',
+    color: 'rgba(255,255,255,0.6)',
+    marginBottom: '15px',
+  },
+  pricingRationale: {
+    fontSize: '0.95rem',
+    lineHeight: '1.5',
+    marginBottom: '15px',
+  },
+  pricingProscons: {
+    fontSize: '0.9rem',
+    lineHeight: '1.5',
+  },
+  tabs: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginBottom: '30px',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    paddingBottom: '10px',
+  },
+  tab: {
+    padding: '10px 16px',
+    background: 'transparent',
+    border: 'none',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: '0.95rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    borderBottom: '2px solid transparent',
+  },
+  tabActive: {
+    color: '#C9A84C',
+    borderBottom: '2px solid #C9A84C',
+  },
+  tabContent: {
+    padding: '20px',
+    background: 'rgba(255,255,255,0.03)',
+    borderRadius: '12px',
+    marginBottom: '30px',
+  },
+  sectionTitle: {
+    fontSize: '1.3rem',
+    fontWeight: '700',
+    color: '#C9A84C',
+    marginBottom: '15px',
+  },
+  sectionText: {
+    fontSize: '1rem',
+    lineHeight: '1.6',
+    marginBottom: '15px',
+  },
+  weekBlock: {
+    padding: '15px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    marginBottom: '12px',
+    fontSize: '0.95rem',
+    lineHeight: '1.6',
+  },
+  milestoneBlock: {
+    display: 'flex',
+    gap: '20px',
+    padding: '15px',
+    background: 'rgba(201,168,76,0.1)',
+    border: '1px solid rgba(201,168,76,0.3)',
+    borderRadius: '8px',
+    marginBottom: '12px',
+  },
+  milestoneDay: {
+    fontSize: '1.1rem',
+    fontWeight: '700',
+    color: '#C9A84C',
+    minWidth: '70px',
+  },
+  milestoneGoal: {
+    fontSize: '1rem',
+    lineHeight: '1.6',
+  },
+  exportSection: {
+    textAlign: 'center',
+    marginTop: '30px',
+    marginBottom: '30px',
+  },
+  accountabilityFooter: {
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '12px',
+    padding: '25px',
+    marginBottom: '30px',
+  },
+  footer: {
+    maxWidth: '900px',
+    margin: '40px auto 0',
+    padding: '30px',
+    borderTop: '1px solid rgba(255,255,255,0.1)',
+    textAlign: 'center',
+    fontSize: '0.9rem',
+    color: 'rgba(255,255,255,0.6)',
+  },
+};
+
+// ========== SKILL CATEGORIES (11 total) ==========
+const skillCategories = [
+  { id: 'creative', label: 'Creative & Arts', emoji: '🎨', desc: 'Design, writing, music, photography' },
+  { id: 'tech', label: 'Tech & Digital', emoji: '💻', desc: 'Coding, social media, software, AI' },
+  { id: 'trades', label: 'Trades & Hands-On', emoji: '🔧', desc: 'Building, fixing, landscaping, auto' },
+  { id: 'teaching', label: 'Teaching & Coaching', emoji: '📚', desc: 'Tutoring, training, mentoring, consulting' },
+  { id: 'sales', label: 'Sales & Marketing', emoji: '📈', desc: 'Selling, negotiating, networking, ads' },
+  { id: 'care', label: 'Care & Service', emoji: '❤️', desc: 'Childcare, eldercare, pet care, cleaning' },
+  { id: 'finance', label: 'Finance & Numbers', emoji: '💰', desc: 'Bookkeeping, taxes, investing, analysis' },
+  { id: 'health', label: 'Health & Wellness', emoji: '🏃', desc: 'Fitness, nutrition, therapy, beauty' },
+  { id: 'operations', label: 'Operations & Logistics', emoji: '📦', desc: 'Driving, organizing, planning, admin' },
+  { id: 'food', label: 'Food & Hospitality', emoji: '🍳', desc: 'Cooking, catering, bartending, events' },
+  { id: 'none', label: 'None of these', emoji: '🤷', desc: 'I have something else' },
+];
+
+// ========== MAIN COMPONENT ==========
 const CashMachineQuickStart = () => {
   // ========== STATE ==========
   const [testMode, setTestMode] = useState(false);
@@ -33,6 +534,11 @@ const CashMachineQuickStart = () => {
   // Phase 4: 90-Day Plan
   const [plan, setPlan] = useState(null);
   const [activeTab, setActiveTab] = useState('pricing');
+
+  // ========== SCROLL TO TOP ON MOUNT ==========
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // ========== LOCALSTORAGE PERSISTENCE ==========
   useEffect(() => {
@@ -69,21 +575,6 @@ const CashMachineQuickStart = () => {
   }, [phase, hasPaid, name, background, selectedSkills, specificIdea, 
       timeAvailable, incomeGoal, ideas, selectedIdea, pricingOptions,
       selectedPricing, plan]);
-
-  // ========== SKILL CATEGORIES (11 total) ==========
-  const skillCategories = [
-    { id: 'creative', label: 'Creative & Arts', emoji: '🎨', desc: 'Design, writing, music, photography' },
-    { id: 'tech', label: 'Tech & Digital', emoji: '💻', desc: 'Coding, social media, software, AI' },
-    { id: 'trades', label: 'Trades & Hands-On', emoji: '🔧', desc: 'Building, fixing, landscaping, auto' },
-    { id: 'teaching', label: 'Teaching & Coaching', emoji: '📚', desc: 'Tutoring, training, mentoring, consulting' },
-    { id: 'sales', label: 'Sales & Marketing', emoji: '📈', desc: 'Selling, negotiating, networking, ads' },
-    { id: 'care', label: 'Care & Service', emoji: '❤️', desc: 'Childcare, eldercare, pet care, cleaning' },
-    { id: 'finance', label: 'Finance & Numbers', emoji: '💰', desc: 'Bookkeeping, taxes, investing, analysis' },
-    { id: 'health', label: 'Health & Wellness', emoji: '🏃', desc: 'Fitness, nutrition, therapy, beauty' },
-    { id: 'operations', label: 'Operations & Logistics', emoji: '📦', desc: 'Driving, organizing, planning, admin' },
-    { id: 'food', label: 'Food & Hospitality', emoji: '🍳', desc: 'Cooking, catering, bartending, events' },
-    { id: 'none', label: 'None of these', emoji: '🤷', desc: 'I have something else' },
-  ];
 
   // ========== AI CALLS ==========
   const generateIdeas = async () => {
@@ -250,8 +741,8 @@ No preamble.`
   // ========== COMPONENTS ==========
 
   const TestModeToggle = () => (
-    <div style={st.testToggle}>
-      <label style={st.testLabel}>
+    <div style={styles.testToggle}>
+      <label style={styles.testLabel}>
         <input
           type="checkbox"
           checked={testMode}
@@ -266,15 +757,15 @@ No preamble.`
   );
 
   const ProgressSteps = () => (
-    <div style={st.progressBar}>
+    <div style={styles.progressBar}>
       {[1, 2, 3, 4].map((step) => (
         <div key={step} style={{
-          ...st.progressStep,
-          ...(phase >= step ? st.progressStepActive : {}),
-          ...(phase === step ? st.progressStepCurrent : {})
+          ...styles.progressStep,
+          ...(phase >= step ? styles.progressStepActive : {}),
+          ...(phase === step ? styles.progressStepCurrent : {})
         }}>
-          <div style={st.progressCircle}>{step}</div>
-          <span style={st.progressLabel}>
+          <div style={styles.progressCircle}>{step}</div>
+          <span style={styles.progressLabel}>
             {step === 1 && 'About You'}
             {step === 2 && 'Your Ideas'}
             {step === 3 && 'Price It'}
@@ -289,8 +780,8 @@ No preamble.`
     <button
       onClick={onClick}
       style={{
-        ...st.chip,
-        ...(selected ? st.chipSelected : {})
+        ...styles.chip,
+        ...(selected ? styles.chipSelected : {})
       }}
     >
       {label}
@@ -298,27 +789,27 @@ No preamble.`
   );
 
   const PaymentGate = () => (
-    <div style={st.paymentGate}>
-      <div style={st.paymentHeader}>
+    <div style={styles.paymentGate}>
+      <div style={styles.paymentHeader}>
         <span style={{fontSize: '2.5rem'}}>💳</span>
-        <h2 style={st.paymentTitle}>Ready to Start Your Cash Machine?</h2>
-        <p style={st.paymentSubtitle}>
+        <h2 style={styles.paymentTitle}>Ready to Start Your Cash Machine?</h2>
+        <p style={styles.paymentSubtitle}>
           90 days of accountability, AI-powered ideas, and a personalized action plan
         </p>
       </div>
 
-      <div style={st.pricingCard}>
-        <div style={st.priceRow}>
+      <div style={styles.pricingCard}>
+        <div style={styles.priceRow}>
           <span>Program Access (90 Days)</span>
-          <span style={st.priceAmount}>$67.00</span>
+          <span style={styles.priceAmount}>$67.00</span>
         </div>
-        <div style={st.priceRow}>
+        <div style={styles.priceRow}>
           <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>
             Processing Fee (Stripe)
           </span>
           <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>$2.97</span>
         </div>
-        <div style={{...st.priceRow, ...st.priceTotal}}>
+        <div style={{...styles.priceRow, ...styles.priceTotal}}>
           <span style={{fontSize: '1.2rem', fontWeight: '700'}}>Total</span>
           <span style={{fontSize: '1.5rem', fontWeight: '700', color: '#C9A84C'}}>$69.97</span>
         </div>
@@ -327,7 +818,7 @@ No preamble.`
         </p>
       </div>
 
-      <div style={st.includesBox}>
+      <div style={styles.includesBox}>
         <h3 style={{fontSize: '1.1rem', marginBottom: '15px', color: '#C9A84C'}}>
           ✅ What's Included:
         </h3>
@@ -353,7 +844,7 @@ No preamble.`
         </ul>
       </div>
 
-      <div style={st.accountabilityBox}>
+      <div style={styles.accountabilityBox}>
         <h3 style={{fontSize: '1.1rem', marginBottom: '10px'}}>
           🤝 Why Accountability Matters
         </h3>
@@ -371,12 +862,12 @@ No preamble.`
         href="https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed"
         target="_blank"
         rel="noopener noreferrer"
-        style={st.purchaseButton}
+        style={styles.purchaseButton}
       >
         Purchase Now - $69.97
       </a>
 
-      <div style={st.consentNotice}>
+      <div style={styles.consentNotice}>
         <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5'}}>
           By purchasing, you consent to receive SMS accountability check-ins (3x per week for 90 days) 
           and email communications. Reply STOP to opt out anytime. Message & data rates may apply.
@@ -396,40 +887,40 @@ No preamble.`
 
   // ========== PHASE 1: ABOUT YOU ==========
   const Phase1 = () => (
-    <div style={st.phase}>
-      <div style={st.phaseHeader}>
+    <div style={styles.phase}>
+      <div style={styles.phaseHeader}>
         <span style={{fontSize: '2rem'}}>👋</span>
-        <h2 style={st.phaseTitle}>
+        <h2 style={styles.phaseTitle}>
           Let's find the money hiding in what you <span style={{color: '#C9A84C'}}>already know how to do.</span>
         </h2>
-        <p style={st.phaseSubtitle}>
+        <p style={styles.phaseSubtitle}>
           You don't need a fancy degree or a trust fund. You need to get paid for stuff you can do right now.
         </p>
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>First name</label>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>First name</label>
         <input
-          style={st.input}
+          style={styles.input}
           placeholder="e.g., Alex"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>What do you do, and what are you actually good at?</label>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>What do you do, and what are you actually good at?</label>
         <textarea
-          style={{...st.input, minHeight: '100px'}}
+          style={{...styles.input, minHeight: '100px'}}
           placeholder="Be real. e.g. I'm a sophomore who runs my school's IG and people pay me for social media help. Or: I fix computers and everyone thinks I'm a wizard. Or: Honestly? No clue. Just show me options."
           value={background}
           onChange={(e) => setBackground(e.target.value)}
         />
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>Pick the skills that feel like you (check all that apply)</label>
-        <div style={st.chipGrid}>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>Pick the skills that feel like you (check all that apply)</label>
+        <div style={styles.chipGrid}>
           {skillCategories.map((cat) => (
             <Chip
               key={cat.id}
@@ -447,21 +938,21 @@ No preamble.`
         </div>
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>
           Got a specific money idea already? Spill it. (optional but helps us help you)
         </label>
         <textarea
-          style={{...st.input, minHeight: '80px'}}
+          style={{...styles.input, minHeight: '80px'}}
           placeholder="e.g. I want to tutor high schoolers in calculus. Or: I flip vintage sneakers on Depop. Or: Honestly? No clue. Just show me what's possible."
           value={specificIdea}
           onChange={(e) => setSpecificIdea(e.target.value)}
         />
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>Time you can commit per week</label>
-        <div style={st.chipRow}>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>Time you can commit per week</label>
+        <div style={styles.chipRow}>
           {['Under 5 hrs/wk', '5-10 hrs/wk', '10-20 hrs/wk', '20+ hrs/wk'].map((opt) => (
             <Chip
               key={opt}
@@ -473,9 +964,9 @@ No preamble.`
         </div>
       </div>
 
-      <div style={st.formGroup}>
-        <label style={st.label}>Monthly income goal</label>
-        <div style={st.chipRow}>
+      <div style={styles.formGroup}>
+        <label style={styles.label}>Monthly income goal</label>
+        <div style={styles.chipRow}>
           {['$500/mo', '$1,500/mo', '$5,000/mo', '$10,000+/mo'].map((opt) => (
             <Chip
               key={opt}
@@ -487,10 +978,10 @@ No preamble.`
         </div>
       </div>
 
-      {error && <div style={st.error}>{error}</div>}
+      {error && <div style={styles.error}>{error}</div>}
 
       <button
-        style={{...st.button, ...(loading ? st.buttonDisabled : {})}}
+        style={{...styles.button, ...(loading ? styles.buttonDisabled : {})}}
         onClick={generateIdeas}
         disabled={loading || !name || !background || selectedSkills.length === 0 || !timeAvailable || !incomeGoal}
       >
@@ -501,13 +992,13 @@ No preamble.`
 
   // ========== PHASE 2: YOUR IDEAS ==========
   const Phase2 = () => (
-    <div style={st.phase}>
-      <div style={st.phaseHeader}>
+    <div style={styles.phase}>
+      <div style={styles.phaseHeader}>
         <span style={{fontSize: '2rem'}}>💡</span>
-        <h2 style={st.phaseTitle}>
+        <h2 style={styles.phaseTitle}>
           Here are <span style={{color: '#C9A84C'}}>8 ways you could start making money</span> based on what you told us.
         </h2>
-        <p style={st.phaseSubtitle}>
+        <p style={styles.phaseSubtitle}>
           We ranked them Best Fit → Stretch Goal. Pick one. You can always pivot later.
         </p>
       </div>
@@ -515,7 +1006,7 @@ No preamble.`
       {/* Payment Gate Check */}
       {!hasPaid && !testMode && (
         <>
-          <div style={st.lockedOverlay}>
+          <div style={styles.lockedOverlay}>
             <div style={{fontSize: '3rem', marginBottom: '15px'}}>🔒</div>
             <h3 style={{fontSize: '1.3rem', marginBottom: '10px'}}>
               Your Ideas Are Ready
@@ -530,37 +1021,37 @@ No preamble.`
 
       {(hasPaid || testMode) && (
         <>
-          <div style={st.ideasGrid}>
+          <div style={styles.ideasGrid}>
             {ideas.map((idea, idx) => (
               <div
                 key={idx}
                 style={{
-                  ...st.ideaCard,
-                  ...(selectedIdea?.title === idea.title ? st.ideaCardSelected : {})
+                  ...styles.ideaCard,
+                  ...(selectedIdea?.title === idea.title ? styles.ideaCardSelected : {})
                 }}
                 onClick={() => setSelectedIdea(idea)}
               >
-                <div style={st.ideaHeader}>
-                  <h3 style={st.ideaTitle}>{idea.title}</h3>
-                  <div style={st.fitBadge}>
+                <div style={styles.ideaHeader}>
+                  <h3 style={styles.ideaTitle}>{idea.title}</h3>
+                  <div style={styles.fitBadge}>
                     {idea.fitScore}% fit
                   </div>
                 </div>
-                <p style={st.ideaTagline}>{idea.tagline}</p>
-                <div style={st.ideaEarnings}>
+                <p style={styles.ideaTagline}>{idea.tagline}</p>
+                <div style={styles.ideaEarnings}>
                   <div>
-                    <div style={st.earningLabel}>Month 1</div>
-                    <div style={st.earningAmount}>{idea.monthOne}</div>
+                    <div style={styles.earningLabel}>Month 1</div>
+                    <div style={styles.earningAmount}>{idea.monthOne}</div>
                   </div>
                   <div>
-                    <div style={st.earningLabel}>18 Months</div>
-                    <div style={st.earningAmount}>{idea.yearTwo}</div>
+                    <div style={styles.earningLabel}>18 Months</div>
+                    <div style={styles.earningAmount}>{idea.yearTwo}</div>
                   </div>
                 </div>
-                <div style={st.quickStart}>
+                <div style={styles.quickStart}>
                   <strong>Quick Start:</strong> {idea.quickStart}
                 </div>
-                <div style={st.proscons}>
+                <div style={styles.proscons}>
                   <div>
                     <strong style={{color: '#3ECFAB'}}>Pros:</strong>
                     <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
@@ -578,14 +1069,14 @@ No preamble.`
             ))}
           </div>
 
-          {error && <div style={st.error}>{error}</div>}
+          {error && <div style={styles.error}>{error}</div>}
 
-          <div style={st.buttonRow}>
-            <button style={st.buttonSecondary} onClick={() => setPhase(1)}>
+          <div style={styles.buttonRow}>
+            <button style={styles.buttonSecondary} onClick={() => setPhase(1)}>
               ← Back
             </button>
             <button
-              style={{...st.button, ...(loading || !selectedIdea ? st.buttonDisabled : {})}}
+              style={{...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {})}}
               onClick={generatePricing}
               disabled={loading || !selectedIdea}
             >
@@ -599,32 +1090,32 @@ No preamble.`
 
   // ========== PHASE 3: PRICING STRATEGY ==========
   const Phase3 = () => (
-    <div style={st.phase}>
-      <div style={st.phaseHeader}>
+    <div style={styles.phase}>
+      <div style={styles.phaseHeader}>
         <span style={{fontSize: '2rem'}}>💰</span>
-        <h2 style={st.phaseTitle}>
+        <h2 style={styles.phaseTitle}>
           Let's figure out <span style={{color: '#C9A84C'}}>what to charge</span> for "{selectedIdea?.title}"
         </h2>
-        <p style={st.phaseSubtitle}>
+        <p style={styles.phaseSubtitle}>
           Pricing isn't random. Here are 5 strategies that actually work.
         </p>
       </div>
 
-      <div style={st.pricingGrid}>
+      <div style={styles.pricingGrid}>
         {pricingOptions.map((option, idx) => (
           <div
             key={idx}
             style={{
-              ...st.pricingCard2,
-              ...(selectedPricing?.name === option.name ? st.pricingCardSelected : {})
+              ...styles.pricingCard2,
+              ...(selectedPricing?.name === option.name ? styles.pricingCardSelected : {})
             }}
             onClick={() => setSelectedPricing(option)}
           >
-            <h3 style={st.pricingName}>{option.name}</h3>
-            <div style={st.pricingPrice}>{option.price}</div>
-            <div style={st.pricingMonthly}>{option.monthly}</div>
-            <p style={st.pricingRationale}>{option.rationale}</p>
-            <div style={st.pricingProscons}>
+            <h3 style={styles.pricingName}>{option.name}</h3>
+            <div style={styles.pricingPrice}>{option.price}</div>
+            <div style={styles.pricingMonthly}>{option.monthly}</div>
+            <p style={styles.pricingRationale}>{option.rationale}</p>
+            <div style={styles.pricingProscons}>
               <div>
                 <strong style={{color: '#3ECFAB'}}>✓</strong> {option.pros.join(', ')}
               </div>
@@ -636,14 +1127,14 @@ No preamble.`
         ))}
       </div>
 
-      {error && <div style={st.error}>{error}</div>}
+      {error && <div style={styles.error}>{error}</div>}
 
-      <div style={st.buttonRow}>
-        <button style={st.buttonSecondary} onClick={() => setPhase(2)}>
+      <div style={styles.buttonRow}>
+        <button style={styles.buttonSecondary} onClick={() => setPhase(2)}>
           ← Back
         </button>
         <button
-          style={{...st.button, ...(loading || !selectedPricing ? st.buttonDisabled : {})}}
+          style={{...styles.button, ...(loading || !selectedPricing ? styles.buttonDisabled : {})}}
           onClick={generate90DayPlan}
           disabled={loading || !selectedPricing}
         >
@@ -667,24 +1158,24 @@ No preamble.`
     ];
 
     return (
-      <div style={st.phase}>
-        <div style={st.phaseHeader}>
+      <div style={styles.phase}>
+        <div style={styles.phaseHeader}>
           <span style={{fontSize: '2rem'}}>🎉</span>
-          <h2 style={st.phaseTitle}>
+          <h2 style={styles.phaseTitle}>
             Your <span style={{color: '#C9A84C'}}>90-Day Cash Machine Plan</span> is Ready
           </h2>
-          <p style={st.phaseSubtitle}>
+          <p style={styles.phaseSubtitle}>
             {name}, here's your roadmap. Follow this and you'll be making money in 30 days.
           </p>
         </div>
 
-        <div style={st.tabs}>
+        <div style={styles.tabs}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               style={{
-                ...st.tab,
-                ...(activeTab === tab.id ? st.tabActive : {})
+                ...styles.tab,
+                ...(activeTab === tab.id ? styles.tabActive : {})
               }}
               onClick={() => setActiveTab(tab.id)}
             >
@@ -693,81 +1184,81 @@ No preamble.`
           ))}
         </div>
 
-        <div style={st.tabContent}>
+        <div style={styles.tabContent}>
           {activeTab === 'pricing' && (
             <div>
-              <h3 style={st.sectionTitle}>Your Pricing Model: {plan.pricing.model}</h3>
-              <p style={st.sectionText}><strong>Rate:</strong> {plan.pricing.rate}</p>
-              <p style={st.sectionText}>{plan.pricing.breakdown}</p>
-              <p style={st.sectionText}><strong>When to Adjust:</strong> {plan.pricing.adjustments}</p>
+              <h3 style={styles.sectionTitle}>Your Pricing Model: {plan.pricing.model}</h3>
+              <p style={styles.sectionText}><strong>Rate:</strong> {plan.pricing.rate}</p>
+              <p style={styles.sectionText}>{plan.pricing.breakdown}</p>
+              <p style={styles.sectionText}><strong>When to Adjust:</strong> {plan.pricing.adjustments}</p>
             </div>
           )}
 
           {activeTab === 'month1' && (
             <div>
-              <h3 style={st.sectionTitle}>Month 1: {plan.month1.goal}</h3>
+              <h3 style={styles.sectionTitle}>Month 1: {plan.month1.goal}</h3>
               {plan.month1.weeks.map((week, idx) => (
-                <div key={idx} style={st.weekBlock}>
+                <div key={idx} style={styles.weekBlock}>
                   <strong>Week {idx + 1}:</strong> {week}
                 </div>
               ))}
-              <p style={st.sectionText}><strong>Track:</strong> {plan.month1.metrics}</p>
+              <p style={styles.sectionText}><strong>Track:</strong> {plan.month1.metrics}</p>
             </div>
           )}
 
           {activeTab === 'month2' && (
             <div>
-              <h3 style={st.sectionTitle}>Month 2: {plan.month2.goal}</h3>
+              <h3 style={styles.sectionTitle}>Month 2: {plan.month2.goal}</h3>
               {plan.month2.weeks.map((week, idx) => (
-                <div key={idx} style={st.weekBlock}>
+                <div key={idx} style={styles.weekBlock}>
                   <strong>Weeks {5 + idx * 4}-{8 + idx * 4}:</strong> {week}
                 </div>
               ))}
-              <p style={st.sectionText}><strong>Track:</strong> {plan.month2.metrics}</p>
+              <p style={styles.sectionText}><strong>Track:</strong> {plan.month2.metrics}</p>
             </div>
           )}
 
           {activeTab === 'month3' && (
             <div>
-              <h3 style={st.sectionTitle}>Month 3: {plan.month3.goal}</h3>
+              <h3 style={styles.sectionTitle}>Month 3: {plan.month3.goal}</h3>
               {plan.month3.weeks.map((week, idx) => (
-                <div key={idx} style={st.weekBlock}>
+                <div key={idx} style={styles.weekBlock}>
                   <strong>Weeks {9 + idx * 4}-{12}:</strong> {week}
                 </div>
               ))}
-              <p style={st.sectionText}><strong>Track:</strong> {plan.month3.metrics}</p>
+              <p style={styles.sectionText}><strong>Track:</strong> {plan.month3.metrics}</p>
             </div>
           )}
 
           {activeTab === 'marketing' && (
             <div>
-              <h3 style={st.sectionTitle}>Marketing Strategy</h3>
-              <p style={st.sectionText}><strong>Channels:</strong> {plan.marketing.channels.join(', ')}</p>
-              <p style={st.sectionText}><strong>Content:</strong> {plan.marketing.content}</p>
-              <p style={st.sectionText}><strong>Budget:</strong> {plan.marketing.budget}</p>
+              <h3 style={styles.sectionTitle}>Marketing Strategy</h3>
+              <p style={styles.sectionText}><strong>Channels:</strong> {plan.marketing.channels.join(', ')}</p>
+              <p style={styles.sectionText}><strong>Content:</strong> {plan.marketing.content}</p>
+              <p style={styles.sectionText}><strong>Budget:</strong> {plan.marketing.budget}</p>
             </div>
           )}
 
           {activeTab === 'milestones' && (
             <div>
-              <h3 style={st.sectionTitle}>Your 90-Day Milestones</h3>
+              <h3 style={styles.sectionTitle}>Your 90-Day Milestones</h3>
               {plan.milestones.map((milestone, idx) => (
-                <div key={idx} style={st.milestoneBlock}>
-                  <div style={st.milestoneDay}>Day {milestone.day}</div>
-                  <div style={st.milestoneGoal}>{milestone.goal}</div>
+                <div key={idx} style={styles.milestoneBlock}>
+                  <div style={styles.milestoneDay}>Day {milestone.day}</div>
+                  <div style={styles.milestoneGoal}>{milestone.goal}</div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div style={st.exportSection}>
-          <button style={st.buttonSecondary} onClick={() => window.print()}>
+        <div style={styles.exportSection}>
+          <button style={styles.buttonSecondary} onClick={() => window.print()}>
             📥 Download PDF
           </button>
         </div>
 
-        <div style={st.accountabilityFooter}>
+        <div style={styles.accountabilityFooter}>
           <h3 style={{fontSize: '1.2rem', marginBottom: '15px'}}>
             🎯 Your Accountability Coach
           </h3>
@@ -790,7 +1281,7 @@ No preamble.`
           </p>
         </div>
 
-        <button style={st.buttonSecondary} onClick={() => {
+        <button style={styles.buttonSecondary} onClick={() => {
           if (window.confirm('Start over? This will clear your current plan.')) {
             localStorage.removeItem('cmqs_state');
             window.location.reload();
@@ -802,497 +1293,13 @@ No preamble.`
     );
   };
 
-  // ========== STYLES (DEFINED ONCE - FIXES INPUT BUG) ==========
-  const st = {
-    container: {
-      minHeight: '100vh',
-      background: '#0d1117',
-      color: '#ffffff',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      padding: '20px',
-    },
-    header: {
-      maxWidth: '900px',
-      margin: '0 auto 30px',
-      textAlign: 'center',
-      padding: '20px',
-    },
-    brandLine: {
-      fontSize: '0.85rem',
-      fontFamily: '"IBM Plex Mono", monospace',
-      color: '#C9A84C',
-      textTransform: 'uppercase',
-      letterSpacing: '2px',
-      marginBottom: '15px',
-    },
-    hero: {
-      fontSize: '2.5rem',
-      fontWeight: '800',
-      lineHeight: '1.2',
-      marginBottom: '15px',
-    },
-    tagline: {
-      fontSize: '1.1rem',
-      color: 'rgba(255,255,255,0.7)',
-      lineHeight: '1.6',
-    },
-    testToggle: {
-      textAlign: 'center',
-      marginBottom: '20px',
-    },
-    testLabel: {
-      fontSize: '0.9rem',
-      color: 'rgba(255,255,255,0.6)',
-      cursor: 'pointer',
-    },
-    progressBar: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      gap: '40px',
-      maxWidth: '700px',
-      margin: '30px auto',
-      padding: '0 20px',
-    },
-    progressStep: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '8px',
-      opacity: 0.4,
-    },
-    progressStepActive: {
-      opacity: 1,
-    },
-    progressStepCurrent: {
-      opacity: 1,
-    },
-    progressCircle: {
-      width: '40px',
-      height: '40px',
-      borderRadius: '50%',
-      background: 'rgba(255,255,255,0.1)',
-      border: '2px solid rgba(255,255,255,0.3)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontWeight: '700',
-      fontSize: '1.1rem',
-    },
-    progressLabel: {
-      fontSize: '0.85rem',
-      fontWeight: '600',
-      textAlign: 'center',
-    },
-    phase: {
-      maxWidth: '900px',
-      margin: '0 auto',
-      background: 'rgba(255,255,255,0.025)',
-      border: '1px solid rgba(255,255,255,0.07)',
-      borderRadius: '16px',
-      padding: '40px',
-    },
-    phaseHeader: {
-      textAlign: 'center',
-      marginBottom: '40px',
-    },
-    phaseTitle: {
-      fontSize: '1.8rem',
-      fontWeight: '700',
-      lineHeight: '1.3',
-      marginBottom: '10px',
-    },
-    phaseSubtitle: {
-      fontSize: '1rem',
-      color: 'rgba(255,255,255,0.7)',
-      lineHeight: '1.6',
-    },
-    formGroup: {
-      marginBottom: '30px',
-    },
-    label: {
-      display: 'block',
-      fontSize: '0.95rem',
-      fontWeight: '600',
-      marginBottom: '10px',
-      color: 'rgba(255,255,255,0.9)',
-    },
-    input: {
-      width: '100%',
-      padding: '12px 16px',
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '8px',
-      color: '#ffffff',
-      fontSize: '1rem',
-      outline: 'none',
-      transition: 'border 0.2s',
-    },
-    chipGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-      gap: '12px',
-    },
-    chipRow: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '12px',
-    },
-    chip: {
-      padding: '10px 16px',
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '8px',
-      color: '#ffffff',
-      fontSize: '0.9rem',
-      fontWeight: '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-      outline: 'none',
-    },
-    chipSelected: {
-      background: 'rgba(201,168,76,0.2)',
-      border: '1px solid #C9A84C',
-      color: '#C9A84C',
-    },
-    button: {
-      width: '100%',
-      padding: '16px',
-      background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
-      color: '#0d1117',
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      border: 'none',
-      borderRadius: '12px',
-      cursor: 'pointer',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-    },
-    buttonDisabled: {
-      opacity: 0.5,
-      cursor: 'not-allowed',
-    },
-    buttonSecondary: {
-      padding: '12px 24px',
-      background: 'rgba(255,255,255,0.1)',
-      color: '#ffffff',
-      fontSize: '1rem',
-      fontWeight: '600',
-      border: '1px solid rgba(255,255,255,0.2)',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-    },
-    buttonRow: {
-      display: 'flex',
-      gap: '15px',
-      marginTop: '30px',
-    },
-    error: {
-      padding: '15px',
-      background: 'rgba(240,98,146,0.1)',
-      border: '1px solid rgba(240,98,146,0.3)',
-      borderRadius: '8px',
-      color: '#F06292',
-      fontSize: '0.95rem',
-      marginBottom: '20px',
-    },
-    paymentGate: {
-      maxWidth: '600px',
-      margin: '30px auto',
-      padding: '30px',
-    },
-    paymentHeader: {
-      textAlign: 'center',
-      marginBottom: '30px',
-    },
-    paymentTitle: {
-      fontSize: '1.8rem',
-      fontWeight: '700',
-      color: '#ffffff',
-      marginBottom: '10px',
-    },
-    paymentSubtitle: {
-      fontSize: '1rem',
-      color: 'rgba(255,255,255,0.7)',
-    },
-    pricingCard: {
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      padding: '20px',
-      marginBottom: '20px',
-    },
-    priceRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '10px 0',
-      borderBottom: '1px solid rgba(255,255,255,0.1)',
-    },
-    priceTotal: {
-      borderBottom: 'none',
-      marginTop: '10px',
-      paddingTop: '15px',
-      borderTop: '2px solid #C9A84C',
-    },
-    priceAmount: {
-      fontWeight: '600',
-      color: '#ffffff',
-    },
-    includesBox: {
-      background: 'rgba(201,168,76,0.1)',
-      border: '1px solid rgba(201,168,76,0.3)',
-      borderRadius: '12px',
-      padding: '20px',
-      marginBottom: '20px',
-    },
-    accountabilityBox: {
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      padding: '20px',
-      marginBottom: '30px',
-    },
-    purchaseButton: {
-      display: 'block',
-      width: '100%',
-      padding: '18px',
-      background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
-      color: '#0d1117',
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      textAlign: 'center',
-      textDecoration: 'none',
-      borderRadius: '12px',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      marginBottom: '20px',
-    },
-    consentNotice: {
-      textAlign: 'center',
-      marginTop: '20px',
-    },
-    lockedOverlay: {
-      textAlign: 'center',
-      padding: '40px',
-      background: 'rgba(255,255,255,0.02)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      marginBottom: '30px',
-    },
-    ideasGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-      gap: '20px',
-      marginBottom: '30px',
-    },
-    ideaCard: {
-      background: 'rgba(255,255,255,0.03)',
-      border: '2px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      padding: '20px',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-    },
-    ideaCardSelected: {
-      border: '2px solid #C9A84C',
-      background: 'rgba(201,168,76,0.1)',
-    },
-    ideaHeader: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'start',
-      marginBottom: '10px',
-    },
-    ideaTitle: {
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      color: '#ffffff',
-    },
-    fitBadge: {
-      padding: '4px 10px',
-      background: 'rgba(62,207,171,0.2)',
-      border: '1px solid #3ECFAB',
-      borderRadius: '6px',
-      fontSize: '0.85rem',
-      fontWeight: '600',
-      color: '#3ECFAB',
-    },
-    ideaTagline: {
-      fontSize: '0.95rem',
-      color: 'rgba(255,255,255,0.7)',
-      marginBottom: '15px',
-      lineHeight: '1.5',
-    },
-    ideaEarnings: {
-      display: 'flex',
-      gap: '20px',
-      marginBottom: '15px',
-    },
-    earningLabel: {
-      fontSize: '0.8rem',
-      color: 'rgba(255,255,255,0.5)',
-      marginBottom: '3px',
-    },
-    earningAmount: {
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      color: '#C9A84C',
-    },
-    quickStart: {
-      fontSize: '0.9rem',
-      padding: '10px',
-      background: 'rgba(255,255,255,0.05)',
-      borderRadius: '6px',
-      marginBottom: '15px',
-    },
-    proscons: {
-      fontSize: '0.9rem',
-      lineHeight: '1.5',
-    },
-    pricingGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '20px',
-      marginBottom: '30px',
-    },
-    pricingCard2: {
-      background: 'rgba(255,255,255,0.03)',
-      border: '2px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      padding: '20px',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-    },
-    pricingCardSelected: {
-      border: '2px solid #C9A84C',
-      background: 'rgba(201,168,76,0.1)',
-    },
-    pricingName: {
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      color: '#C9A84C',
-      marginBottom: '10px',
-    },
-    pricingPrice: {
-      fontSize: '1.5rem',
-      fontWeight: '700',
-      color: '#ffffff',
-      marginBottom: '5px',
-    },
-    pricingMonthly: {
-      fontSize: '0.9rem',
-      color: 'rgba(255,255,255,0.6)',
-      marginBottom: '15px',
-    },
-    pricingRationale: {
-      fontSize: '0.95rem',
-      lineHeight: '1.5',
-      marginBottom: '15px',
-    },
-    pricingProscons: {
-      fontSize: '0.9rem',
-      lineHeight: '1.5',
-    },
-    tabs: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '10px',
-      marginBottom: '30px',
-      borderBottom: '1px solid rgba(255,255,255,0.1)',
-      paddingBottom: '10px',
-    },
-    tab: {
-      padding: '10px 16px',
-      background: 'transparent',
-      border: 'none',
-      color: 'rgba(255,255,255,0.6)',
-      fontSize: '0.95rem',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-      borderBottom: '2px solid transparent',
-    },
-    tabActive: {
-      color: '#C9A84C',
-      borderBottom: '2px solid #C9A84C',
-    },
-    tabContent: {
-      padding: '20px',
-      background: 'rgba(255,255,255,0.03)',
-      borderRadius: '12px',
-      marginBottom: '30px',
-    },
-    sectionTitle: {
-      fontSize: '1.3rem',
-      fontWeight: '700',
-      color: '#C9A84C',
-      marginBottom: '15px',
-    },
-    sectionText: {
-      fontSize: '1rem',
-      lineHeight: '1.6',
-      marginBottom: '15px',
-    },
-    weekBlock: {
-      padding: '15px',
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '8px',
-      marginBottom: '12px',
-      fontSize: '0.95rem',
-      lineHeight: '1.6',
-    },
-    milestoneBlock: {
-      display: 'flex',
-      gap: '20px',
-      padding: '15px',
-      background: 'rgba(201,168,76,0.1)',
-      border: '1px solid rgba(201,168,76,0.3)',
-      borderRadius: '8px',
-      marginBottom: '12px',
-    },
-    milestoneDay: {
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      color: '#C9A84C',
-      minWidth: '70px',
-    },
-    milestoneGoal: {
-      fontSize: '1rem',
-      lineHeight: '1.6',
-    },
-    exportSection: {
-      textAlign: 'center',
-      marginTop: '30px',
-      marginBottom: '30px',
-    },
-    accountabilityFooter: {
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '12px',
-      padding: '25px',
-      marginBottom: '30px',
-    },
-    footer: {
-      maxWidth: '900px',
-      margin: '40px auto 0',
-      padding: '30px',
-      borderTop: '1px solid rgba(255,255,255,0.1)',
-      textAlign: 'center',
-      fontSize: '0.9rem',
-      color: 'rgba(255,255,255,0.6)',
-    },
-  };
-
   // ========== RENDER ==========
   return (
-    <div style={st.container}>
-      <div style={st.header}>
-        <div style={st.brandLine}>Loral Langemeier + Kelli Owens — Cash Machine QuickStart</div>
-        <h1 style={st.hero}>You're broke.<br/>We get it. Let's fix that.</h1>
-        <p style={st.tagline}>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <div style={styles.brandLine}>Loral Langemeier + Kelli Owens — Cash Machine QuickStart</div>
+        <h1 style={styles.hero}>You're broke.<br/>We get it. Let's fix that.</h1>
+        <p style={styles.tagline}>
           Turn what you already know into actual money — this week. No MBA required. No trust fund needed. 
           Just you, your skills, and a plan that actually works.
         </p>
@@ -1307,7 +1314,7 @@ No preamble.`
       {phase === 4 && <Phase4 />}
 
       {/* A2P Compliance Footer */}
-      <div style={st.footer}>
+      <div style={styles.footer}>
         <div style={{marginBottom: '15px'}}>
           <strong style={{color: '#C9A84C'}}>Cash Machine QuickStart</strong>
         </div>
