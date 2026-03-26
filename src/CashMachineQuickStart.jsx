@@ -689,27 +689,36 @@ const CashMachineQuickStart = () => {
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Generate 8 cash machine ideas for: ${name}
+            content: `Generate 8 FAST CASH ideas for someone who needs money NOW - not long-term business building.
 
+Person: ${name}
 Background: ${background}
 Skills: ${selectedSkills.join(', ')}
 ${specificIdea ? `Specific idea: ${specificIdea}` : ''}
 Time: ${timeAvailable}
 Goal: ${incomeGoal}
 
+CRITICAL REQUIREMENTS:
+- They can start making money TOMORROW or within 48 hours
+- NO network required, NO audience building, NO relationship marketing
+- Focus on: gig economy platforms, service work, cash jobs, local opportunities
+- Real examples: TaskRabbit, DoorDash, Rover, Fiverr quick gigs, local cleaning/handyman, Facebook Marketplace flips, babysitting, tutoring, event work
+- Month 1 earnings = realistic first WEEK earnings (they need cash NOW)
+- Ideas must work for someone starting from ZERO connections
+
 Return ONLY valid JSON array with 8 objects:
 [{
-  "title": "Idea name",
-  "tagline": "One sentence pitch",
-  "monthOne": "$X-$Y/mo realistic first month",
-  "yearTwo": "18-month scale potential",
-  "quickStart": "First 3 steps",
+  "title": "Idea name (specific, actionable)",
+  "tagline": "One sentence - what you do and how fast you get paid",
+  "monthOne": "$X-$Y realistic FIRST WEEK (not month)",
+  "yearTwo": "18-month potential if they scale",
+  "quickStart": "Step 1: Sign up/do this TODAY. Step 2: First job/gig. Step 3: Get paid.",
   "pros": ["benefit 1", "benefit 2", "benefit 3"],
   "cons": ["challenge 1", "challenge 2"],
   "fitScore": 85
 }]
 
-Rank by fitScore (best=95, stretch=75). Be realistic. No preamble.`
+Rank by fitScore (best=95, stretch=75). Prioritize SPEED TO CASH. Be realistic. No preamble.`
           }]
         })
       });
@@ -844,7 +853,7 @@ No preamble.`
     <div style={styles.container}>
       <div style={styles.header}>
         <div style={styles.brandLine}>Loral Langemeier + Kelli Owens — Cash Machine QuickStart</div>
-        <h1 style={styles.hero}>You're broke.<br/>We get it. Let's fix that.</h1>
+        <h1 style={styles.hero}>You're broke.<br/>We get it. Let's <span style={{color: '#C9A84C'}}>fix that.</span></h1>
         <p style={styles.tagline}>
           Turn what you already know into actual money — this week. No MBA required. No trust fund needed. 
           Just you, your skills, and a plan that actually works.
@@ -1018,7 +1027,7 @@ No preamble.`
                     <p style={styles.ideaTagline}>{idea.tagline}</p>
                     <div style={styles.ideaEarnings}>
                       <div>
-                        <div style={styles.earningLabel}>Month 1</div>
+                        <div style={styles.earningLabel}>First Week</div>
                         <div style={styles.earningAmount}>{idea.monthOne}</div>
                       </div>
                       <div>
