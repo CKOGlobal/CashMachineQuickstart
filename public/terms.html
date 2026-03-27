@@ -1,101 +1,169 @@
-export default function Terms() {
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#07090F',
-      padding: '40px 20px'
-    }}>
-      <div style={{
-        maxWidth: '800px',
-        margin: '0 auto',
-        background: '#0F1419',
-        border: '1px solid #1F2937',
-        borderRadius: '8px',
-        padding: '40px'
-      }}>
-        <h1 style={{ 
-          color: '#C9A84C', 
-          marginBottom: '30px',
-          fontSize: '32px',
-          fontFamily: 'Syne, sans-serif',
-          fontWeight: 800
-        }}>
-          Terms of Service
-        </h1>
-        
-        <p style={{ color: '#9CA3AF', fontSize: '14px', marginBottom: '30px' }}>
-          Last Updated: March 27, 2026
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Cash Machine QuickStart</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+        }
+        h1 {
+            color: #C9A84C;
+            border-bottom: 3px solid #C9A84C;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #C9A84C;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        .highlight {
+            background: #FFF9E6;
+            border-left: 4px solid #C9A84C;
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        a {
+            color: #C9A84C;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
 
-        <div style={{ color: '#E5E7EB', lineHeight: '1.8', fontSize: '16px' }}>
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            SMS Program Terms
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            By opting in to receive SMS messages from Cash Machine QuickStart, you agree to receive 
-            accountability check-ins, progress reminders, and coaching support messages from CKO Global INC.
-          </p>
+<h1>Terms of Service</h1>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            Message Frequency
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            You will receive approximately 25 messages over 90 days. Message frequency may vary based on 
-            your progress and participation in the program.
-          </p>
+<p><strong>Last Updated: March 27, 2026</strong></p>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            Message and Data Rates
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            Message and data rates may apply for any messages sent to you from us and to us from you. 
-            If you have any questions about your text plan or data plan, it is best to contact your 
-            wireless provider.
-          </p>
+<h2>Age Requirement</h2>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            How to Opt Out
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            You can cancel the SMS service at any time by replying STOP to any message. After you send 
-            the message STOP, we will send you an SMS message to confirm that you have been unsubscribed. 
-            After this, you will no longer receive SMS messages from us.
-          </p>
-          <p style={{ marginBottom: '20px' }}>
-            If you want to join again, just sign up as you did the first time and we will start sending 
-            SMS messages to you again.
-          </p>
+<div class="highlight">
+    You must be at least 18 years of age to use the Cash Machine QuickStart program. By signing up, you confirm that you are 18 years or older. If you are under 18, you are not permitted to use this Service.
+</div>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            How to Get Help
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            If you are experiencing issues with the messaging program you can reply with the keyword HELP 
-            for more assistance, or you can get help directly at kelli@proactive-lazy.com
-          </p>
+<h2>SMS Program Terms</h2>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            Carrier Liability
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            Carriers are not liable for delayed or undelivered messages.
-          </p>
+<p>By opting in to receive SMS messages from Cash Machine QuickStart, you agree to receive accountability check-ins, progress reminders, and coaching support messages from CKO Global INC.</p>
 
-          <h2 style={{ color: '#C9A84C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>
-            Privacy Policy
-          </h2>
-          <p style={{ marginBottom: '20px' }}>
-            If you have any questions regarding privacy, please read our{' '}
-            <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'underline' }}>Privacy Policy</a>.
-          </p>
-        </div>
+<h3>Message Types:</h3>
+<ul>
+    <li><strong>Non-Promotional Messages:</strong> Accountability check-ins, service notifications, progress tracking, and program-related updates</li>
+    <li><strong>Marketing Messages (if separately opted in):</strong> Special offers, new programs, and promotional content</li>
+</ul>
 
-        <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #374151' }}>
-          <a href="/cmqs-opt-in" style={{ color: '#C9A84C', textDecoration: 'none', fontSize: '14px' }}>
-            ← Back to Opt-In Form
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
+<h2>Message Frequency</h2>
+
+<p>You will receive approximately 25 messages over 90 days. Message frequency may vary based on your progress and participation in the program.</p>
+
+<p><strong>Typical Schedule:</strong> 3 check-ins per week (Monday, Wednesday, Friday) for 12 weeks</p>
+
+<h2>Message and Data Rates</h2>
+
+<p>Message and data rates may apply for any messages sent to you from us and to us from you. If you have any questions about your text plan or data plan, it is best to contact your wireless provider.</p>
+
+<h2>How to Opt Out</h2>
+
+<p>You can cancel the SMS service at any time by replying <strong>STOP</strong> to any message. After you send the message STOP, we will send you an SMS message to confirm that you have been unsubscribed. After this, you will no longer receive SMS messages from us.</p>
+
+<p>If you want to join again, just sign up as you did the first time and we will start sending SMS messages to you again.</p>
+
+<h2>How to Get Help</h2>
+
+<p>If you are experiencing issues with the messaging program you can reply with the keyword <strong>HELP</strong> for more assistance, or you can get help directly at <a href="mailto:kelli@proactively-lazy.com">kelli@proactively-lazy.com</a></p>
+
+<h2>Carrier Liability</h2>
+
+<p>Carriers are not liable for delayed or undelivered messages.</p>
+
+<h2>Program Description</h2>
+
+<p>Cash Machine QuickStart is a 90-day accountability coaching program designed to help participants identify income opportunities based on their existing skills and take action to generate revenue. The program includes:</p>
+
+<ul>
+    <li>AI-generated cash machine ideas personalized to your background</li>
+    <li>A customized 90-day action plan with pricing strategy</li>
+    <li>Weekly accountability check-ins via SMS and email (3x per week for 12 weeks)</li>
+    <li>Progress tracking and milestone celebrations at 30, 60, and 90 days</li>
+    <li>Downloadable PDF action plan</li>
+</ul>
+
+<h2>Payment Terms</h2>
+
+<p>The Cash Machine QuickStart program is a one-time payment of $69.97 (includes $67 program fee + $2.97 processing fee).</p>
+
+<ul>
+    <li><strong>Refund Policy:</strong> 7-day money-back guarantee from date of purchase</li>
+    <li><strong>Payment Processing:</strong> Payments are processed securely through our payment provider</li>
+    <li><strong>Access:</strong> You will receive immediate access to the program upon successful payment</li>
+</ul>
+
+<h2>User Responsibilities</h2>
+
+<p>By using the Cash Machine QuickStart program, you agree to:</p>
+
+<ul>
+    <li>Provide accurate information during signup</li>
+    <li>Respond to accountability check-ins in good faith</li>
+    <li>Use the program for lawful purposes only</li>
+    <li>Not share your login credentials with others</li>
+    <li>Not attempt to circumvent or abuse the Service</li>
+</ul>
+
+<h2>Disclaimer</h2>
+
+<p>Cash Machine QuickStart provides educational guidance and accountability support. We do not guarantee specific income results. Your success depends on your effort, skills, market conditions, and execution of the plan.</p>
+
+<p><strong>Results may vary.</strong> Income examples and case studies are illustrative and do not represent typical results.</p>
+
+<h2>Limitation of Liability</h2>
+
+<p>To the fullest extent permitted by law, CKO Global INC shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Service.</p>
+
+<h2>Privacy</h2>
+
+<p>If you have any questions regarding privacy, please read our <a href="/privacy.html">Privacy Policy</a>.</p>
+
+<h2>Changes to Terms</h2>
+
+<p>We reserve the right to update these Terms of Service at any time. We will notify you of material changes by:</p>
+
+<ul>
+    <li>Posting the updated terms on this page</li>
+    <li>Updating the "Last Updated" date</li>
+    <li>Sending email notification for significant changes</li>
+</ul>
+
+<p>Your continued use of the Service after changes are posted constitutes acceptance of the updated terms.</p>
+
+<h2>Contact Us</h2>
+
+<p>If you have any questions about these Terms of Service, please contact us:</p>
+
+<p>
+    <strong>CKO Global INC</strong><br>
+    Email: <a href="mailto:kelli@proactively-lazy.com">kelli@proactively-lazy.com</a><br>
+    Website: <a href="https://cash-machine-quickstart.vercel.app">cash-machine-quickstart.vercel.app</a>
+</p>
+
+<p style="text-align: center; margin-top: 40px;">
+    <a href="/cmqs-opt-in">← Back to Opt-In Form</a>
+</p>
+
+</body>
+</html>
