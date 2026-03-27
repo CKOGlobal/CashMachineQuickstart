@@ -212,8 +212,7 @@ export default function CMQSOptIn() {
                 }}
               />
               <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.5' }}>
-                I consent to receive non-promotional messages from CKO Global INC at the phone number provided. 
-                Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
+                <strong>NON-PROMOTIONAL MESSAGES:</strong> I consent to receive transactional and service-related messages from CKO Global INC (account updates, accountability check-ins, progress tracking, and program-related notifications) at the phone number provided. Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
               </span>
             </label>
 
@@ -235,8 +234,7 @@ export default function CMQSOptIn() {
                 }}
               />
               <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.5' }}>
-                I consent to receive marketing and promotional messages from CKO Global INC at the phone number provided. 
-                Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
+                <strong>MARKETING & PROMOTIONAL MESSAGES:</strong> I consent to receive marketing, promotional, and sales messages from CKO Global INC (special offers, new programs, and promotional content) at the phone number provided. Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
               </span>
             </label>
           </div>
