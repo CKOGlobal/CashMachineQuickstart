@@ -42,15 +42,6 @@ const styles = {
     color: 'rgba(255,255,255,0.7)',
     lineHeight: '1.6',
   },
-  testToggle: {
-    textAlign: 'center',
-    marginBottom: '20px',
-  },
-  testLabel: {
-    fontSize: '0.9rem',
-    color: 'rgba(255,255,255,0.6)',
-    cursor: 'pointer',
-  },
   progressBar: {
     display: 'flex',
     justifyContent: 'center',
@@ -831,12 +822,12 @@ User question: ${input}`;
 
 // ========== MAIN COMPONENT ==========
 const CashMachineQuickStart = () => {
-  const [testMode, setTestMode] = useState(false);
   const [phase, setPhase] = useState(1);
   const [hasPaid, setHasPaid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [adminClicks, setAdminClicks] = useState(0);
 
   const [name, setName] = useState('');
   const [procrastination, setProcrastination] = useState('');
@@ -1144,25 +1135,30 @@ No preamble.`
     <div style={styles.container}>
       <div style={styles.header}>
         <div style={styles.brandLine}>Loral Langemeier + Kelli Owens — Cash Machine QuickStart</div>
+        <span 
+          onClick={() => {
+            const newCount = adminClicks + 1;
+            setAdminClicks(newCount);
+            if (newCount >= 5) {
+              setHasPaid(true);
+            }
+          }}
+          style={{
+            fontSize: '3rem', 
+            cursor: 'pointer', 
+            display: 'inline-block',
+            userSelect: 'none',
+            marginBottom: '15px'
+          }}
+          title={adminClicks > 0 ? `${5 - adminClicks} more clicks` : ''}
+        >
+          👋
+        </span>
         <h1 style={styles.hero}>You're broke.<br/>We get it. Let's <span style={{color: '#C9A84C'}}>fix that.</span></h1>
         <p style={styles.tagline}>
           Get cash this week doing gig work. Build a real business over 90 days. 
           No MBA required. No trust fund needed. Just you, your skills, and a plan that actually works.
         </p>
-      </div>
-
-      <div style={styles.testToggle}>
-        <label style={styles.testLabel}>
-          <input
-            type="checkbox"
-            checked={testMode}
-            onChange={(e) => {
-              setTestMode(e.target.checked);
-              if (e.target.checked) setHasPaid(true);
-            }}
-          />
-          <span style={{marginLeft: '8px'}}>TEST MODE (Skip Payment)</span>
-        </label>
       </div>
 
       <div style={styles.progressBar}>
@@ -1444,7 +1440,7 @@ No preamble.`
             <button
               style={{...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {})}}
               onClick={() => {
-                if (!hasPaid && !testMode) {
+                if (!hasPaid && adminClicks < 5) {
                   setPhase(2.5);
                 } else {
                   generatePricing();
@@ -1460,7 +1456,7 @@ No preamble.`
 
       {phase === 2.5 && (
         <div style={styles.phase}>
-          {(hasPaid || testMode) ? (
+          {(hasPaid || adminClicks >= 5) ? (
             <>
               {(() => {
                 if (pricingOptions.length === 0 && !loading) {
@@ -1514,7 +1510,7 @@ No preamble.`
         </div>
       )}
 
-      {phase === 3 && (hasPaid || testMode) && (
+      {phase === 3 && (hasPaid || adminClicks >= 5) && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{fontSize: '2rem'}}>💰</span>
@@ -1583,7 +1579,7 @@ No preamble.`
         </div>
       )}
 
-      {phase === 4 && plan && (hasPaid || testMode) && (
+      {phase === 4 && plan && (hasPaid || adminClicks >= 5) && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{fontSize: '2rem'}}>🎉</span>
@@ -1864,7 +1860,7 @@ No preamble.`
         </div>
       )}
 
-      {chatbotOpen && phase === 4 && (hasPaid || testMode) && (
+      {chatbotOpen && phase === 4 && (hasPaid || adminClicks >= 5) && (
         <ChatbotHelper
           plan={plan}
           selectedIdea={selectedIdea}
