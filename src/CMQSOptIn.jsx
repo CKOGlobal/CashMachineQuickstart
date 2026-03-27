@@ -267,6 +267,18 @@ export default function CMQSOptIn() {
             borderTop: '1px solid #374151',
             textAlign: 'center'
           }}>
+            <p style={{ color: '#C9A84C', fontSize: '14px', marginBottom: '10px', fontWeight: 600 }}>
+              Cash Machine QuickStart
+            </p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '5px' }}>
+              CKO Global INC
+            </p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '5px' }}>
+              Email: Kelli@proactively-lazy.com
+            </p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '15px' }}>
+              Website: cash-machine-quickstart.vercel.app
+            </p>
             <p style={{ color: '#6B7280', fontSize: '12px', lineHeight: '1.6' }}>
               By submitting this form, you agree to our{' '}
               <a href="/privacy.html" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
