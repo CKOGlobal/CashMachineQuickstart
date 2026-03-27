@@ -13,8 +13,6 @@ export default function CMQSOptIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // For now, just show success - we'll add GHL integration later
     console.log('Form submitted:', formData);
     setSubmitted(true);
   };
@@ -99,7 +97,6 @@ export default function CMQSOptIn() {
         </p>
 
         <form onSubmit={handleSubmit}>
-          {/* Name Fields */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', color: '#E5E7EB', marginBottom: '8px', fontSize: '14px' }}>
               First Name *
@@ -185,7 +182,6 @@ export default function CMQSOptIn() {
             />
           </div>
 
-          {/* SMS Consent Checkboxes - CRITICAL FOR A2P */}
           <div style={{
             background: '#1F2937',
             border: '1px solid #374151',
@@ -197,7 +193,6 @@ export default function CMQSOptIn() {
               SMS Message Preferences (Optional)
             </p>
 
-            {/* Non-Promotional Checkbox */}
             <label style={{ 
               display: 'flex', 
               alignItems: 'flex-start',
@@ -222,7 +217,6 @@ export default function CMQSOptIn() {
               </span>
             </label>
 
-            {/* Marketing Checkbox */}
             <label style={{ 
               display: 'flex', 
               alignItems: 'flex-start',
@@ -234,4 +228,54 @@ export default function CMQSOptIn() {
                 onChange={(e) => setFormData({...formData, marketing: e.target.checked})}
                 style={{ 
                   marginRight: '10px', 
-                  marginTop
+                  marginTop: '4px',
+                  width: '18px',
+                  height: '18px',
+                  cursor: 'pointer'
+                }}
+              />
+              <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.5' }}>
+                I consent to receive marketing and promotional messages from CKO Global INC at the phone number provided. 
+                Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
+              </span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: '#C9A84C',
+              color: '#07090F',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '16px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.background = '#E8C870'}
+            onMouseOut={(e) => e.target.style.background = '#C9A84C'}
+          >
+            Activate My Coaching
+          </button>
+
+          <div style={{ 
+            marginTop: '20px', 
+            paddingTop: '20px', 
+            borderTop: '1px solid #374151',
+            textAlign: 'center'
+          }}>
+            <p style={{ color: '#6B7280', fontSize: '12px', lineHeight: '1.6' }}>
+              By submitting this form, you agree to our{' '}
+              <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+              {' '}and{' '}
+              <a href="/terms" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
