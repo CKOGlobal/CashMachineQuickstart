@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 // ============================================================================
-// CASH MACHINE QUICKSTART - PROPERLY FIXED
-// All helper components defined OUTSIDE main component to prevent re-creation
+// CASH MACHINE QUICKSTART - COMPLETE REBUILD
+// - Scaffolded intake questions (fun, easy to understand)
+// - Updated AI prompts ("start this week" for both tracks)
+// - Accountability messaging (nice but firm boundaries)
+// - Chatbot helper (paid users only)
 // ============================================================================
 
 // ========== STYLES (OUTSIDE COMPONENT) ==========
@@ -119,6 +122,12 @@ const styles = {
     fontWeight: '600',
     marginBottom: '10px',
     color: 'rgba(255,255,255,0.9)',
+  },
+  helperText: {
+    fontSize: '0.85rem',
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: '8px',
+    fontStyle: 'italic',
   },
   input: {
     width: '100%',
@@ -479,6 +488,47 @@ const styles = {
     padding: '25px',
     marginBottom: '30px',
   },
+  chatbotModal: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.8)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+    padding: '20px',
+  },
+  chatbotContainer: {
+    background: '#0d1117',
+    border: '1px solid rgba(255,255,255,0.2)',
+    borderRadius: '16px',
+    maxWidth: '700px',
+    width: '100%',
+    maxHeight: '80vh',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  chatbotHeader: {
+    padding: '20px',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chatbotMessages: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '20px',
+  },
+  chatbotInput: {
+    padding: '20px',
+    borderTop: '1px solid rgba(255,255,255,0.1)',
+    display: 'flex',
+    gap: '10px',
+  },
   footer: {
     maxWidth: '900px',
     margin: '40px auto 0',
@@ -567,6 +617,9 @@ const PaymentGate = () => (
           🎯 Weekly progress coaching (12 weeks of support)
         </li>
         <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+          💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)
+        </li>
+        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
           🎉 Milestone celebrations at 30, 60, and 90 days
         </li>
         <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
@@ -616,6 +669,166 @@ const PaymentGate = () => (
   </div>
 );
 
+// ========== CHATBOT COMPONENT ==========
+const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: `Hey! I'm your AI coach. I know your plan (${selectedIdea?.title}), your pricing (${selectedPricing?.name}), and your milestones. What do you need help with?`
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMessage = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const context = `You are an accountability coach for the Cash Machine QuickStart program. 
+
+User's Plan:
+- Idea: ${selectedIdea?.title} (${selectedIdea?.category})
+- Pricing: ${selectedPricing?.name} at ${selectedPricing?.price}
+- 90-Day Plan: ${JSON.stringify(plan).substring(0, 500)}...
+
+Your role:
+- Answer questions about their specific plan
+- Help when they're stuck on execution
+- Be supportive but direct - no excuses accepted
+- Always ask "What have you tried already?" before giving solutions
+- Keep answers short and actionable
+
+User question: ${input}`;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            ...messages,
+            userMessage,
+            { role: 'system', content: context }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I hit a technical snag. Try asking again?' 
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={styles.chatbotModal} onClick={onClose}>
+      <div style={styles.chatbotContainer} onClick={(e) => e.stopPropagation()}>
+        <div style={styles.chatbotHeader}>
+          <h3 style={{margin: 0, fontSize: '1.2rem'}}>💬 Your AI Coach</h3>
+          <button 
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              padding: '0',
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <div style={styles.chatbotMessages}>
+          {messages.map((msg, idx) => (
+            <div key={idx} style={{
+              marginBottom: '15px',
+              display: 'flex',
+              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+            }}>
+              <div style={{
+                maxWidth: '80%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: msg.role === 'user' 
+                  ? 'rgba(201,168,76,0.2)' 
+                  : 'rgba(255,255,255,0.05)',
+                border: `1px solid ${msg.role === 'user' 
+                  ? 'rgba(201,168,76,0.3)' 
+                  : 'rgba(255,255,255,0.1)'}`,
+                fontSize: '0.95rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+              }}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div style={{
+              padding: '12px 16px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              fontSize: '0.95rem',
+              maxWidth: '80%',
+            }}>
+              Thinking...
+            </div>
+          )}
+        </div>
+
+        <div style={styles.chatbotInput}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask your question..."
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+              color: '#ffffff',
+              fontSize: '1rem',
+              outline: 'none',
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading || !input.trim()}
+            style={{
+              padding: '12px 24px',
+              background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+              color: '#0d1117',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+              opacity: loading || !input.trim() ? 0.5 : 1,
+            }}
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ========== MAIN COMPONENT ==========
 const CashMachineQuickStart = () => {
   const [testMode, setTestMode] = useState(false);
@@ -623,9 +836,12 @@ const CashMachineQuickStart = () => {
   const [hasPaid, setHasPaid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   const [name, setName] = useState('');
-  const [background, setBackground] = useState('');
+  const [procrastination, setProcrastination] = useState('');
+  const [goodAt, setGoodAt] = useState('');
+  const [hardPass, setHardPass] = useState('');
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [specificIdea, setSpecificIdea] = useState('');
   const [timeAvailable, setTimeAvailable] = useState('');
@@ -653,7 +869,9 @@ const CashMachineQuickStart = () => {
         setPhase(data.phase || 1);
         setHasPaid(data.hasPaid || false);
         setName(data.name || '');
-        setBackground(data.background || '');
+        setProcrastination(data.procrastination || '');
+        setGoodAt(data.goodAt || '');
+        setHardPass(data.hardPass || '');
         setSelectedSkills(data.selectedSkills || []);
         setSpecificIdea(data.specificIdea || '');
         setTimeAvailable(data.timeAvailable || '');
@@ -671,12 +889,12 @@ const CashMachineQuickStart = () => {
 
   useEffect(() => {
     const state = {
-      phase, hasPaid, name, background, selectedSkills, specificIdea,
+      phase, hasPaid, name, procrastination, goodAt, hardPass, selectedSkills, specificIdea,
       timeAvailable, incomeGoal, ideas, selectedIdea, pricingOptions,
       selectedPricing, plan
     };
     localStorage.setItem('cmqs_state', JSON.stringify(state));
-  }, [phase, hasPaid, name, background, selectedSkills, specificIdea, 
+  }, [phase, hasPaid, name, procrastination, goodAt, hardPass, selectedSkills, specificIdea, 
       timeAvailable, incomeGoal, ideas, selectedIdea, pricingOptions,
       selectedPricing, plan]);
 
@@ -692,7 +910,9 @@ const CashMachineQuickStart = () => {
             role: 'user',
             content: `Generate 8 cash machine ideas using the DUAL-TRACK system for: ${name}
 
-Background: ${background}
+Procrastination activity: ${procrastination}
+What they're good at: ${goodAt}
+Hard pass (avoid): ${hardPass}
 Skills: ${selectedSkills.join(', ')}
 ${specificIdea ? `Specific idea: ${specificIdea}` : ''}
 Time: ${timeAvailable}
@@ -702,18 +922,18 @@ DUAL-TRACK FRAMEWORK:
 Generate exactly 8 ideas in this order:
 
 IDEAS 1-2: BRIDGE IDEAS (Survival Income)
-- Gig economy platforms they can start TODAY
+- Gig economy platforms they can START TODAY
 - Examples: DoorDash, TaskRabbit, Rover, Instacart, Fiverr quick gigs
 - Be honest: "This isn't a business. This pays bills while you build the real thing."
-- First week earnings: realistic gig platform income
+- Timeline: Start TODAY, cash THIS WEEK
 - Set category: "bridge"
 
 IDEAS 3-7: BUSINESS IDEAS (Real Business)
-- Skills-based services they can start within 2-6 weeks
+- Skills-based services they can START THIS WEEK
 - Must be scalable, have exit potential, based on their actual skills
 - Examples: social media management, tutoring, video editing, pet training, house cleaning, meal prep, photography, graphic design, personal training, tech support
 - NOT: MLM, "build an audience first", high-capital businesses, drop shipping
-- First client within 2-6 weeks, $500-2000/mo by month 3
+- Timeline: Start THIS WEEK, first customer within 7 days, $500-2000/mo by month 3
 - Set category: "business"
 
 IDEA 8: WILDCARD (Creative/Unique)
@@ -721,12 +941,14 @@ IDEA 8: WILDCARD (Creative/Unique)
 - Could be bridge OR business depending on what fits
 - Set category: "wildcard"
 
+IMPORTANT: Both bridge AND business ideas should START THIS WEEK. The difference is NOT speed—it's EXIT POTENTIAL. Bridge = you ARE the product (can't sell). Business = you OWN the product (can hire, scale, sell).
+
 Return ONLY valid JSON array:
 [{
   "title": "Specific, actionable idea name",
   "tagline": "One sentence - what you do and speed to first dollar",
   "category": "bridge" | "business" | "wildcard",
-  "monthOne": "$X-$Y realistic first week (bridge) or first month (business)",
+  "monthOne": "$X-$Y realistic first week earnings",
   "yearTwo": "18-month potential if they scale",
   "quickStart": "Step 1: Do this today. Step 2: First customer/gig. Step 3: Get paid.",
   "pros": ["benefit 1", "benefit 2", "benefit 3"],
@@ -764,7 +986,7 @@ Rank by fitScore within each category. Bridge ideas = 70-80 fit (they're tempora
             content: `Generate 5 pricing strategies for: ${selectedIdea.title}
 
 Context: ${selectedIdea.tagline}
-Market: ${background}
+Good at: ${goodAt}
 Time: ${timeAvailable}
 
 Return ONLY valid JSON array:
@@ -813,7 +1035,8 @@ No preamble.`
 
 Pricing: ${selectedPricing.name} at ${selectedPricing.price}
 Person: ${name}
-Background: ${background}
+Good at: ${goodAt}
+Hard pass: ${hardPass}
 Time: ${timeAvailable}
 Idea Category: ${selectedIdea.category || 'business'}
 
@@ -983,13 +1206,42 @@ No preamble.`
           </div>
 
           <div style={styles.formGroup}>
-            <label style={styles.label}>What do you do, and what are you actually good at?</label>
+            <label style={styles.label}>What do you do when you're supposed to be doing something else?</label>
             <textarea
               style={{...styles.input, minHeight: '100px'}}
-              placeholder="Be real. e.g. I'm a sophomore who runs my school's IG and people pay me for social media help. Or: I fix computers and everyone thinks I'm a wizard. Or: Honestly? No clue. Just show me options."
-              value={background}
-              onChange={(e) => setBackground(e.target.value)}
+              placeholder="e.g., I reorganize my closet by color when I should be studying. Or: I'm always making Spotify playlists. Or: I scroll Instagram and critique everyone's captions."
+              value={procrastination}
+              onChange={(e) => setProcrastination(e.target.value)}
             />
+            <p style={styles.helperText}>
+              Seriously — what's your favorite way to procrastinate? That's usually hiding money.
+            </p>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>What do people bug you about because you're weirdly good at it?</label>
+            <textarea
+              style={{...styles.input, minHeight: '100px'}}
+              placeholder="e.g., Everyone asks me to fix their phone/computer. Or: My friends pay me to write their dating app bios. Or: I'm the go-to person for last-minute airport runs because I'm crazy organized."
+              value={goodAt}
+              onChange={(e) => setGoodAt(e.target.value)}
+            />
+            <p style={styles.helperText}>
+              Think about what feels easy to YOU but everyone else struggles with.
+            </p>
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>What's your hard pass? (Like, you'd fake sick to avoid it)</label>
+            <textarea
+              style={{...styles.input, minHeight: '100px'}}
+              placeholder="e.g., Anything with numbers — I can't even balance my checkbook. Or: Talking to strangers on the phone. Or: Getting up before 9am. Or: Heavy lifting — I pulled a muscle opening a jar once."
+              value={hardPass}
+              onChange={(e) => setHardPass(e.target.value)}
+            />
+            <p style={styles.helperText}>
+              Be honest. We won't suggest stuff that'll make you miserable.
+            </p>
           </div>
 
           <div style={styles.formGroup}>
@@ -1014,14 +1266,17 @@ No preamble.`
 
           <div style={styles.formGroup}>
             <label style={styles.label}>
-              Got a specific money idea already? Spill it. (optional but helps us help you)
+              Already have a money idea rattling around in your head?
             </label>
             <textarea
               style={{...styles.input, minHeight: '80px'}}
-              placeholder="e.g. I want to tutor high schoolers in calculus. Or: I flip vintage sneakers on Depop. Or: Honestly? No clue. Just show me what's possible."
+              placeholder="e.g., I want to help people declutter their homes. Or: I think I could flip vintage sneakers. Or: Honestly? No clue. Just show me what's possible."
               value={specificIdea}
               onChange={(e) => setSpecificIdea(e.target.value)}
             />
+            <p style={styles.helperText}>
+              (Optional) If you have something specific, tell us. If not, no worries — that's literally what this tool is for.
+            </p>
           </div>
 
           <div style={styles.formGroup}>
@@ -1057,7 +1312,7 @@ No preamble.`
           <button
             style={{...styles.button, ...(loading ? styles.buttonDisabled : {})}}
             onClick={generateIdeas}
-            disabled={loading || !name || !background || selectedSkills.length === 0 || !timeAvailable || !incomeGoal}
+            disabled={loading || !name || !procrastination || !goodAt || !hardPass || selectedSkills.length === 0 || !timeAvailable || !incomeGoal}
           >
             {loading ? '🤖 Generating Ideas...' : 'Show Me My Options →'}
           </button>
@@ -1079,129 +1334,127 @@ No preamble.`
           </div>
 
           <div style={styles.ideasGrid}>
-                {ideas.map((idea, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      ...styles.ideaCard,
-                      ...(selectedIdea?.title === idea.title ? styles.ideaCardSelected : {})
-                    }}
-                    onClick={() => {
-                      setSelectedIdea(idea);
-                      setExpandedIdea(idx); // Auto-expand when selected
-                    }}
-                  >
-                    <div style={styles.ideaHeader}>
-                      <h3 style={styles.ideaTitle}>{idea.title}</h3>
-                      <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                        <div style={{
-                          padding: '4px 10px',
-                          background: idea.category === 'bridge' ? 'rgba(96,184,232,0.2)' : 
-                                     idea.category === 'wildcard' ? 'rgba(168,216,76,0.2)' : 
-                                     'rgba(201,168,76,0.2)',
-                          border: `1px solid ${idea.category === 'bridge' ? '#60B8E8' : 
-                                               idea.category === 'wildcard' ? '#A8D84C' : 
-                                               '#C9A84C'}`,
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          color: idea.category === 'bridge' ? '#60B8E8' : 
-                                 idea.category === 'wildcard' ? '#A8D84C' : 
-                                 '#C9A84C',
-                          textTransform: 'uppercase',
-                        }}>
-                          {idea.category || 'business'}
-                        </div>
-                        <div style={styles.fitBadge}>
-                          {idea.fitScore}% fit
-                        </div>
-                      </div>
+            {ideas.map((idea, idx) => (
+              <div
+                key={idx}
+                style={{
+                  ...styles.ideaCard,
+                  ...(selectedIdea?.title === idea.title ? styles.ideaCardSelected : {})
+                }}
+                onClick={() => {
+                  setSelectedIdea(idea);
+                  setExpandedIdea(idx);
+                }}
+              >
+                <div style={styles.ideaHeader}>
+                  <h3 style={styles.ideaTitle}>{idea.title}</h3>
+                  <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                    <div style={{
+                      padding: '4px 10px',
+                      background: idea.category === 'bridge' ? 'rgba(96,184,232,0.2)' : 
+                                 idea.category === 'wildcard' ? 'rgba(168,216,76,0.2)' : 
+                                 'rgba(201,168,76,0.2)',
+                      border: `1px solid ${idea.category === 'bridge' ? '#60B8E8' : 
+                                           idea.category === 'wildcard' ? '#A8D84C' : 
+                                           '#C9A84C'}`,
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      color: idea.category === 'bridge' ? '#60B8E8' : 
+                             idea.category === 'wildcard' ? '#A8D84C' : 
+                             '#C9A84C',
+                      textTransform: 'uppercase',
+                    }}>
+                      {idea.category || 'business'}
                     </div>
-                    <p style={styles.ideaTagline}>{idea.tagline}</p>
-                    <div style={styles.ideaEarnings}>
-                      <div>
-                        <div style={styles.earningLabel}>First Week</div>
-                        <div style={styles.earningAmount}>{idea.monthOne}</div>
-                      </div>
-                      <div>
-                        <div style={styles.earningLabel}>18 Months</div>
-                        <div style={styles.earningAmount}>{idea.yearTwo}</div>
-                      </div>
+                    <div style={styles.fitBadge}>
+                      {idea.fitScore}% fit
                     </div>
-
-                    {/* Toggle Details Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedIdea(expandedIdea === idx ? null : idx);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '10px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '6px',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: '0.85rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '5px',
-                        transition: 'all 0.2s',
-                        marginBottom: expandedIdea === idx ? '15px' : '0',
-                      }}
-                    >
-                      {expandedIdea === idx ? '▼ Hide Details' : '► See Details'}
-                    </button>
-
-                    {/* Collapsible Details Section */}
-                    {expandedIdea === idx && (
-                      <>
-                        <div style={styles.quickStart}>
-                          <strong>Quick Start:</strong> {idea.quickStart}
-                        </div>
-                        <div style={styles.proscons}>
-                          <div>
-                            <strong style={{color: '#3ECFAB'}}>Pros:</strong>
-                            <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
-                              {idea.pros.map((pro, i) => <li key={i}>{pro}</li>)}
-                            </ul>
-                          </div>
-                          <div>
-                            <strong style={{color: '#F06292'}}>Cons:</strong>
-                            <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
-                              {idea.cons.map((con, i) => <li key={i}>{con}</li>)}
-                            </ul>
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </div>
-                ))}
-              </div>
+                </div>
+                <p style={styles.ideaTagline}>{idea.tagline}</p>
+                <div style={styles.ideaEarnings}>
+                  <div>
+                    <div style={styles.earningLabel}>First Week</div>
+                    <div style={styles.earningAmount}>{idea.monthOne}</div>
+                  </div>
+                  <div>
+                    <div style={styles.earningLabel}>18 Months</div>
+                    <div style={styles.earningAmount}>{idea.yearTwo}</div>
+                  </div>
+                </div>
 
-              {error && <div style={styles.error}>{error}</div>}
-
-              <div style={styles.buttonRow}>
-                <button style={styles.buttonSecondary} onClick={() => setPhase(1)}>
-                  ← Back
-                </button>
                 <button
-                  style={{...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {})}}
-                  onClick={() => {
-                    if (!hasPaid && !testMode) {
-                      setPhase(2.5); // Trigger payment gate
-                    } else {
-                      generatePricing();
-                    }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedIdea(expandedIdea === idx ? null : idx);
                   }}
-                  disabled={loading || !selectedIdea}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    color: 'rgba(255,255,255,0.7)',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '5px',
+                    transition: 'all 0.2s',
+                    marginBottom: expandedIdea === idx ? '15px' : '0',
+                  }}
                 >
-                  {loading ? '🤖 Generating Pricing...' : 'Get Your Complete Plan →'}
+                  {expandedIdea === idx ? '▼ Hide Details' : '► See Details'}
                 </button>
+
+                {expandedIdea === idx && (
+                  <>
+                    <div style={styles.quickStart}>
+                      <strong>Quick Start:</strong> {idea.quickStart}
+                    </div>
+                    <div style={styles.proscons}>
+                      <div>
+                        <strong style={{color: '#3ECFAB'}}>Pros:</strong>
+                        <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
+                          {idea.pros.map((pro, i) => <li key={i}>{pro}</li>)}
+                        </ul>
+                      </div>
+                      <div>
+                        <strong style={{color: '#F06292'}}>Cons:</strong>
+                        <ul style={{margin: '5px 0 0 20px', fontSize: '0.9rem'}}>
+                          {idea.cons.map((con, i) => <li key={i}>{con}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
+            ))}
+          </div>
+
+          {error && <div style={styles.error}>{error}</div>}
+
+          <div style={styles.buttonRow}>
+            <button style={styles.buttonSecondary} onClick={() => setPhase(1)}>
+              ← Back
+            </button>
+            <button
+              style={{...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {})}}
+              onClick={() => {
+                if (!hasPaid && !testMode) {
+                  setPhase(2.5);
+                } else {
+                  generatePricing();
+                }
+              }}
+              disabled={loading || !selectedIdea}
+            >
+              {loading ? '🤖 Generating Pricing...' : 'Get Your Complete Plan →'}
+            </button>
+          </div>
         </div>
       )}
 
@@ -1209,7 +1462,6 @@ No preamble.`
         <div style={styles.phase}>
           {(hasPaid || testMode) ? (
             <>
-              {/* Auto-advance to Phase 3 and generate pricing */}
               {(() => {
                 if (pricingOptions.length === 0 && !loading) {
                   generatePricing();
@@ -1541,19 +1793,35 @@ No preamble.`
           </div>
 
           <div style={styles.exportSection}>
-            <button style={styles.buttonSecondary} onClick={() => window.print()}>
-              📥 Download PDF
-            </button>
+            <div style={{display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap'}}>
+              <button style={styles.buttonSecondary} onClick={() => window.print()}>
+                📥 Download PDF
+              </button>
+              <button 
+                style={{
+                  ...styles.buttonSecondary,
+                  background: 'rgba(62,207,171,0.2)',
+                  border: '1px solid #3ECFAB',
+                  color: '#3ECFAB',
+                }}
+                onClick={() => setChatbotOpen(true)}
+              >
+                💬 Ask Your AI Coach
+              </button>
+            </div>
           </div>
 
           <div style={styles.accountabilityFooter}>
             <h3 style={{fontSize: '1.2rem', marginBottom: '15px'}}>
-              🎯 Your Accountability Coach
+              🤝 Your Accountability Coach (Not Your Babysitter)
             </h3>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+              Here's the deal: We give you the map. You walk the path.
+            </p>
             <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
               Starting Monday, you'll get 3 check-ins per week for 90 days:
             </p>
-            <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+            <ul style={{listStyle: 'none', padding: 0, margin: '0 0 15px 0'}}>
               <li style={{marginBottom: '8px'}}>
                 <strong>Monday:</strong> "What's your win for this week?"
               </li>
@@ -1564,8 +1832,24 @@ No preamble.`
                 <strong>Friday:</strong> "Where are you at — on track, almost there, or stuck?"
               </li>
             </ul>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+              We're your coach in your corner. We'll check in, celebrate wins, and help when you're genuinely stuck. 
+              But we're not here to make excuses for you or do the work for you.
+            </p>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+              <strong>Your wins? Those are YOURS. Own them.</strong><br/>
+              <strong>Your setbacks? Also YOURS. Learn from them.</strong>
+            </p>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+              If you ghost us for 2 weeks straight, we'll check in ONE more time. After that, we assume you quit 
+              and you'll stop getting messages. No hard feelings — this isn't for everyone.
+            </p>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+              But if you show up, stay honest, and do the work? We've got your back every step of the way.
+            </p>
             <p style={{fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)'}}>
-              This is your coach in your corner, helping you stay focused when life gets busy.
+              Plus: Got a question at 2am when you're stuck on pricing? Use the chatbot helper 24/7. 
+              It knows your plan, your pricing, and your milestones. It's like having a coach who never sleeps.
             </p>
           </div>
 
@@ -1578,6 +1862,15 @@ No preamble.`
             Start Over
           </button>
         </div>
+      )}
+
+      {chatbotOpen && phase === 4 && (hasPaid || testMode) && (
+        <ChatbotHelper
+          plan={plan}
+          selectedIdea={selectedIdea}
+          selectedPricing={selectedPricing}
+          onClose={() => setChatbotOpen(false)}
+        />
       )}
 
       <div style={styles.footer}>
