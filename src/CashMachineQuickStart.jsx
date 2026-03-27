@@ -1585,7 +1585,7 @@ No preamble.`
           <strong style={{color: '#C9A84C'}}>Cash Machine QuickStart</strong>
         </div>
         <div>
-          CKO Global LLC<br/>
+          CKO Global INC<br/>
           Email: <a href="mailto:Kelli@proactively-lazy.com" style={{color: '#C9A84C', textDecoration: 'none'}}>Kelli@proactively-lazy.com</a><br/>
           Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{color: '#C9A84C', textDecoration: 'none'}}>proactively-lazy.com</a>
         </div>
