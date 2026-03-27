@@ -269,9 +269,9 @@ export default function CMQSOptIn() {
           }}>
             <p style={{ color: '#6B7280', fontSize: '12px', lineHeight: '1.6' }}>
               By submitting this form, you agree to our{' '}
-              <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+              <a href="/privacy.html" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
               {' '}and{' '}
-              <a href="/terms" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
+              <a href="/terms.html" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
             </p>
           </div>
         </form>
