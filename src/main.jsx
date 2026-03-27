@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import CashMachineQuickStart from './CashMachineQuickStart';
 import StuckChat from './StuckChat';
 import CMQSOptIn from './CMQSOptIn';
+import Privacy from './Privacy';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<CashMachineQuickStart />} />
         <Route path="/stuck-chat" element={<StuckChat />} />
         <Route path="/cmqs-opt-in" element={<CMQSOptIn />} />
+        <Route path="/privacy" element={<Privacy />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
