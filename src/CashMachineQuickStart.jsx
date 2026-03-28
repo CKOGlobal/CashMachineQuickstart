@@ -619,6 +619,7 @@ const referralCodes = {
   'STUDENT50': { type: 'discount', price: 69.97, name: 'Student Discount' },
   
   // Beta/Free access codes
+  'BETA': { type: 'free', price: 0, name: 'Beta Access' },
   'BETA2025': { type: 'free', price: 0, name: 'Beta Tester' },
   'TESTACCESS': { type: 'free', price: 0, name: 'Test Access' },
 };
@@ -1382,45 +1383,38 @@ Good at: ${goodAt}
 Hard pass: ${hardPass}
 Category: ${selectedIdea.category}
 
-CRITICAL: For YOUNG ADULTS who need EXACT steps with WHY explanations.
+CRITICAL: For YOUNG ADULTS. Be concise but complete.
 
 Return ONLY valid JSON:
 {
-  "goal": "Month 1 goal in one sentence",
+  "goal": "Month 1 goal (one sentence)",
   "weeks": [
     {
       "week": 1,
-      "summary": "Week focus",
+      "summary": "Week focus (one sentence)",
       "steps": [
         {
-          "what": "Action (e.g., Sign up for TaskRabbit)",
-          "how": "Step 1: Go to [website]. Step 2: Click [button]. Step 3: [action]. Be VERY specific.",
-          "why": "This is important because [reason]. Explains the strategy.",
+          "what": "Action (concise)",
+          "how": "2-3 sentences max. Be specific but brief.",
+          "why": "1-2 sentences. Strategic reason.",
           "time": "X hours",
-          "success": "You know you did it right when [specific outcome]"
+          "success": "One specific outcome"
         }
       ]
     },
-    {
-      "week": 2,
-      "summary": "Week focus",
-      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
-    },
-    {
-      "week": 3,
-      "summary": "Week focus",
-      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
-    },
-    {
-      "week": 4,
-      "summary": "Week focus",
-      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
-    }
+    {"week": 2, "summary": "...", "steps": [...]},
+    {"week": 3, "summary": "...", "steps": [...]},
+    {"week": 4, "summary": "...", "steps": [...]}
   ],
-  "metrics": "What to track this month"
+  "metrics": "What to track (one sentence)"
 }
 
-Each week needs 3-5 detailed steps. No preamble.`
+IMPORTANT: 
+- Each week needs EXACTLY 3 steps (not 3-5, just 3)
+- Keep "how" field to 2-3 sentences maximum
+- Keep "why" field to 1-2 sentences maximum
+- No preamble, no extra explanation
+`
           }]
         })
       });
@@ -1455,18 +1449,18 @@ MONTH 2 FOCUS: Scale business, reduce gig dependency.
 
 Return ONLY valid JSON:
 {
-  "goal": "Month 2 goal in one sentence",
+  "goal": "Month 2 goal (one sentence)",
   "weeks": [
     {
       "week": 5,
-      "summary": "Week focus",
+      "summary": "Week focus (one sentence)",
       "steps": [
         {
-          "what": "Action",
-          "how": "VERY specific step-by-step",
-          "why": "Strategic explanation",
+          "what": "Action (concise)",
+          "how": "2-3 sentences max. Be specific but brief.",
+          "why": "1-2 sentences. Strategic reason.",
           "time": "X hours",
-          "success": "How they know it worked"
+          "success": "One specific outcome"
         }
       ]
     },
@@ -1474,10 +1468,15 @@ Return ONLY valid JSON:
     {"week": 7, "summary": "...", "steps": [...]},
     {"week": 8, "summary": "...", "steps": [...]}
   ],
-  "metrics": "What to track"
+  "metrics": "What to track (one sentence)"
 }
 
-Each week needs 3-5 detailed steps. No preamble.`
+IMPORTANT:
+- Each week needs EXACTLY 3 steps
+- Keep "how" to 2-3 sentences
+- Keep "why" to 1-2 sentences
+- No preamble
+`
           }]
         })
       });
@@ -1512,18 +1511,18 @@ MONTH 3 FOCUS: Business income > gig income. Growth systems.
 
 Return ONLY valid JSON:
 {
-  "goal": "Month 3 goal in one sentence",
+  "goal": "Month 3 goal (one sentence)",
   "weeks": [
     {
       "week": 9,
-      "summary": "Week focus",
+      "summary": "Week focus (one sentence)",
       "steps": [
         {
-          "what": "Action",
-          "how": "VERY specific step-by-step",
-          "why": "Strategic explanation",
+          "what": "Action (concise)",
+          "how": "2-3 sentences max. Be specific but brief.",
+          "why": "1-2 sentences. Strategic reason.",
           "time": "X hours",
-          "success": "How they know it worked"
+          "success": "One specific outcome"
         }
       ]
     },
@@ -1531,10 +1530,15 @@ Return ONLY valid JSON:
     {"week": 11, "summary": "...", "steps": [...]},
     {"week": 12, "summary": "...", "steps": [...]}
   ],
-  "metrics": "What to track"
+  "metrics": "What to track (one sentence)"
 }
 
-Each week needs 3-5 detailed steps. No preamble.`
+IMPORTANT:
+- Each week needs EXACTLY 3 steps
+- Keep "how" to 2-3 sentences
+- Keep "why" to 1-2 sentences
+- No preamble
+`
           }]
         })
       });
@@ -2242,6 +2246,26 @@ Email: Kelli@proactively-lazy.com
               {activeTab === 'month1' && plan.month1 && (
                 <div style={styles.tabContent}>
                   <h3 style={styles.sectionTitle}>🚀 Month 1: {plan.month1.goal}</h3>
+                  
+                  <div style={{
+                    padding: '15px 20px',
+                    background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '25px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}>
+                    <span style={{fontSize: '1.5rem'}}>💡</span>
+                    <div>
+                      <strong style={{color: '#C9A84C', fontSize: '0.95rem'}}>Stuck or confused?</strong>
+                      <p style={{margin: '3px 0 0 0', fontSize: '0.9rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.8)'}}>
+                        Click <strong>"💬 Ask AI Coach"</strong> below. It knows your entire plan and can explain any step, tool, or concept.
+                      </p>
+                    </div>
+                  </div>
+
                   {plan.month1.weeks.map((week) => (
                     <div key={week.week} style={styles.weekBlock}>
                       <h4 style={styles.weekTitle}>Week {week.week}</h4>
@@ -2280,6 +2304,26 @@ Email: Kelli@proactively-lazy.com
               {activeTab === 'month2' && plan.month2 && (
                 <div style={styles.tabContent}>
                   <h3 style={styles.sectionTitle}>📈 Month 2: {plan.month2.goal}</h3>
+                  
+                  <div style={{
+                    padding: '15px 20px',
+                    background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '25px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}>
+                    <span style={{fontSize: '1.5rem'}}>💡</span>
+                    <div>
+                      <strong style={{color: '#C9A84C', fontSize: '0.95rem'}}>Stuck or confused?</strong>
+                      <p style={{margin: '3px 0 0 0', fontSize: '0.9rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.8)'}}>
+                        Click <strong>"💬 Ask AI Coach"</strong> below. It knows your entire plan and can explain any step, tool, or concept.
+                      </p>
+                    </div>
+                  </div>
+
                   {plan.month2.weeks.map((week) => (
                     <div key={week.week} style={styles.weekBlock}>
                       <h4 style={styles.weekTitle}>Week {week.week}</h4>
@@ -2318,6 +2362,26 @@ Email: Kelli@proactively-lazy.com
               {activeTab === 'month3' && plan.month3 && (
                 <div style={styles.tabContent}>
                   <h3 style={styles.sectionTitle}>🎯 Month 3: {plan.month3.goal}</h3>
+                  
+                  <div style={{
+                    padding: '15px 20px',
+                    background: 'rgba(201,168,76,0.1)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '25px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}>
+                    <span style={{fontSize: '1.5rem'}}>💡</span>
+                    <div>
+                      <strong style={{color: '#C9A84C', fontSize: '0.95rem'}}>Stuck or confused?</strong>
+                      <p style={{margin: '3px 0 0 0', fontSize: '0.9rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.8)'}}>
+                        Click <strong>"💬 Ask AI Coach"</strong> below. It knows your entire plan and can explain any step, tool, or concept.
+                      </p>
+                    </div>
+                  </div>
+
                   {plan.month3.weeks.map((week) => (
                     <div key={week.week} style={styles.weekBlock}>
                       <h4 style={styles.weekTitle}>Week {week.week}</h4>
@@ -2413,7 +2477,7 @@ Email: Kelli@proactively-lazy.com
               {/* EXPORT & ACTIONS */}
               <div style={styles.exportSection}>
                 <button
-                  onClick={downloadPlan}
+                  onClick={() => setChatbotOpen(true)}
                   style={{
                     padding: '14px 28px',
                     background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
@@ -2426,10 +2490,10 @@ Email: Kelli@proactively-lazy.com
                     marginRight: '15px',
                   }}
                 >
-                  📥 Download Plan (TXT)
+                  💬 Ask AI Coach
                 </button>
                 <button
-                  onClick={() => setChatbotOpen(true)}
+                  onClick={downloadPlan}
                   style={{
                     padding: '14px 28px',
                     background: 'rgba(255,255,255,0.1)',
@@ -2441,7 +2505,7 @@ Email: Kelli@proactively-lazy.com
                     cursor: 'pointer',
                   }}
                 >
-                  💬 Ask AI Coach
+                  📥 Download Plan (TXT)
                 </button>
               </div>
 
