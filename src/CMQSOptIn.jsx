@@ -1,5 +1,221 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
+// ========== AI COACH COMPONENT ==========
+const ChatbotHelper = ({ plan, onClose }) => {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: `Hey! I'm your AI coach. I know your entire 90-day plan for ${plan.selectedIdea}. When you get stuck on a task, DON'T just sit there - ask me for help. I'll guide you to figure it out.\n\nWhat do you need help with?`
+    }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMessage = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const contextualPrompt = messages.length === 1 
+        ? `You are a Socratic coach for the Cash Machine QuickStart accountability program. Your job is to help students DISCOVER answers, not give them answers.
+
+User's Plan:
+- Business: ${plan.selectedIdea}
+- Pricing: ${plan.selectedPricing}
+- Category: ${plan.category}
+- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}
+
+Your coaching style:
+- ALWAYS ask "What have you tried already?" before helping
+- Ask questions that lead them to the answer (Socratic method)
+- Be supportive but don't rescue - they need to figure it out
+- If they say "I don't know," ask "If you DID know, what would you guess?"
+- Keep responses SHORT (2-3 sentences max) - more questions, less explaining
+- Never say "you should" - instead ask "what options do you see?"
+
+Examples:
+User: "How do I find my first customer?"
+You: "What's one place your ideal customer already hangs out? What have you tried so far?"
+
+User: "I don't know how to price my service."
+You: "What are 3 competitors charging? What would make you feel confident saying your price out loud?"
+
+User question: ${input}`
+        : input;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: messages.length === 1
+            ? [{ role: 'user', content: contextualPrompt }]
+            : [...messages.slice(1), userMessage]
+        })
+      });
+
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I hit a technical snag. Try asking again?' 
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const styles = {
+    chatbotModal: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.8)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      padding: '20px',
+    },
+    chatbotContainer: {
+      background: '#0F1419',
+      border: '1px solid rgba(201,168,76,0.3)',
+      borderRadius: '16px',
+      width: '100%',
+      maxWidth: '600px',
+      maxHeight: '80vh',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    chatbotHeader: {
+      padding: '20px',
+      borderBottom: '1px solid rgba(255,255,255,0.1)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    chatbotMessages: {
+      flex: 1,
+      overflowY: 'auto',
+      padding: '20px',
+    },
+    chatbotInput: {
+      padding: '20px',
+      borderTop: '1px solid rgba(255,255,255,0.1)',
+      display: 'flex',
+      gap: '12px',
+    },
+  };
+
+  return (
+    <div style={styles.chatbotModal} onClick={onClose}>
+      <div style={styles.chatbotContainer} onClick={(e) => e.stopPropagation()}>
+        <div style={styles.chatbotHeader}>
+          <h3 style={{margin: 0, fontSize: '1.2rem', color: '#ffffff'}}>💬 Your AI Coach</h3>
+          <button 
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              padding: '0',
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <div style={styles.chatbotMessages}>
+          {messages.map((msg, idx) => (
+            <div key={idx} style={{
+              marginBottom: '15px',
+              display: 'flex',
+              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+            }}>
+              <div style={{
+                maxWidth: '80%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                background: msg.role === 'user' 
+                  ? 'rgba(201,168,76,0.2)' 
+                  : 'rgba(255,255,255,0.05)',
+                border: `1px solid ${msg.role === 'user' 
+                  ? 'rgba(201,168,76,0.3)' 
+                  : 'rgba(255,255,255,0.1)'}`,
+                color: '#ffffff',
+                fontSize: '0.95rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+              }}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div style={{
+              padding: '12px 16px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              color: '#ffffff',
+              fontSize: '0.95rem',
+              maxWidth: '80%',
+            }}>
+              Thinking...
+            </div>
+          )}
+        </div>
+
+        <div style={styles.chatbotInput}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Ask your question..."
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '8px',
+              color: '#ffffff',
+              fontSize: '1rem',
+              outline: 'none',
+            }}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading || !input.trim()}
+            style={{
+              padding: '12px 24px',
+              background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+              color: '#0d1117',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+              opacity: loading || !input.trim() ? 0.5 : 1,
+            }}
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ========== MAIN COMPONENT ==========
 export default function CMQSOptIn() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -15,6 +231,35 @@ export default function CMQSOptIn() {
   const [plan, setPlan] = useState(null);
   const [activeTab, setActiveTab] = useState('month1');
   const [chatbotOpen, setChatbotOpen] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  const loadingMessages = [
+    "Analyzing your business idea...",
+    "Building Month 1 roadmap...",
+    "Designing Week 1-4 tasks...",
+    "Creating Month 2 strategy...",
+    "Planning Weeks 5-8...",
+    "Structuring Month 3 growth...",
+    "Mapping Weeks 9-12...",
+    "Generating marketing plan...",
+    "Building objection responses...",
+    "Creating milestone tracker...",
+    "Almost done..."
+  ];
+
+  // Cycle through loading messages
+  React.useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setLoadingMessageIndex(prev => 
+          prev < loadingMessages.length - 1 ? prev + 1 : prev
+        );
+      }, 2800); // Change message every 2.8 seconds
+      return () => clearInterval(interval);
+    } else {
+      setLoadingMessageIndex(0);
+    }
+  }, [loading]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -343,6 +588,39 @@ export default function CMQSOptIn() {
           <p style={styles.tagline}>
             Here's your complete roadmap. GHL accountability check-ins start now.
           </p>
+          
+          <div style={{
+            marginTop: '30px',
+            padding: '20px',
+            background: 'rgba(201,168,76,0.1)',
+            border: '2px solid rgba(201,168,76,0.4)',
+            borderRadius: '12px',
+            textAlign: 'left',
+          }}>
+            <div style={{fontSize: '1.5rem', marginBottom: '10px'}}>💡</div>
+            <h3 style={{fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px'}}>
+              Stuck on a task? Don't sit there wondering - ASK FOR HELP.
+            </h3>
+            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px', color: 'rgba(255,255,255,0.85)'}}>
+              Your AI Coach knows this entire plan. It won't just give you answers - it'll ask questions to help you figure it out yourself. That's how you learn.
+            </p>
+            <button
+              onClick={() => setChatbotOpen(true)}
+              style={{
+                padding: '14px 28px',
+                background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+                color: '#0d1117',
+                fontSize: '1.05rem',
+                fontWeight: '700',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              💬 Ask AI Coach
+            </button>
+          </div>
         </div>
 
         <div style={styles.phase}>
@@ -390,6 +668,19 @@ export default function CMQSOptIn() {
           {activeTab === 'month1' && plan.month1 && (
             <div style={styles.tabContent}>
               <h3 style={styles.sectionTitle}>🚀 Month 1: {plan.month1.goal}</h3>
+              
+              <div style={{
+                padding: '15px 20px',
+                background: 'rgba(62,207,171,0.1)',
+                border: '1px solid rgba(62,207,171,0.3)',
+                borderRadius: '8px',
+                marginBottom: '25px',
+                fontSize: '0.9rem',
+                lineHeight: '1.6',
+                color: 'rgba(255,255,255,0.9)',
+              }}>
+                <strong style={{color: '#3ECFAB'}}>📌 Getting Stuck Is Normal.</strong> When you hit a task and think "I don't know how to do this" — that's your cue to click "Ask AI Coach" above. Don't waste time guessing.
+              </div>
               
               {plan.month1.weeks.map((week) => (
                 <div key={week.week} style={styles.weekBlock}>
@@ -563,7 +854,7 @@ export default function CMQSOptIn() {
 
           <div style={styles.exportSection}>
             <button
-              onClick={downloadPlan}
+              onClick={() => setChatbotOpen(true)}
               style={{
                 padding: '14px 28px',
                 background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
@@ -571,6 +862,22 @@ export default function CMQSOptIn() {
                 fontSize: '1rem',
                 fontWeight: '700',
                 border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginRight: '15px',
+              }}
+            >
+              💬 Ask AI Coach
+            </button>
+            <button
+              onClick={downloadPlan}
+              style={{
+                padding: '14px 28px',
+                background: 'rgba(255,255,255,0.1)',
+                color: '#ffffff',
+                fontSize: '1rem',
+                fontWeight: '600',
+                border: '1px solid rgba(255,255,255,0.2)',
                 borderRadius: '8px',
                 cursor: 'pointer',
               }}
@@ -592,6 +899,13 @@ export default function CMQSOptIn() {
             </p>
           </div>
         </div>
+
+        {chatbotOpen && (
+          <ChatbotHelper
+            plan={plan}
+            onClose={() => setChatbotOpen(false)}
+          />
+        )}
 
         <div style={styles.footer}>
           <div style={{marginBottom: '15px'}}>
