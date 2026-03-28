@@ -1193,7 +1193,7 @@ No preamble. Return valid JSON only.`
 
   return (
     <div style={styles.container}>
-      {/* Admin Override - Click 5 times */}
+      {/* Hidden Admin Override - Click bottom-right corner 5 times */}
       <div 
         onClick={() => {
           const newCount = adminClicks + 1;
@@ -1206,23 +1206,15 @@ No preamble. Return valid JSON only.`
           position: 'fixed',
           bottom: '20px',
           right: '20px',
-          fontSize: '2.5rem',
-          cursor: 'pointer',
-          zIndex: 999,
-          background: adminClicks >= 5 ? 'rgba(62,207,171,0.2)' : 'rgba(255,255,255,0.1)',
-          borderRadius: '50%',
           width: '60px',
           height: '60px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: adminClicks >= 5 ? '2px solid #3ECFAB' : '2px solid rgba(255,255,255,0.2)',
+          cursor: 'default',
+          zIndex: 999,
+          opacity: 0,
           userSelect: 'none',
-          transition: 'all 0.3s',
         }}
-        title={adminClicks === 0 ? '' : adminClicks >= 5 ? 'Admin Mode Active' : `${5 - adminClicks} more clicks`}
+        title=""
       >
-        🔑
       </div>
 
       <div style={styles.header}>
