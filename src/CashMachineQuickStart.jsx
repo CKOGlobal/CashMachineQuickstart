@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 // - Updated AI prompts ("start this week" for both tracks)
 // - Accountability messaging (nice but firm boundaries)
 // - Chatbot helper (paid users only)
+// - Referral code system ($97 base, $69.97 with code, FREE for beta)
 // ============================================================================
 
 // ========== STYLES (OUTSIDE COMPONENT) ==========
@@ -546,6 +547,18 @@ const skillCategories = [
   { id: 'none', label: 'None of these', emoji: '🤷' },
 ];
 
+// ========== REFERRAL CODES CONFIGURATION ==========
+const referralCodes = {
+  // Standard discount codes ($97 → $69.97)
+  'LORAL2025': { type: 'discount', price: 69.97, name: 'Loral Partnership' },
+  'EARLYBIRD': { type: 'discount', price: 69.97, name: 'Early Bird' },
+  'STUDENT50': { type: 'discount', price: 69.97, name: 'Student Discount' },
+  
+  // Beta/Free access codes
+  'BETA2025': { type: 'free', price: 0, name: 'Beta Tester' },
+  'TESTACCESS': { type: 'free', price: 0, name: 'Test Access' },
+};
+
 // ========== HELPER COMPONENTS (OUTSIDE MAIN COMPONENT) ==========
 
 const Chip = ({ label, selected, onClick }) => (
@@ -560,105 +573,285 @@ const Chip = ({ label, selected, onClick }) => (
   </button>
 );
 
-const PaymentGate = () => (
-  <div style={styles.paymentGate}>
-    <div style={styles.paymentHeader}>
-      <span style={{fontSize: '2.5rem'}}>💳</span>
-      <h2 style={styles.paymentTitle}>Ready to Start Your Cash Machine?</h2>
-      <p style={styles.paymentSubtitle}>
-        90 days of accountability, AI-powered ideas, and a personalized action plan
-      </p>
-    </div>
+const PaymentGate = () => {
+  const [referralCode, setReferralCode] = useState('');
+  const [appliedCode, setAppliedCode] = useState(null);
+  const [codeError, setCodeError] = useState('');
 
-    <div style={styles.pricingCard}>
-      <div style={styles.priceRow}>
-        <span>Program Access (90 Days)</span>
-        <span style={styles.priceAmount}>$67.00</span>
+  const baseProgramPrice = 97.00;
+  const processingFee = appliedCode?.type === 'free' ? 0 : 2.97;
+  const programPrice = appliedCode ? appliedCode.price : baseProgramPrice;
+  const totalPrice = programPrice + processingFee;
+
+  const applyCode = () => {
+    const code = referralCode.trim().toUpperCase();
+    
+    if (!code) {
+      setCodeError('Please enter a referral code');
+      return;
+    }
+
+    if (referralCodes[code]) {
+      setAppliedCode(referralCodes[code]);
+      setCodeError('');
+    } else {
+      setCodeError('Invalid referral code');
+      setAppliedCode(null);
+    }
+  };
+
+  const removeCode = () => {
+    setReferralCode('');
+    setAppliedCode(null);
+    setCodeError('');
+  };
+
+  return (
+    <div style={styles.paymentGate}>
+      <div style={styles.paymentHeader}>
+        <span style={{fontSize: '2.5rem'}}>💳</span>
+        <h2 style={styles.paymentTitle}>Ready to Start Your Cash Machine?</h2>
+        <p style={styles.paymentSubtitle}>
+          90 days of accountability, AI-powered ideas, and a personalized action plan
+        </p>
       </div>
-      <div style={styles.priceRow}>
-        <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>
-          Processing Fee (Stripe)
-        </span>
-        <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>$2.97</span>
+
+      {/* Referral Code Input */}
+      <div style={{
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: '12px',
+        padding: '20px',
+        marginBottom: '20px',
+      }}>
+        <label style={{
+          display: 'block',
+          fontSize: '0.95rem',
+          fontWeight: '600',
+          marginBottom: '10px',
+          color: 'rgba(255,255,255,0.9)',
+        }}>
+          Have a referral code?
+        </label>
+        
+        {!appliedCode ? (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <input
+              type="text"
+              value={referralCode}
+              onChange={(e) => {
+                setReferralCode(e.target.value.toUpperCase());
+                setCodeError('');
+              }}
+              placeholder="Enter code"
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '1rem',
+                outline: 'none',
+              }}
+            />
+            <button
+              onClick={applyCode}
+              style={{
+                padding: '12px 24px',
+                background: 'rgba(201,168,76,0.2)',
+                border: '1px solid #C9A84C',
+                borderRadius: '8px',
+                color: '#C9A84C',
+                fontSize: '0.95rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Apply
+            </button>
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 16px',
+            background: 'rgba(62,207,171,0.1)',
+            border: '1px solid rgba(62,207,171,0.3)',
+            borderRadius: '8px',
+          }}>
+            <div>
+              <div style={{
+                fontSize: '0.95rem',
+                fontWeight: '600',
+                color: '#3ECFAB',
+                marginBottom: '3px',
+              }}>
+                ✓ {appliedCode.name}
+              </div>
+              <div style={{
+                fontSize: '0.85rem',
+                color: 'rgba(255,255,255,0.7)',
+              }}>
+                Code: {referralCode}
+              </div>
+            </div>
+            <button
+              onClick={removeCode}
+              style={{
+                padding: '6px 12px',
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '6px',
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
+        
+        {codeError && (
+          <p style={{
+            fontSize: '0.85rem',
+            color: '#F06292',
+            marginTop: '8px',
+            marginBottom: 0,
+          }}>
+            {codeError}
+          </p>
+        )}
       </div>
-      <div style={{...styles.priceRow, ...styles.priceTotal}}>
-        <span style={{fontSize: '1.2rem', fontWeight: '700'}}>Total</span>
-        <span style={{fontSize: '1.5rem', fontWeight: '700', color: '#C9A84C'}}>$69.97</span>
+
+      {/* Pricing Breakdown */}
+      <div style={styles.pricingCard}>
+        <div style={styles.priceRow}>
+          <span>Program Access (90 Days)</span>
+          <div style={{ textAlign: 'right' }}>
+            {appliedCode && programPrice < baseProgramPrice && (
+              <div style={{
+                fontSize: '0.85rem',
+                color: 'rgba(255,255,255,0.5)',
+                textDecoration: 'line-through',
+                marginBottom: '3px',
+              }}>
+                ${baseProgramPrice.toFixed(2)}
+              </div>
+            )}
+            <span style={styles.priceAmount}>
+              ${programPrice.toFixed(2)}
+            </span>
+          </div>
+        </div>
+        
+        {processingFee > 0 && (
+          <div style={styles.priceRow}>
+            <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>
+              Processing Fee (Stripe)
+            </span>
+            <span style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)'}}>
+              ${processingFee.toFixed(2)}
+            </span>
+          </div>
+        )}
+        
+        <div style={{...styles.priceRow, ...styles.priceTotal}}>
+          <span style={{fontSize: '1.2rem', fontWeight: '700'}}>Total</span>
+          <span style={{fontSize: '1.5rem', fontWeight: '700', color: '#C9A84C'}}>
+            ${totalPrice.toFixed(2)}
+          </span>
+        </div>
+        
+        <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center'}}>
+          {appliedCode?.type === 'free' ? 'Free beta access' : 'One-time payment'} • 7-day money-back guarantee
+        </p>
       </div>
-      <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center'}}>
-        One-time payment • 7-day money-back guarantee
-      </p>
-    </div>
 
-    <div style={styles.includesBox}>
-      <h3 style={{fontSize: '1.1rem', marginBottom: '15px', color: '#C9A84C'}}>
-        ✅ What's Included:
-      </h3>
-      <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          🤖 AI-generated cash machine ideas based on your skills
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          📋 Personalized 90-day action plan with pricing strategy
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          📱 90 days of accountability check-ins (SMS/Email)
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          🎯 Weekly progress coaching (12 weeks of support)
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          🎉 Milestone celebrations at 30, 60, and 90 days
-        </li>
-        <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
-          📥 Downloadable PDF action plan
-        </li>
-      </ul>
-    </div>
+      <div style={styles.includesBox}>
+        <h3 style={{fontSize: '1.1rem', marginBottom: '15px', color: '#C9A84C'}}>
+          ✅ What's Included:
+        </h3>
+        <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            🤖 AI-generated cash machine ideas based on your skills
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            📋 Personalized 90-day action plan with pricing strategy
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            📱 90 days of accountability check-ins (SMS/Email)
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            🎯 Weekly progress coaching (12 weeks of support)
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            🎉 Milestone celebrations at 30, 60, and 90 days
+          </li>
+          <li style={{marginBottom: '8px', fontSize: '0.95rem'}}>
+            📥 Downloadable PDF action plan
+          </li>
+        </ul>
+      </div>
 
-    <div style={styles.accountabilityBox}>
-      <h3 style={{fontSize: '1.1rem', marginBottom: '10px'}}>
-        🤝 Why Accountability Matters
-      </h3>
-      <p style={{fontSize: '0.95rem', lineHeight: '1.6', margin: 0}}>
-        Think of this as your accountability partner — someone checking in three times a week 
-        to make sure you're actually doing the work. No judgment, no pressure, just: 
-        "Hey, where are you at?" Because ideas don't make money. Action does.
-      </p>
-      <p style={{fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)'}}>
-        You've got this. We've got your back.
-      </p>
-    </div>
+      <div style={styles.accountabilityBox}>
+        <h3 style={{fontSize: '1.1rem', marginBottom: '10px'}}>
+          🤝 Why Accountability Matters
+        </h3>
+        <p style={{fontSize: '0.95rem', lineHeight: '1.6', margin: 0}}>
+          Think of this as your accountability partner — someone checking in three times a week 
+          to make sure you're actually doing the work. No judgment, no pressure, just: 
+          "Hey, where are you at?" Because ideas don't make money. Action does.
+        </p>
+        <p style={{fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)'}}>
+          You've got this. We've got your back.
+        </p>
+      </div>
 
-    <a 
-      href="https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={styles.purchaseButton}
-    >
-      Purchase Now - $69.97
-    </a>
+      <a 
+        href={appliedCode?.type === 'free' 
+          ? '/cmqs-opt-in?code=' + referralCode + '&type=free'
+          : 'https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed?code=' + referralCode
+        }
+        target={appliedCode?.type === 'free' ? '_self' : '_blank'}
+        rel={appliedCode?.type === 'free' ? '' : 'noopener noreferrer'}
+        style={{
+          ...styles.purchaseButton,
+          background: appliedCode?.type === 'free' 
+            ? 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)'
+            : 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+        }}
+      >
+        {appliedCode?.type === 'free' 
+          ? '🎉 Activate Free Beta Access'
+          : `Purchase Now - $${totalPrice.toFixed(2)}`
+        }
+      </a>
 
-    <div style={styles.consentNotice}>
-      <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5'}}>
-        By purchasing, you consent to receive SMS accountability check-ins (3x per week for 90 days) 
-        and email communications. Reply STOP to opt out anytime. Message & data rates may apply.
-      </p>
-      <p style={{fontSize: '0.85rem', marginTop: '10px'}}>
-        <a href="/terms.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
-          Terms of Service
-        </a>
-        {' • '}
-        <a href="/privacy.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
-          Privacy Policy
-        </a>
-      </p>
+      <div style={styles.consentNotice}>
+        <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5'}}>
+          By purchasing, you consent to receive SMS accountability check-ins (3x per week for 90 days) 
+          and email communications. Reply STOP to opt out anytime. Message & data rates may apply.
+        </p>
+        <p style={{fontSize: '0.85rem', marginTop: '10px'}}>
+          <a href="/terms.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
+            Terms of Service
+          </a>
+          {' • '}
+          <a href="/privacy.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
+            Privacy Policy
+          </a>
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ========== CHATBOT COMPONENT ==========
 const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
