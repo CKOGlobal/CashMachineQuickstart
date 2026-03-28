@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 // ============================================================================
-// CASH MACHINE QUICKSTART - COMPLETE REBUILD
-// - Scaffolded intake questions (fun, easy to understand)
-// - Updated AI prompts ("start this week" for both tracks)
-// - Accountability messaging (nice but firm boundaries)
-// - Chatbot helper (paid users only)
+// CASH MACHINE QUICKSTART - PROGRESSIVE PLAN GENERATION
+// - 3-call system: Month 1 → Month 2 → Month 3
+// - User sees Month 1 immediately, reads while others load
+// - Full educational detail (how/why/success)
 // - Referral code system ($97 base, $69.97 with code, FREE for beta)
 // ============================================================================
 
@@ -200,6 +199,23 @@ const styles = {
     color: '#F06292',
     fontSize: '0.95rem',
     marginBottom: '20px',
+  },
+  loadingBanner: {
+    padding: '20px',
+    background: 'rgba(201,168,76,0.1)',
+    border: '1px solid rgba(201,168,76,0.3)',
+    borderRadius: '12px',
+    marginBottom: '30px',
+    textAlign: 'center',
+  },
+  loadingSpinner: {
+    width: '40px',
+    height: '40px',
+    border: '4px solid rgba(201,168,76,0.2)',
+    borderTop: '4px solid #C9A84C',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    margin: '0 auto 15px',
   },
   paymentGate: {
     maxWidth: '600px',
@@ -441,13 +457,51 @@ const styles = {
     marginBottom: '15px',
   },
   weekBlock: {
-    padding: '15px',
+    padding: '20px',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: '8px',
+    marginBottom: '20px',
+  },
+  weekTitle: {
+    fontSize: '1.2rem',
+    fontWeight: '700',
+    color: '#C9A84C',
+    marginBottom: '10px',
+  },
+  weekSummary: {
+    fontSize: '1rem',
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: '15px',
+  },
+  stepBlock: {
+    padding: '15px',
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '8px',
     marginBottom: '12px',
+  },
+  stepWhat: {
+    fontSize: '1.05rem',
+    fontWeight: '700',
+    color: '#ffffff',
+    marginBottom: '10px',
+  },
+  stepSection: {
+    marginBottom: '10px',
+  },
+  stepLabel: {
+    fontSize: '0.85rem',
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '5px',
+  },
+  stepContent: {
     fontSize: '0.95rem',
     lineHeight: '1.6',
+    color: 'rgba(255,255,255,0.9)',
   },
   milestoneBlock: {
     display: 'flex',
@@ -531,6 +585,16 @@ const styles = {
     color: 'rgba(255,255,255,0.6)',
   },
 };
+
+// Add spinner animation
+const styleSheet = document.createElement("style");
+styleSheet.textContent = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(styleSheet);
 
 // ========== SKILL CATEGORIES ==========
 const skillCategories = [
@@ -840,10 +904,9 @@ const PaymentGate = () => {
           and email communications. Reply STOP to opt out anytime. Message & data rates may apply.
         </p>
         <p style={{fontSize: '0.85rem', marginTop: '10px'}}>
-          <a href="/terms.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
+          <a href="/terms.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none', marginRight: '15px'}}>
             Terms of Service
           </a>
-          {' • '}
           <a href="/privacy.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none'}}>
             Privacy Policy
           </a>
@@ -873,7 +936,6 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     setLoading(true);
 
     try {
-      // Build context-aware prompt
       const contextualPrompt = messages.length === 1 
         ? `You are an accountability coach for the Cash Machine QuickStart program. 
 
@@ -1019,6 +1081,7 @@ const CashMachineQuickStart = () => {
   const [phase, setPhase] = useState(1);
   const [hasPaid, setHasPaid] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingMonth, setLoadingMonth] = useState(null);
   const [error, setError] = useState('');
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [adminClicks, setAdminClicks] = useState(0);
@@ -1207,186 +1270,414 @@ No preamble.`
   };
 
   const generate90DayPlan = async () => {
-    setLoading(true);
     setError('');
+    setPhase(4);
+    
+    const emptyPlan = {
+      dualTrack: null,
+      pricing: null,
+      month1: null,
+      month2: null,
+      month3: null,
+      marketing: null,
+      milestones: null,
+    };
+    setPlan(emptyPlan);
+
+    setLoadingMonth('base');
     try {
-      const res = await fetch('/api/chat', {
+      const baseRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{
             role: 'user',
-            content: `Create a DUAL-TRACK 90-day plan for: ${selectedIdea.title}
+            content: `Create the FOUNDATION for a 90-day plan for: ${selectedIdea.title}
 
 Pricing: ${selectedPricing.name} at ${selectedPricing.price}
 Person: ${name}
 Good at: ${goodAt}
-Hard pass: ${hardPass}
 Time: ${timeAvailable}
-Idea Category: ${selectedIdea.category || 'business'}
+Category: ${selectedIdea.category || 'business'}
 
-CRITICAL: This is for YOUNG ADULTS who have NEVER done this before. They need BABY STEPS with:
-1. EXACT HOW (step 1, step 2, step 3 - what buttons to click, what websites to go to)
-2. WHY (explain the reason behind each step so they understand and remember)
-3. WHAT SUCCESS LOOKS LIKE (how they know they did it right)
+Return ONLY valid JSON with these components:
 
-DUAL-TRACK SYSTEM:
-${selectedIdea.category === 'bridge' ? 
-`This is a BRIDGE idea. The 90-day plan should focus on maximizing gig income while setting up a REAL business on the side.
-
-Track A (Gig Income): ${selectedIdea.title} - Start high, maintain as needed
-Track B (Business Setup): Identify and launch a scalable business based on their skills
-
-Goal: By Day 90, have a real business generating $500-1000/mo` :
-`This is a BUSINESS idea. The 90-day plan should show the transition from gig work to full business.
-
-Track A (Gig Income - DECREASING): Start with gig platforms for survival cash
-Track B (Business Income - INCREASING): ${selectedIdea.title}
-
-Goal: Crossover by Day 60-90 where business income > gig income`}
-
-Return ONLY valid JSON:
 {
   "dualTrack": {
     "trackA": {
       "name": "Gig Income (Survival)",
-      "weeks1_4": "Gig platforms + hours/week + expected income",
-      "weeks5_8": "Reduced hours as business grows",
-      "weeks9_12": "Minimal or phased out - business supports you"
+      "weeks1_4": "Brief description",
+      "weeks5_8": "Brief description",
+      "weeks9_12": "Brief description"
     },
     "trackB": {
       "name": "${selectedIdea.title}",
-      "weeks1_4": "Setup + first customers + learning",
-      "weeks5_8": "Scale customers + refine offer",
-      "weeks9_12": "Consistent income + growth systems"
+      "weeks1_4": "Brief description",
+      "weeks5_8": "Brief description",
+      "weeks9_12": "Brief description"
     },
-    "crossover": "Day 60-90: Business income replaces gig income"
+    "crossover": "When business income surpasses gig income"
   },
   "pricing": {
     "model": "${selectedPricing.name}",
     "rate": "${selectedPricing.price}",
-    "breakdown": "Cost analysis + when to adjust",
-    "adjustments": "Pricing evolution over 90 days"
-  },
-  "month1": {
-    "goal": "Survival income + business foundation",
-    "weeks": [
-      {
-        "week": 1,
-        "summary": "Start gig work + business setup",
-        "steps": [
-          {
-            "what": "Sign up for [Platform Name]",
-            "how": "Step 1: Go to [website]. Step 2: Click 'Sign Up'. Step 3: Fill out profile with [specific info]. Step 4: Upload [specific documents].",
-            "why": "This gets you into the system so you can start earning TODAY. The better your profile, the more gigs you'll get.",
-            "time": "2 hours",
-            "success": "Profile approved, first gig posted"
-          },
-          {
-            "what": "Complete first gig/customer",
-            "how": "Specific steps for this business type",
-            "why": "Reason this matters",
-            "time": "X hours",
-            "success": "What completion looks like"
-          }
-        ]
-      }
-    ],
-    "metrics": "Gig income + Business customers + Hours split"
-  },
-  "month2": {
-    "goal": "Scale business, reduce gig dependency",
-    "weeks": [
-      {
-        "week": 5,
-        "summary": "Brief week summary",
-        "steps": [
-          {
-            "what": "Action item",
-            "how": "Exact steps",
-            "why": "Reason",
-            "time": "Hours",
-            "success": "What success looks like"
-          }
-        ]
-      }
-    ],
-    "metrics": "Customer count + Revenue split (gig vs business) + Repeat rate"
-  },
-  "month3": {
-    "goal": "Business income > gig income",
-    "weeks": [
-      {
-        "week": 9,
-        "summary": "Brief week summary",
-        "steps": [
-          {
-            "what": "Action item",
-            "how": "Exact steps",
-            "why": "Reason",
-            "time": "Hours",
-            "success": "What success looks like"
-          }
-        ]
-      }
-    ],
-    "metrics": "Business revenue stable + Gig phased out + Growth trajectory"
+    "breakdown": "Cost analysis",
+    "adjustments": "When to adjust pricing"
   },
   "marketing": {
-    "channels": ["Low-cost channel 1", "channel 2", "channel 3"],
-    "dmScript": "Hey [Name]! 👋 [Personalized opener]. I just started [SERVICE] and I'm looking for a few people to work with. I'd love to help you with [SPECIFIC THING]. My rate is [PRICE]. Would you be open to a quick chat?",
-    "socialPost": "📣 Post template with emojis and structure they can copy/paste",
-    "emailTemplate": "Subject: [SUBJECT]\\n\\nHi [Name],\\n\\n[Body with specific value prop]\\n\\nWould you be open to a 10-minute call?",
+    "channels": ["channel1", "channel2", "channel3"],
+    "dmScript": "DM template",
+    "socialPost": "Social post template",
+    "emailTemplate": "Email template",
     "objections": {
-      "tooExpensive": "Response script",
-      "needToThink": "Response script",
-      "doItMyself": "Response script"
+      "tooExpensive": "Response",
+      "needToThink": "Response",
+      "doItMyself": "Response"
     },
-    "budget": "Free strategies + platforms"
+    "budget": "Budget strategy"
   },
   "milestones": [
-    {"day": 7, "goal": "First gig income + business accounts set up"},
-    {"day": 14, "goal": "First business customer + $200+ from gigs"},
-    {"day": 30, "goal": "3-5 business customers + reducing gig hours"},
-    {"day": 60, "goal": "Business generating $300-500/mo consistently"},
-    {"day": 90, "goal": "Business $500-1000/mo + gigs phased out"}
+    {"day": 7, "goal": "Goal"},
+    {"day": 14, "goal": "Goal"},
+    {"day": 30, "goal": "Goal"},
+    {"day": 60, "goal": "Goal"},
+    {"day": 90, "goal": "Goal"}
   ]
 }
-
-IMPORTANT: Each week should have 3-5 DETAILED steps with EXACT how-to instructions. Assume they know NOTHING. Example:
-
-GOOD:
-"what": "Set up Google Business Profile"
-"how": "Step 1: Go to google.com/business. Step 2: Click 'Manage now'. Step 3: Enter your business name exactly as: [Name] [Service Type]. Step 4: Choose 'Service Area Business' (not storefront). Step 5: Enter your ZIP code. Step 6: Choose category: [specific category]. Step 7: Add phone number and verify with code."
-"why": "This makes you show up in Google Maps when people search '[your service] near me'. 60% of local customers find businesses this way."
-"time": "1 hour"
-"success": "Profile shows as 'Verified' with green checkmark"
-
-BAD:
-"what": "Set up business systems"
-"how": "Create CRM and contracts"
-"why": "You need these"
 
 No preamble. Return valid JSON only.`
           }]
         })
       });
-      const data = await res.json();
-      const json = data.reply.replace(/```json\n?|\n?```/g, '').trim();
-      const parsed = JSON.parse(json);
-      setPlan(parsed);
-      setPhase(4);
+      const baseData = await baseRes.json();
+      const baseJson = baseData.reply.replace(/```json\n?|\n?```/g, '').trim();
+      const baseParsed = JSON.parse(baseJson);
+      
+      setPlan(prev => ({
+        ...prev,
+        dualTrack: baseParsed.dualTrack,
+        pricing: baseParsed.pricing,
+        marketing: baseParsed.marketing,
+        milestones: baseParsed.milestones,
+      }));
     } catch (err) {
-      setError('Failed to generate plan. Please try again.');
+      setError('Failed to generate plan foundation. Please try again.');
       console.error(err);
-    } finally {
-      setLoading(false);
+      setLoadingMonth(null);
+      return;
     }
+
+    setLoadingMonth(1);
+    try {
+      const month1Res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: `Generate MONTH 1 (weeks 1-4) for: ${selectedIdea.title}
+
+Person: ${name}
+Good at: ${goodAt}
+Hard pass: ${hardPass}
+Category: ${selectedIdea.category}
+
+CRITICAL: For YOUNG ADULTS who need EXACT steps with WHY explanations.
+
+Return ONLY valid JSON:
+{
+  "goal": "Month 1 goal in one sentence",
+  "weeks": [
+    {
+      "week": 1,
+      "summary": "Week focus",
+      "steps": [
+        {
+          "what": "Action (e.g., Sign up for TaskRabbit)",
+          "how": "Step 1: Go to [website]. Step 2: Click [button]. Step 3: [action]. Be VERY specific.",
+          "why": "This is important because [reason]. Explains the strategy.",
+          "time": "X hours",
+          "success": "You know you did it right when [specific outcome]"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "summary": "Week focus",
+      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
+    },
+    {
+      "week": 3,
+      "summary": "Week focus",
+      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
+    },
+    {
+      "week": 4,
+      "summary": "Week focus",
+      "steps": [{"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}]
+    }
+  ],
+  "metrics": "What to track this month"
+}
+
+Each week needs 3-5 detailed steps. No preamble.`
+          }]
+        })
+      });
+      const month1Data = await month1Res.json();
+      const month1Json = month1Data.reply.replace(/```json\n?|\n?```/g, '').trim();
+      const month1Parsed = JSON.parse(month1Json);
+      
+      setPlan(prev => ({
+        ...prev,
+        month1: month1Parsed,
+      }));
+    } catch (err) {
+      setError('Month 1 generation failed. Month 2 and 3 will continue...');
+      console.error(err);
+    }
+
+    setLoadingMonth(2);
+    try {
+      const month2Res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: `Generate MONTH 2 (weeks 5-8) for: ${selectedIdea.title}
+
+Person: ${name}
+Good at: ${goodAt}
+Category: ${selectedIdea.category}
+
+MONTH 2 FOCUS: Scale business, reduce gig dependency.
+
+Return ONLY valid JSON:
+{
+  "goal": "Month 2 goal in one sentence",
+  "weeks": [
+    {
+      "week": 5,
+      "summary": "Week focus",
+      "steps": [
+        {
+          "what": "Action",
+          "how": "VERY specific step-by-step",
+          "why": "Strategic explanation",
+          "time": "X hours",
+          "success": "How they know it worked"
+        }
+      ]
+    },
+    {"week": 6, "summary": "...", "steps": [...]},
+    {"week": 7, "summary": "...", "steps": [...]},
+    {"week": 8, "summary": "...", "steps": [...]}
+  ],
+  "metrics": "What to track"
+}
+
+Each week needs 3-5 detailed steps. No preamble.`
+          }]
+        })
+      });
+      const month2Data = await month2Res.json();
+      const month2Json = month2Data.reply.replace(/```json\n?|\n?```/g, '').trim();
+      const month2Parsed = JSON.parse(month2Json);
+      
+      setPlan(prev => ({
+        ...prev,
+        month2: month2Parsed,
+      }));
+    } catch (err) {
+      setError('Month 2 generation failed. Month 3 will continue...');
+      console.error(err);
+    }
+
+    setLoadingMonth(3);
+    try {
+      const month3Res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{
+            role: 'user',
+            content: `Generate MONTH 3 (weeks 9-12) for: ${selectedIdea.title}
+
+Person: ${name}
+Good at: ${goodAt}
+Category: ${selectedIdea.category}
+
+MONTH 3 FOCUS: Business income > gig income. Growth systems.
+
+Return ONLY valid JSON:
+{
+  "goal": "Month 3 goal in one sentence",
+  "weeks": [
+    {
+      "week": 9,
+      "summary": "Week focus",
+      "steps": [
+        {
+          "what": "Action",
+          "how": "VERY specific step-by-step",
+          "why": "Strategic explanation",
+          "time": "X hours",
+          "success": "How they know it worked"
+        }
+      ]
+    },
+    {"week": 10, "summary": "...", "steps": [...]},
+    {"week": 11, "summary": "...", "steps": [...]},
+    {"week": 12, "summary": "...", "steps": [...]}
+  ],
+  "metrics": "What to track"
+}
+
+Each week needs 3-5 detailed steps. No preamble.`
+          }]
+        })
+      });
+      const month3Data = await month3Res.json();
+      const month3Json = month3Data.reply.replace(/```json\n?|\n?```/g, '').trim();
+      const month3Parsed = JSON.parse(month3Json);
+      
+      setPlan(prev => ({
+        ...prev,
+        month3: month3Parsed,
+      }));
+    } catch (err) {
+      setError('Month 3 generation failed.');
+      console.error(err);
+    }
+
+    setLoadingMonth(null);
+  };
+
+  const downloadPlan = () => {
+    const content = `
+CASH MACHINE QUICKSTART - 90-DAY ACTION PLAN
+Generated for: ${name}
+Business Idea: ${selectedIdea?.title}
+Pricing: ${selectedPricing?.name} at ${selectedPricing?.price}
+
+========================================
+DUAL-TRACK SYSTEM
+========================================
+
+Track A: ${plan.dualTrack.trackA.name}
+- Weeks 1-4: ${plan.dualTrack.trackA.weeks1_4}
+- Weeks 5-8: ${plan.dualTrack.trackA.weeks5_8}
+- Weeks 9-12: ${plan.dualTrack.trackA.weeks9_12}
+
+Track B: ${plan.dualTrack.trackB.name}
+- Weeks 1-4: ${plan.dualTrack.trackB.weeks1_4}
+- Weeks 5-8: ${plan.dualTrack.trackB.weeks5_8}
+- Weeks 9-12: ${plan.dualTrack.trackB.weeks9_12}
+
+Crossover Point: ${plan.dualTrack.crossover}
+
+========================================
+PRICING STRATEGY
+========================================
+Model: ${plan.pricing.model}
+Rate: ${plan.pricing.rate}
+${plan.pricing.breakdown}
+${plan.pricing.adjustments}
+
+========================================
+MONTH 1: ${plan.month1?.goal || 'Building Foundation'}
+========================================
+${plan.month1?.weeks.map(w => `
+WEEK ${w.week}: ${w.summary}
+${w.steps.map((s, i) => `
+  ${i + 1}. ${s.what}
+     HOW: ${s.how}
+     WHY: ${s.why}
+     TIME: ${s.time}
+     SUCCESS: ${s.success}
+`).join('')}
+`).join('') || 'Loading...'}
+
+Metrics to Track: ${plan.month1?.metrics || 'TBD'}
+
+========================================
+MONTH 2: ${plan.month2?.goal || 'Scaling Up'}
+========================================
+${plan.month2?.weeks.map(w => `
+WEEK ${w.week}: ${w.summary}
+${w.steps.map((s, i) => `
+  ${i + 1}. ${s.what}
+     HOW: ${s.how}
+     WHY: ${s.why}
+     TIME: ${s.time}
+     SUCCESS: ${s.success}
+`).join('')}
+`).join('') || 'Loading...'}
+
+Metrics to Track: ${plan.month2?.metrics || 'TBD'}
+
+========================================
+MONTH 3: ${plan.month3?.goal || 'Growth & Systems'}
+========================================
+${plan.month3?.weeks.map(w => `
+WEEK ${w.week}: ${w.summary}
+${w.steps.map((s, i) => `
+  ${i + 1}. ${s.what}
+     HOW: ${s.how}
+     WHY: ${s.why}
+     TIME: ${s.time}
+     SUCCESS: ${s.success}
+`).join('')}
+`).join('') || 'Loading...'}
+
+Metrics to Track: ${plan.month3?.metrics || 'TBD'}
+
+========================================
+MARKETING PLAN
+========================================
+Channels: ${plan.marketing?.channels.join(', ')}
+
+DM Script:
+${plan.marketing?.dmScript}
+
+Social Post Template:
+${plan.marketing?.socialPost}
+
+Email Template:
+${plan.marketing?.emailTemplate}
+
+Objection Handling:
+- "Too expensive": ${plan.marketing?.objections?.tooExpensive}
+- "Need to think": ${plan.marketing?.objections?.needToThink}
+- "Can do it myself": ${plan.marketing?.objections?.doItMyself}
+
+Budget Strategy: ${plan.marketing?.budget}
+
+========================================
+MILESTONES
+========================================
+${plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`).join('\n') || 'TBD'}
+
+========================================
+
+Generated by Cash Machine QuickStart
+Partnership: Loral Langemeier + Kelli Owens
+Website: proactively-lazy.com
+Email: Kelli@proactively-lazy.com
+`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name.replace(/\s+/g, '_')}_90Day_Plan.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div style={styles.container}>
-      {/* Hidden Admin Override - Click bottom-right corner 5 times */}
       <div 
         onClick={() => {
           const newCount = adminClicks + 1;
@@ -1837,628 +2128,363 @@ No preamble. Return valid JSON only.`
         </div>
       )}
 
-      {phase === 4 && plan && (hasPaid || adminClicks >= 5) && (
+      {phase === 4 && (
         <div style={styles.phase}>
-          <div style={styles.phaseHeader}>
-            <span style={{fontSize: '2rem'}}>🎉</span>
-            <h2 style={styles.phaseTitle}>
-              Your <span style={{color: '#C9A84C'}}>90-Day Cash Machine Plan</span> is Ready
-            </h2>
-            <p style={styles.phaseSubtitle}>
-              {name}, here's your roadmap. Follow this and you'll be making money in 30 days.
-            </p>
-          </div>
+          {loadingMonth && (
+            <div style={styles.loadingBanner}>
+              <div style={styles.loadingSpinner}></div>
+              <h3 style={{fontSize: '1.2rem', marginBottom: '10px'}}>
+                {loadingMonth === 'base' && '🎯 Building Your Plan Foundation...'}
+                {loadingMonth === 1 && '🚀 Generating Month 1...'}
+                {loadingMonth === 2 && '📈 Generating Month 2...'}
+                {loadingMonth === 3 && '🎯 Generating Month 3...'}
+              </h3>
+              <p style={{fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', margin: 0}}>
+                {loadingMonth === 'base' && 'Setting up dual-track system, pricing, and marketing...'}
+                {loadingMonth === 1 && 'Creating detailed week-by-week steps...'}
+                {loadingMonth === 2 && 'You can start reading Month 1 while this loads!'}
+                {loadingMonth === 3 && 'Almost done! Month 3 coming right up...'}
+              </p>
+            </div>
+          )}
 
-          <div style={styles.tabs}>
-            {[
-              { id: 'dualtrack', label: 'Dual-Track Plan', emoji: '🎯' },
-              { id: 'pricing', label: 'Pricing', emoji: '💰' },
-              { id: 'month1', label: 'Month 1', emoji: '🚀' },
-              { id: 'month2', label: 'Month 2', emoji: '📈' },
-              { id: 'month3', label: 'Month 3', emoji: '🎯' },
-              { id: 'marketing', label: 'Marketing', emoji: '📣' },
-              { id: 'milestones', label: 'Milestones', emoji: '🏆' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                style={{
-                  ...styles.tab,
-                  ...(activeTab === tab.id ? styles.tabActive : {})
-                }}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.emoji} {tab.label}
-              </button>
-            ))}
-          </div>
+          {plan && plan.dualTrack && (
+            <>
+              <div style={styles.phaseHeader}>
+                <span style={{fontSize: '2rem'}}>🎉</span>
+                <h2 style={styles.phaseTitle}>
+                  Your <span style={{color: '#C9A84C'}}>90-Day Cash Machine Plan</span> is Ready
+                </h2>
+                <p style={styles.phaseSubtitle}>
+                  {name}, here's your roadmap. Follow this and you'll be making money in 30 days.
+                </p>
+              </div>
 
-          <div style={styles.tabContent}>
-            {activeTab === 'dualtrack' && plan.dualTrack && (
-              <div>
-                <h3 style={styles.sectionTitle}>Your 90-Day Dual-Track System</h3>
-                <p style={styles.sectionText}>{plan.dualTrack.crossover}</p>
-                
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px'}}>
-                  <div style={{
-                    padding: '20px',
-                    background: 'rgba(96,184,232,0.1)',
-                    border: '1px solid rgba(96,184,232,0.3)',
-                    borderRadius: '12px'
-                  }}>
-                    <h4 style={{fontSize: '1.1rem', color: '#60B8E8', marginBottom: '10px'}}>
+              {error && <div style={styles.error}>{error}</div>}
+
+              <div style={styles.tabs}>
+                {[
+                  { id: 'dualtrack', label: 'Dual-Track Plan', emoji: '🎯' },
+                  { id: 'pricing', label: 'Pricing', emoji: '💰' },
+                  { id: 'month1', label: 'Month 1', emoji: '🚀', show: plan.month1 },
+                  { id: 'month2', label: 'Month 2', emoji: '📈', show: plan.month2 },
+                  { id: 'month3', label: 'Month 3', emoji: '🎯', show: plan.month3 },
+                  { id: 'marketing', label: 'Marketing', emoji: '📣', show: plan.marketing },
+                  { id: 'milestones', label: 'Milestones', emoji: '🏆', show: plan.milestones },
+                ].map((tab) => {
+                  if (tab.show === false) return null;
+                  return (
+                    <button
+                      key={tab.id}
+                      style={{
+                        ...styles.tab,
+                        ...(activeTab === tab.id ? styles.tabActive : {})
+                      }}
+                      onClick={() => setActiveTab(tab.id)}
+                    >
+                      {tab.emoji} {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* TAB CONTENT */}
+              {activeTab === 'dualtrack' && plan.dualTrack && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>🎯 The Dual-Track System</h3>
+                  <p style={styles.sectionText}>
+                    You're running TWO tracks at once. Track A pays bills <strong>this week</strong>. 
+                    Track B builds the business that'll replace your day job.
+                  </p>
+
+                  <div style={{...styles.weekBlock, borderLeft: '4px solid #60B8E8'}}>
+                    <h4 style={{fontSize: '1.1rem', fontWeight: '700', color: '#60B8E8', marginBottom: '10px'}}>
                       Track A: {plan.dualTrack.trackA.name}
                     </h4>
-                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackA.weeks1_4}</p>
-                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackA.weeks5_8}</p>
-                    <p style={{fontSize: '0.9rem'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackA.weeks9_12}</p>
+                    <p style={{marginBottom: '8px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackA.weeks1_4}</p>
+                    <p style={{marginBottom: '8px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackA.weeks5_8}</p>
+                    <p style={{marginBottom: '0'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackA.weeks9_12}</p>
                   </div>
 
-                  <div style={{
-                    padding: '20px',
-                    background: 'rgba(201,168,76,0.1)',
-                    border: '1px solid rgba(201,168,76,0.3)',
-                    borderRadius: '12px'
-                  }}>
-                    <h4 style={{fontSize: '1.1rem', color: '#C9A84C', marginBottom: '10px'}}>
+                  <div style={{...styles.weekBlock, borderLeft: '4px solid #C9A84C'}}>
+                    <h4 style={{fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px'}}>
                       Track B: {plan.dualTrack.trackB.name}
                     </h4>
-                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackB.weeks1_4}</p>
-                    <p style={{fontSize: '0.9rem', marginBottom: '10px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackB.weeks5_8}</p>
-                    <p style={{fontSize: '0.9rem'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackB.weeks9_12}</p>
+                    <p style={{marginBottom: '8px'}}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackB.weeks1_4}</p>
+                    <p style={{marginBottom: '8px'}}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackB.weeks5_8}</p>
+                    <p style={{marginBottom: '0'}}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackB.weeks9_12}</p>
                   </div>
-                </div>
-              </div>
-            )}
 
-            {activeTab === 'pricing' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Your Pricing Model: {plan.pricing.model}</h3>
-                <p style={styles.sectionText}><strong>Rate:</strong> {plan.pricing.rate}</p>
-                <p style={styles.sectionText}>{plan.pricing.breakdown}</p>
-                <p style={styles.sectionText}><strong>When to Adjust:</strong> {plan.pricing.adjustments}</p>
-              </div>
-            )}
-
-            {activeTab === 'month1' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Month 1: {plan.month1.goal}</h3>
-                {plan.month1.weeks.map((weekData, idx) => (
-                  <div key={idx} style={{marginBottom: '30px'}}>
-                    <div style={{
-                      ...styles.weekBlock,
-                      background: 'rgba(201,168,76,0.1)',
-                      border: '1px solid rgba(201,168,76,0.3)',
-                      marginBottom: '15px',
-                    }}>
-                      <strong style={{color: '#C9A84C', fontSize: '1.1rem'}}>
-                        Week {weekData.week || idx + 1}:
-                      </strong> {weekData.summary || weekData}
-                    </div>
-                    
-                    {weekData.steps && weekData.steps.map((step, stepIdx) => (
-                      <div key={stepIdx} style={{
-                        padding: '15px',
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '12px',
-                        marginLeft: '20px',
-                      }}>
-                        <div style={{fontSize: '0.95rem', marginBottom: '10px'}}>
-                          <strong style={{color: '#3ECFAB'}}>✓ {step.what}</strong>
-                          {step.time && <span style={{color: 'rgba(255,255,255,0.5)', marginLeft: '10px'}}>({step.time})</span>}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6'}}>
-                          <strong>How:</strong> {step.how}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6', fontStyle: 'italic', color: 'rgba(255,255,255,0.8)'}}>
-                          <strong>Why:</strong> {step.why}
-                        </div>
-                        {step.success && (
-                          <div style={{fontSize: '0.85rem', color: '#3ECFAB', marginTop: '8px'}}>
-                            <strong>Success:</strong> {step.success}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-                <p style={styles.sectionText}><strong>Track:</strong> {plan.month1.metrics}</p>
-                
-                <div style={{
-                  marginTop: '20px',
-                  padding: '15px',
-                  background: 'rgba(62,207,171,0.1)',
-                  border: '1px solid rgba(62,207,171,0.3)',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                }}>
-                  <p style={{fontSize: '0.9rem', margin: 0, color: '#3ECFAB'}}>
-                    💬 <strong>Stuck on any of these steps?</strong> Click "Ask Your AI Coach" above — it knows your exact plan and can walk you through it.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'month2' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Month 2: {plan.month2.goal}</h3>
-                {plan.month2.weeks.map((weekData, idx) => (
-                  <div key={idx} style={{marginBottom: '30px'}}>
-                    <div style={{
-                      ...styles.weekBlock,
-                      background: 'rgba(201,168,76,0.1)',
-                      border: '1px solid rgba(201,168,76,0.3)',
-                      marginBottom: '15px',
-                    }}>
-                      <strong style={{color: '#C9A84C', fontSize: '1.1rem'}}>
-                        Week {weekData.week || (5 + idx)}:
-                      </strong> {weekData.summary || weekData}
-                    </div>
-                    
-                    {weekData.steps && weekData.steps.map((step, stepIdx) => (
-                      <div key={stepIdx} style={{
-                        padding: '15px',
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '12px',
-                        marginLeft: '20px',
-                      }}>
-                        <div style={{fontSize: '0.95rem', marginBottom: '10px'}}>
-                          <strong style={{color: '#3ECFAB'}}>✓ {step.what}</strong>
-                          {step.time && <span style={{color: 'rgba(255,255,255,0.5)', marginLeft: '10px'}}>({step.time})</span>}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6'}}>
-                          <strong>How:</strong> {step.how}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6', fontStyle: 'italic', color: 'rgba(255,255,255,0.8)'}}>
-                          <strong>Why:</strong> {step.why}
-                        </div>
-                        {step.success && (
-                          <div style={{fontSize: '0.85rem', color: '#3ECFAB', marginTop: '8px'}}>
-                            <strong>Success:</strong> {step.success}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-                <p style={styles.sectionText}><strong>Track:</strong> {plan.month2.metrics}</p>
-                
-                <div style={{
-                  marginTop: '20px',
-                  padding: '15px',
-                  background: 'rgba(62,207,171,0.1)',
-                  border: '1px solid rgba(62,207,171,0.3)',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                }}>
-                  <p style={{fontSize: '0.9rem', margin: 0, color: '#3ECFAB'}}>
-                    💬 <strong>Stuck on any of these steps?</strong> Click "Ask Your AI Coach" above — it knows your exact plan and can walk you through it.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'month3' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Month 3: {plan.month3.goal}</h3>
-                {plan.month3.weeks.map((weekData, idx) => (
-                  <div key={idx} style={{marginBottom: '30px'}}>
-                    <div style={{
-                      ...styles.weekBlock,
-                      background: 'rgba(201,168,76,0.1)',
-                      border: '1px solid rgba(201,168,76,0.3)',
-                      marginBottom: '15px',
-                    }}>
-                      <strong style={{color: '#C9A84C', fontSize: '1.1rem'}}>
-                        Week {weekData.week || (9 + idx)}:
-                      </strong> {weekData.summary || weekData}
-                    </div>
-                    
-                    {weekData.steps && weekData.steps.map((step, stepIdx) => (
-                      <div key={stepIdx} style={{
-                        padding: '15px',
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        marginBottom: '12px',
-                        marginLeft: '20px',
-                      }}>
-                        <div style={{fontSize: '0.95rem', marginBottom: '10px'}}>
-                          <strong style={{color: '#3ECFAB'}}>✓ {step.what}</strong>
-                          {step.time && <span style={{color: 'rgba(255,255,255,0.5)', marginLeft: '10px'}}>({step.time})</span>}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6'}}>
-                          <strong>How:</strong> {step.how}
-                        </div>
-                        <div style={{fontSize: '0.9rem', marginBottom: '8px', lineHeight: '1.6', fontStyle: 'italic', color: 'rgba(255,255,255,0.8)'}}>
-                          <strong>Why:</strong> {step.why}
-                        </div>
-                        {step.success && (
-                          <div style={{fontSize: '0.85rem', color: '#3ECFAB', marginTop: '8px'}}>
-                            <strong>Success:</strong> {step.success}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-                <p style={styles.sectionText}><strong>Track:</strong> {plan.month3.metrics}</p>
-                
-                <div style={{
-                  marginTop: '20px',
-                  padding: '15px',
-                  background: 'rgba(62,207,171,0.1)',
-                  border: '1px solid rgba(62,207,171,0.3)',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                }}>
-                  <p style={{fontSize: '0.9rem', margin: 0, color: '#3ECFAB'}}>
-                    💬 <strong>Stuck on any of these steps?</strong> Click "Ask Your AI Coach" above — it knows your exact plan and can walk you through it.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'marketing' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Marketing Roadmap + Scripts</h3>
-                
-                <div style={{marginBottom: '20px'}}>
-                  <p style={styles.sectionText}><strong>Best Channels:</strong> {plan.marketing.channels.join(', ')}</p>
-                  <p style={styles.sectionText}><strong>Budget:</strong> {plan.marketing.budget}</p>
-                </div>
-
-                {plan.marketing.dmScript && (
-                  <div style={{
-                    padding: '15px',
-                    background: 'rgba(96,184,232,0.1)',
-                    border: '1px solid rgba(96,184,232,0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '15px',
-                  }}>
-                    <h4 style={{color: '#60B8E8', fontSize: '0.95rem', marginBottom: '10px'}}>📱 DM Script (Copy + Personalize)</h4>
-                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
-                      {plan.marketing.dmScript}
-                    </p>
-                  </div>
-                )}
-
-                {plan.marketing.socialPost && (
-                  <div style={{
-                    padding: '15px',
-                    background: 'rgba(201,168,76,0.1)',
-                    border: '1px solid rgba(201,168,76,0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '15px',
-                  }}>
-                    <h4 style={{color: '#C9A84C', fontSize: '0.95rem', marginBottom: '10px'}}>📣 Social Post Template</h4>
-                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
-                      {plan.marketing.socialPost}
-                    </p>
-                  </div>
-                )}
-
-                {plan.marketing.emailTemplate && (
                   <div style={{
                     padding: '15px',
                     background: 'rgba(62,207,171,0.1)',
                     border: '1px solid rgba(62,207,171,0.3)',
                     borderRadius: '8px',
-                    marginBottom: '15px',
+                    marginTop: '15px',
                   }}>
-                    <h4 style={{color: '#3ECFAB', fontSize: '0.95rem', marginBottom: '10px'}}>📧 Email Template</h4>
-                    <p style={{fontSize: '0.9rem', whiteSpace: 'pre-wrap', fontFamily: "'IBM Plex Mono', monospace"}}>
-                      {plan.marketing.emailTemplate}
-                    </p>
+                    <strong style={{color: '#3ECFAB'}}>🎯 Crossover Point:</strong> {plan.dualTrack.crossover}
                   </div>
-                )}
+                </div>
+              )}
 
-                {plan.marketing.objections && (
-                  <div style={{
-                    padding: '15px',
-                    background: 'rgba(240,98,146,0.1)',
-                    border: '1px solid rgba(240,98,146,0.3)',
-                    borderRadius: '8px',
-                  }}>
-                    <h4 style={{color: '#F06292', fontSize: '0.95rem', marginBottom: '10px'}}>🛡️ Objection Handling</h4>
-                    <div style={{fontSize: '0.9rem'}}>
-                      <p style={{marginBottom: '8px'}}>
-                        <strong>"You're too expensive":</strong> {plan.marketing.objections.tooExpensive}
-                      </p>
-                      <p style={{marginBottom: '8px'}}>
-                        <strong>"I need to think about it":</strong> {plan.marketing.objections.needToThink}
-                      </p>
-                      <p>
-                        <strong>"I can do it myself":</strong> {plan.marketing.objections.doItMyself}
-                      </p>
+              {activeTab === 'pricing' && plan.pricing && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>💰 Your Pricing Strategy</h3>
+                  <div style={styles.weekBlock}>
+                    <p style={{marginBottom: '10px'}}><strong>Model:</strong> {plan.pricing.model}</p>
+                    <p style={{marginBottom: '10px'}}><strong>Rate:</strong> {plan.pricing.rate}</p>
+                    <p style={{marginBottom: '10px'}}><strong>Breakdown:</strong> {plan.pricing.breakdown}</p>
+                    <p style={{marginBottom: '0'}}><strong>When to Adjust:</strong> {plan.pricing.adjustments}</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'month1' && plan.month1 && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>🚀 Month 1: {plan.month1.goal}</h3>
+                  {plan.month1.weeks.map((week) => (
+                    <div key={week.week} style={styles.weekBlock}>
+                      <h4 style={styles.weekTitle}>Week {week.week}</h4>
+                      <p style={styles.weekSummary}>{week.summary}</p>
+                      {week.steps.map((step, idx) => (
+                        <div key={idx} style={styles.stepBlock}>
+                          <div style={styles.stepWhat}>{step.what}</div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>How</div>
+                            <div style={styles.stepContent}>{step.how}</div>
+                          </div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>Why</div>
+                            <div style={styles.stepContent}>{step.why}</div>
+                          </div>
+                          <div style={{display: 'flex', gap: '20px', marginTop: '10px'}}>
+                            <div>
+                              <div style={styles.stepLabel}>Time</div>
+                              <div style={styles.stepContent}>{step.time}</div>
+                            </div>
+                            <div style={{flex: 1}}>
+                              <div style={styles.stepLabel}>Success Looks Like</div>
+                              <div style={styles.stepContent}>{step.success}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
+                  ))}
+                  <div style={{...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)'}}>
+                    <strong style={{color: '#C9A84C'}}>📊 Track These Metrics:</strong> {plan.month1.metrics}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
 
-            {activeTab === 'milestones' && (
-              <div>
-                <h3 style={styles.sectionTitle}>Your 90-Day Milestones</h3>
-                {plan.milestones.map((milestone, idx) => (
-                  <div key={idx} style={styles.milestoneBlock}>
-                    <div style={styles.milestoneDay}>Day {milestone.day}</div>
-                    <div style={styles.milestoneGoal}>{milestone.goal}</div>
+              {activeTab === 'month2' && plan.month2 && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>📈 Month 2: {plan.month2.goal}</h3>
+                  {plan.month2.weeks.map((week) => (
+                    <div key={week.week} style={styles.weekBlock}>
+                      <h4 style={styles.weekTitle}>Week {week.week}</h4>
+                      <p style={styles.weekSummary}>{week.summary}</p>
+                      {week.steps.map((step, idx) => (
+                        <div key={idx} style={styles.stepBlock}>
+                          <div style={styles.stepWhat}>{step.what}</div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>How</div>
+                            <div style={styles.stepContent}>{step.how}</div>
+                          </div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>Why</div>
+                            <div style={styles.stepContent}>{step.why}</div>
+                          </div>
+                          <div style={{display: 'flex', gap: '20px', marginTop: '10px'}}>
+                            <div>
+                              <div style={styles.stepLabel}>Time</div>
+                              <div style={styles.stepContent}>{step.time}</div>
+                            </div>
+                            <div style={{flex: 1}}>
+                              <div style={styles.stepLabel}>Success Looks Like</div>
+                              <div style={styles.stepContent}>{step.success}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                  <div style={{...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)'}}>
+                    <strong style={{color: '#C9A84C'}}>📊 Track These Metrics:</strong> {plan.month2.metrics}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {activeTab === 'month3' && plan.month3 && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>🎯 Month 3: {plan.month3.goal}</h3>
+                  {plan.month3.weeks.map((week) => (
+                    <div key={week.week} style={styles.weekBlock}>
+                      <h4 style={styles.weekTitle}>Week {week.week}</h4>
+                      <p style={styles.weekSummary}>{week.summary}</p>
+                      {week.steps.map((step, idx) => (
+                        <div key={idx} style={styles.stepBlock}>
+                          <div style={styles.stepWhat}>{step.what}</div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>How</div>
+                            <div style={styles.stepContent}>{step.how}</div>
+                          </div>
+                          <div style={styles.stepSection}>
+                            <div style={styles.stepLabel}>Why</div>
+                            <div style={styles.stepContent}>{step.why}</div>
+                          </div>
+                          <div style={{display: 'flex', gap: '20px', marginTop: '10px'}}>
+                            <div>
+                              <div style={styles.stepLabel}>Time</div>
+                              <div style={styles.stepContent}>{step.time}</div>
+                            </div>
+                            <div style={{flex: 1}}>
+                              <div style={styles.stepLabel}>Success Looks Like</div>
+                              <div style={styles.stepContent}>{step.success}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                  <div style={{...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)'}}>
+                    <strong style={{color: '#C9A84C'}}>📊 Track These Metrics:</strong> {plan.month3.metrics}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'marketing' && plan.marketing && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>📣 Your Marketing Plan</h3>
+                  
+                  <div style={styles.weekBlock}>
+                    <strong>Channels to Focus On:</strong>
+                    <ul style={{marginTop: '10px', lineHeight: '1.8'}}>
+                      {plan.marketing.channels.map((ch, i) => <li key={i}>{ch}</li>)}
+                    </ul>
+                  </div>
+
+                  <div style={styles.weekBlock}>
+                    <strong>DM Script:</strong>
+                    <p style={{marginTop: '10px', lineHeight: '1.6', fontStyle: 'italic'}}>"{plan.marketing.dmScript}"</p>
+                  </div>
+
+                  <div style={styles.weekBlock}>
+                    <strong>Social Post Template:</strong>
+                    <p style={{marginTop: '10px', lineHeight: '1.6', fontStyle: 'italic'}}>"{plan.marketing.socialPost}"</p>
+                  </div>
+
+                  <div style={styles.weekBlock}>
+                    <strong>Email Template:</strong>
+                    <p style={{marginTop: '10px', lineHeight: '1.6', fontStyle: 'italic'}}>"{plan.marketing.emailTemplate}"</p>
+                  </div>
+
+                  <div style={{...styles.weekBlock, background: 'rgba(62,207,171,0.1)', border: '1px solid rgba(62,207,171,0.3)'}}>
+                    <strong style={{color: '#3ECFAB'}}>💬 Objection Handling:</strong>
+                    <ul style={{marginTop: '10px', lineHeight: '1.8'}}>
+                      <li><strong>"It's too expensive":</strong> {plan.marketing.objections?.tooExpensive}</li>
+                      <li><strong>"I need to think about it":</strong> {plan.marketing.objections?.needToThink}</li>
+                      <li><strong>"I can do it myself":</strong> {plan.marketing.objections?.doItMyself}</li>
+                    </ul>
+                  </div>
+
+                  <div style={styles.weekBlock}>
+                    <strong>Budget Strategy:</strong>
+                    <p style={{marginTop: '10px', lineHeight: '1.6'}}>{plan.marketing.budget}</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'milestones' && plan.milestones && (
+                <div style={styles.tabContent}>
+                  <h3 style={styles.sectionTitle}>🏆 Your Milestones</h3>
+                  <p style={styles.sectionText}>
+                    These are the checkpoints. Hit these, and you're on track.
+                  </p>
+                  {plan.milestones.map((m, i) => (
+                    <div key={i} style={styles.milestoneBlock}>
+                      <div style={styles.milestoneDay}>Day {m.day}</div>
+                      <div style={styles.milestoneGoal}>{m.goal}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* EXPORT & ACTIONS */}
+              <div style={styles.exportSection}>
+                <button
+                  onClick={downloadPlan}
+                  style={{
+                    padding: '14px 28px',
+                    background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)',
+                    color: '#0d1117',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginRight: '15px',
+                  }}
+                >
+                  📥 Download Plan (TXT)
+                </button>
+                <button
+                  onClick={() => setChatbotOpen(true)}
+                  style={{
+                    padding: '14px 28px',
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#ffffff',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  💬 Ask AI Coach
+                </button>
               </div>
-            )}
-          </div>
 
-          <div style={styles.exportSection}>
-            <div style={{display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap'}}>
-              <button 
-                style={styles.buttonSecondary} 
-                onClick={() => {
-                  // Helper function to format weeks
-                  const formatWeeks = (weeks) => {
-                    return weeks.map(weekData => {
-                      if (typeof weekData === 'string') {
-                        return `  ${weekData}\n`;
-                      }
-                      
-                      let output = `\n  WEEK ${weekData.week}: ${weekData.summary}\n`;
-                      output += `  ${'─'.repeat(70)}\n\n`;
-                      
-                      if (weekData.steps) {
-                        weekData.steps.forEach((step, idx) => {
-                          output += `  STEP ${idx + 1}: ${step.what}`;
-                          if (step.time) output += ` (${step.time})`;
-                          output += `\n\n`;
-                          output += `  HOW:\n  ${step.how}\n\n`;
-                          output += `  WHY:\n  ${step.why}\n\n`;
-                          if (step.success) {
-                            output += `  SUCCESS LOOKS LIKE:\n  ${step.success}\n\n`;
-                          }
-                          output += `\n`;
-                        });
-                      }
-                      
-                      return output;
-                    }).join('\n');
-                  };
+              <div style={styles.accountabilityFooter}>
+                <h3 style={{fontSize: '1.2rem', marginBottom: '10px'}}>
+                  🤝 Your Accountability Check-Ins Start Now
+                </h3>
+                <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
+                  You'll receive SMS check-ins 3x per week for the next 90 days. Every Monday, Wednesday, and Friday, 
+                  we'll ask where you're at. All you have to do is reply with DONE, STUCK, or ALMOST. 
+                  That's it. No pressure, just progress.
+                </p>
+                <p style={{fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)', margin: 0}}>
+                  Reply STOP anytime to opt out. But we both know you're not going to do that. You've got this.
+                </p>
+              </div>
 
-                  // Generate comprehensive plan document
-                  const planContent = `
-╔════════════════════════════════════════════════════════════════════════════╗
-║                  CASH MACHINE QUICKSTART - 90-DAY PLAN                     ║
-║                                                                            ║
-║  Generated for: ${name}                                                   
-║  Date: ${new Date().toLocaleDateString()}                                 
-╚════════════════════════════════════════════════════════════════════════════╝
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-YOUR BUSINESS IDEA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${selectedIdea.title} (${selectedIdea.category.toUpperCase()})
-${selectedIdea.tagline}
-
-First Week Earnings: ${selectedIdea.monthOne}
-18-Month Potential: ${selectedIdea.yearTwo}
-
-QUICK START:
-${selectedIdea.quickStart}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-DUAL-TRACK SYSTEM
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${plan.dualTrack.crossover}
-
-TRACK A: ${plan.dualTrack.trackA.name}
-  Weeks 1-4: ${plan.dualTrack.trackA.weeks1_4}
-  Weeks 5-8: ${plan.dualTrack.trackA.weeks5_8}
-  Weeks 9-12: ${plan.dualTrack.trackA.weeks9_12}
-
-TRACK B: ${plan.dualTrack.trackB.name}
-  Weeks 1-4: ${plan.dualTrack.trackB.weeks1_4}
-  Weeks 5-8: ${plan.dualTrack.trackB.weeks5_8}
-  Weeks 9-12: ${plan.dualTrack.trackB.weeks9_12}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-PRICING STRATEGY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Model: ${plan.pricing.model}
-Rate: ${plan.pricing.rate}
-
-${plan.pricing.breakdown}
-
-When to Adjust: ${plan.pricing.adjustments}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-MONTH 1: ${plan.month1.goal}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${formatWeeks(plan.month1.weeks)}
-
-TRACK THESE METRICS:
-${plan.month1.metrics}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-MONTH 2: ${plan.month2.goal}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${formatWeeks(plan.month2.weeks)}
-
-TRACK THESE METRICS:
-${plan.month2.metrics}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-MONTH 3: ${plan.month3.goal}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${formatWeeks(plan.month3.weeks)}
-
-TRACK THESE METRICS:
-${plan.month3.metrics}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-MARKETING PLAN
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Best Channels: ${plan.marketing.channels.join(', ')}
-Budget: ${plan.marketing.budget}
-
-────────────────────────────────────────────────────────────────────────────
-
-DM SCRIPT (Copy + Personalize):
-
-${plan.marketing.dmScript}
-
-────────────────────────────────────────────────────────────────────────────
-
-SOCIAL POST TEMPLATE:
-
-${plan.marketing.socialPost}
-
-────────────────────────────────────────────────────────────────────────────
-
-EMAIL TEMPLATE:
-
-${plan.marketing.emailTemplate}
-
-────────────────────────────────────────────────────────────────────────────
-
-OBJECTION HANDLING:
-
-"You're too expensive":
-${plan.marketing.objections.tooExpensive}
-
-"I need to think about it":
-${plan.marketing.objections.needToThink}
-
-"I can do it myself":
-${plan.marketing.objections.doItMyself}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-90-DAY MILESTONES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${plan.milestones.map(m => `Day ${m.day.toString().padStart(2, '0')}: ${m.goal}`).join('\n')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ACCOUNTABILITY CHECK-INS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-You'll receive 3 check-ins per week for 90 days:
-
-  Monday: "What's your win for this week?"
-  Wednesday: "How's progress on your milestone?"
-  Friday: "Where are you at — on track, almost there, or stuck?"
-
-Reply STOP to opt out anytime.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Cash Machine QuickStart
-CKO Global INC
-Email: Kelli@proactively-lazy.com
-Website: proactively-lazy.com
-
-Generated: ${new Date().toLocaleString()}
-`;
-
-                  // Create downloadable text file
-                  const blob = new Blob([planContent], { type: 'text/plain' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `CashMachine_90DayPlan_${name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                📥 Download Full 90-Day Plan
-              </button>
-              <button 
-                style={{
-                  ...styles.buttonSecondary,
-                  background: 'rgba(62,207,171,0.2)',
-                  border: '1px solid #3ECFAB',
-                  color: '#3ECFAB',
-                }}
-                onClick={() => setChatbotOpen(true)}
-              >
-                💬 Ask Your AI Coach
-              </button>
-            </div>
-          </div>
-
-          <div style={styles.accountabilityFooter}>
-            <h3 style={{fontSize: '1.2rem', marginBottom: '15px'}}>
-              🤝 Your Accountability Coach (Not Your Babysitter)
-            </h3>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              Here's the deal: We give you the map. You walk the path.
-            </p>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              Starting Monday, you'll get 3 check-ins per week for 90 days:
-            </p>
-            <ul style={{listStyle: 'none', padding: 0, margin: '0 0 15px 0'}}>
-              <li style={{marginBottom: '8px'}}>
-                <strong>Monday:</strong> "What's your win for this week?"
-              </li>
-              <li style={{marginBottom: '8px'}}>
-                <strong>Wednesday:</strong> "How's progress on your milestone?"
-              </li>
-              <li style={{marginBottom: '8px'}}>
-                <strong>Friday:</strong> "Where are you at — on track, almost there, or stuck?"
-              </li>
-            </ul>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              We're your coach in your corner. We'll check in, celebrate wins, and help when you're genuinely stuck. 
-              But we're not here to make excuses for you or do the work for you.
-            </p>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              <strong>Your wins? Those are YOURS. Own them.</strong><br/>
-              <strong>Your setbacks? Also YOURS. Learn from them.</strong>
-            </p>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              If you ghost us for 2 weeks straight, we'll check in ONE more time. After that, we assume you quit 
-              and you'll stop getting messages. No hard feelings — this isn't for everyone.
-            </p>
-            <p style={{fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px'}}>
-              But if you show up, stay honest, and do the work? We've got your back every step of the way.
-            </p>
-            <p style={{fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)'}}>
-              Plus: Got a question at 2am when you're stuck on pricing? Use the chatbot helper 24/7. 
-              It knows your plan, your pricing, and your milestones. It's like having a coach who never sleeps.
-            </p>
-          </div>
-
-          <button style={styles.buttonSecondary} onClick={() => {
-            if (window.confirm('Start over? This will clear your current plan.')) {
-              localStorage.removeItem('cmqs_state');
-              window.location.reload();
-            }
-          }}>
-            Start Over
-          </button>
+              <div style={{textAlign: 'center', marginTop: '30px'}}>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('cmqs_state');
+                    window.location.reload();
+                  }}
+                  style={{
+                    padding: '12px 24px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '8px',
+                    color: 'rgba(255,255,255,0.6)',
+                    fontSize: '0.95rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Start Over with New Idea
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {chatbotOpen && phase === 4 && (hasPaid || adminClicks >= 5) && (
+      {chatbotOpen && (
         <ChatbotHelper
           plan={plan}
           selectedIdea={selectedIdea}
