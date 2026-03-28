@@ -1,8 +1,4 @@
-// api/chat.js - Anthropic API proxy for Cash Machine QuickStart
-// Deployed to Vercel as serverless function
-
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -24,7 +20,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid request: messages array required' });
     }
 
-    // Call Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -50,7 +45,6 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     
-    // Extract text from response
     const reply = data.content
       .filter(item => item.type === 'text')
       .map(item => item.text)
