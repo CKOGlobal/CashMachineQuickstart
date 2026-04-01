@@ -290,10 +290,6 @@ const styles = {
     transition: 'transform 0.2s, box-shadow 0.2s',
     marginBottom: '20px',
   },
-  consentNotice: {
-    textAlign: 'center',
-    marginTop: '20px',
-  },
   lockedOverlay: {
     textAlign: 'center',
     padding: '40px',
@@ -899,11 +895,8 @@ const PaymentGate = () => {
         }
       </a>
 
-      <div style={styles.consentNotice}>
-        <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: '1.5'}}>
-          By purchasing, you consent to receive SMS accountability check-ins (3x per week for 90 days) 
-          and email communications. Reply STOP to opt out anytime. Message & data rates may apply.
-        </p>
+      {/* Legal links only — SMS consent notice removed per A2P compliance */}
+      <div style={{textAlign: 'center', marginTop: '20px'}}>
         <p style={{fontSize: '0.85rem', marginTop: '10px'}}>
           <a href="/terms.html" target="_blank" style={{color: '#C9A84C', textDecoration: 'none', marginRight: '15px'}}>
             Terms of Service
