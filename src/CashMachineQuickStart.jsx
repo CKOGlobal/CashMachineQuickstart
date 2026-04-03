@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 // - Enrollment posts to GHL with tag: KelliCMQS / LoralCMQS / BetaCMQS
 // - Email plan sends full branded HTML plan via Resend
 // - Codes: KELLICMQS ($97, KelliCMQS), LORAL2026 ($69.97, LoralCMQS),
-//          BETA/BETA2026 (free, BetaCMQS). No code = KelliCMQS full price.
+//          CMQS/CMQS2026 (free, CMQSAccess). No code = KelliCMQS full price.
 // ============================================================================
 
 const styles = {
@@ -90,7 +90,7 @@ const styles = {
   milestoneGoal: { fontSize: '1rem', lineHeight: '1.6' },
   accountabilityFooter: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '25px', marginBottom: '30px' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1001, padding: '20px' },
-  modalBox: { background: '#0d1117', border: '1px solid rgba(201,168,76,0.4)', borderRadius: '16px', maxWidth: '520px', width: '100%', padding: '36px' },
+  modalBox: { background: '#0d1117', border: '1px solid rgba(201,168,76,0.4)', borderRadius: '16px', maxWidth: '520px', width: '100%', padding: '36px', maxHeight: '90vh', overflowY: 'auto' },
   chatbotModal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' },
   chatbotContainer: { background: '#0d1117', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '16px', maxWidth: '700px', width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' },
   chatbotHeader: { padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
@@ -104,9 +104,6 @@ ss.textContent = `@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:ro
 document.head.appendChild(ss);
 
 // ── Referral codes ────────────────────────────────────────────────────────────
-// No code or KELLICMQS → $97 full price, tag KelliCMQS (Kelli's platform)
-// LORAL2026            → $69.97 discount, tag LoralCMQS
-// BETA / BETA2026      → free,            tag BetaCMQS
 const referralCodes = {
   KELLICMQS:  { type: 'full',     price: 97.00, name: 'Kelli — Cash Machine' },
   LORAL2026:  { type: 'discount', price: 69.97, name: 'Loral Partnership'    },
@@ -140,6 +137,7 @@ const Chip = ({ label, selected, onClick }) => (
 const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, plan, onClose, onSuccess }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [smsConsent, setSmsConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
 
@@ -150,7 +148,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       const res = await fetch('/api/cmqs-enroll', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email: email.trim(), phone: phone.trim(), referralCode: referralCode || '', selectedIdea, selectedPricing, plan }),
+        body: JSON.stringify({ name, email: email.trim(), phone: phone.trim(), smsConsent, referralCode: referralCode || '', selectedIdea, selectedPricing, plan }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Enrollment failed');
@@ -164,27 +162,67 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       <div style={styles.modalBox} onClick={e => e.stopPropagation()}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px' }}>🎯 Lock In Your Plan</h2>
         <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '24px', lineHeight: '1.5' }}>
-          Enter your details and we'll enroll you, send your 90-day plan to your inbox, and fire off your Week 1 welcome email right away.
+          Enter your details and we'll enroll you in <strong>Cash Machine QuickStart</strong> (by CKO Global LLC), send your 90-day plan to your inbox, and fire off your Week 1 welcome email right away.
         </p>
+
         {err && <div style={styles.error}>{err}</div>}
+
         <div style={styles.formGroup}>
           <label style={styles.label}>Email Address *</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" style={styles.input} />
         </div>
+
         <div style={styles.formGroup}>
           <label style={styles.label}>Mobile Number (for SMS check-ins)</label>
           <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" style={styles.input} />
-          <p style={styles.helperText}>Optional but recommended — this is how your 3x/week accountability check-ins are delivered.</p>
+          <p style={styles.helperText}>Optional but recommended — this is how your 3×/week accountability check-ins are delivered.</p>
         </div>
+
+        {/* ── SMS CONSENT — Complete CTA for A2P ── */}
+        {phone.trim().length > 5 && (
+          <div style={{ background: 'rgba(201,168,76,0.07)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+            <p style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', marginTop: 0 }}>📱 SMS Consent Required</p>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
+              <input
+                type="checkbox"
+                checked={smsConsent}
+                onChange={e => setSmsConsent(e.target.checked)}
+                style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }}
+              />
+              <span style={{ color: '#D1D5DB', fontSize: '12px', lineHeight: '1.65' }}>
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Cash Machine QuickStart) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+              </span>
+            </label>
+            <p style={{ fontSize: '11px', color: '#4B5563', marginBottom: 0, marginTop: 0, lineHeight: '1.5' }}>
+              Consent is not required as a condition of purchase.{' '}
+              <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+              {' '}·{' '}
+              <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+            </p>
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={onClose} style={{ ...styles.buttonSecondary, flex: 1 }}>Cancel</button>
-          <button onClick={enroll} disabled={loading || !email.trim()} style={{ ...styles.button, flex: 2, width: 'auto', ...(loading || !email.trim() ? styles.buttonDisabled : {}) }}>
+          <button
+            onClick={enroll}
+            disabled={loading || !email.trim() || (phone.trim().length > 5 && !smsConsent)}
+            style={{ ...styles.button, flex: 2, width: 'auto', ...((loading || !email.trim() || (phone.trim().length > 5 && !smsConsent)) ? styles.buttonDisabled : {}) }}
+          >
             {loading ? 'Enrolling...' : 'Send My Plan & Enroll →'}
           </button>
         </div>
+
+        {phone.trim().length > 5 && !smsConsent && (
+          <p style={{ fontSize: '11px', color: '#F06292', marginTop: '8px', textAlign: 'center' }}>
+            Please check the SMS consent box above to continue with a phone number.
+          </p>
+        )}
+
         <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '16px', textAlign: 'center', lineHeight: '1.5' }}>
-          By enrolling you consent to receive SMS accountability check-ins (3x/week for 90 days). Reply STOP anytime to opt out. Message & data rates may apply.{' '}
-          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+          By enrolling you agree to our{' '}
+          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
+          <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
         </p>
       </div>
     </div>
@@ -258,7 +296,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
       <div style={styles.includesBox}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#C9A84C' }}>✅ What's Included:</h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {['🤖 AI-generated cash machine ideas based on your skills','📋 Personalized 90-day action plan with pricing strategy','📱 90 days of accountability check-ins (SMS/Email)','🎯 Weekly progress coaching (12 weeks of support)','💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)','🎉 Milestone celebrations at 30, 60, and 90 days','📧 Plan emailed directly to you — printable and saveable'].map((item, i) => (
+          {['🤖 AI-generated cash machine ideas based on your skills','📋 Personalized 90-day action plan with pricing strategy','📱 90 days of SMS accountability check-ins (up to 3× per week)','🎯 Weekly progress coaching (12 weeks of support)','💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)','🎉 Milestone celebrations at 30, 60, and 90 days','📧 Plan emailed directly to you — printable and saveable'].map((item, i) => (
             <li key={i} style={{ marginBottom: '8px', fontSize: '0.95rem' }}>{item}</li>
           ))}
         </ul>
@@ -276,7 +314,17 @@ const PaymentGate = ({ onReferralCodeChange }) => {
         {appliedCode?.type === 'free' ? '🎉 Activate Free Beta Access' : `Purchase Now - $${totalPrice.toFixed(2)}`}
       </a>
 
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      {/* SMS disclosure on payment page */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
+        <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
+          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global LLC</strong> (Cash Machine QuickStart). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
+          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+          {' '}·{' '}
+          <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+        </p>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: '10px' }}>
         <p style={{ fontSize: '0.85rem' }}>
           <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
           <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
@@ -547,7 +595,7 @@ IMPORTANT: EXACTLY 3 steps per week. Concise how/why. No preamble.`);
       }),
       `=== MILESTONES ===`,
       ...(plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`) || []),
-      ``, `Generated by Cash Machine QuickStart`, `proactively-lazy.com | kelli@proactively-lazy.com`,
+      ``, `Generated by Cash Machine QuickStart — CKO Global LLC`, `proactively-lazy.com | kelli@proactively-lazy.com`,
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -561,10 +609,48 @@ IMPORTANT: EXACTLY 3 steps per week. Concise how/why. No preamble.`);
       {/* god-mode bypass */}
       <div onClick={() => { const n = adminClicks+1; setAdminClicks(n); if (n>=5) setHasPaid(true); }} style={{ position:'fixed', bottom:'20px', right:'20px', width:'60px', height:'60px', opacity:0, zIndex:999, userSelect:'none' }} />
 
+      {/* ── HEADER ── */}
       <div style={styles.header}>
         <div style={styles.brandLine}>Cash Machine QuickStart · Kelli Owens + Loral Langemeier</div>
         <h1 style={styles.hero}>You're broke.<br/>We get it. Let's <span style={{color:'#C9A84C'}}>fix that.</span></h1>
         <p style={styles.tagline}>Get cash this week doing gig work. Build a real business over 90 days. No MBA required. No trust fund needed.</p>
+
+        {/* ── BUSINESS CONTEXT BLOCK — Required for A2P SMS Registration ── */}
+        <div style={{ maxWidth: '700px', margin: '28px auto 0', padding: '22px 24px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', textAlign: 'left' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginBottom: '16px' }}>
+            <div style={{ flex: '1', minWidth: '200px' }}>
+              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.7', margin: 0 }}>
+                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Cash Machine QuickStart</strong> is a 90-day business coaching and accountability program offered by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global LLC</strong>, in partnership with Loral Langemeier / Live Out Loud. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
+              </p>
+            </div>
+            <div style={{ flex: '1', minWidth: '180px' }}>
+              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>What You Get</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.8' }}>
+                📋 AI-generated 90-day action plan<br/>
+                📱 SMS accountability check-ins (3×/week)<br/>
+                💬 24/7 AI Coach access<br/>
+                📧 Plan delivered to your inbox
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
+            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global LLC</span>
+            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Operated by:</strong> Kelli Owens</span>
+            <span>
+              <strong style={{ color: 'rgba(255,255,255,0.55)' }}>Email:</strong>{' '}
+              <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>
+            </span>
+            <span>
+              <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a>
+            </span>
+            <span>
+              <a href="/privacy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Privacy Policy</a>
+              {' '}·{' '}
+              <a href="/terms" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Terms of Service</a>
+            </span>
+          </div>
+        </div>
       </div>
 
       <div style={styles.progressBar}>
@@ -832,8 +918,9 @@ IMPORTANT: EXACTLY 3 steps per week. Concise how/why. No preamble.`);
 
               <div style={styles.accountabilityFooter}>
                 <h3 style={{fontSize:'1.2rem',marginBottom:'10px'}}>🤝 Your Accountability Check-Ins Start Now</h3>
-                <p style={{fontSize:'0.95rem',lineHeight:'1.6',marginBottom:'15px'}}>You'll receive SMS check-ins 3x per week for the next 90 days. Every Monday, Wednesday, and Friday, we'll ask where you're at. Reply DONE, STUCK, or ALMOST. That's it.</p>
-                <p style={{fontSize:'0.9rem',fontStyle:'italic',color:'rgba(255,255,255,0.7)',margin:0}}>Reply STOP anytime to opt out. But we both know you're not going to do that. You've got this.</p>
+                <p style={{fontSize:'0.95rem',lineHeight:'1.6',marginBottom:'15px'}}>You'll receive SMS check-ins 3× per week for the next 90 days. Every Monday, Wednesday, and Friday, we'll ask where you're at. Reply DONE, STUCK, or ALMOST. That's it.</p>
+                <p style={{fontSize:'0.9rem',fontStyle:'italic',color:'rgba(255,255,255,0.7)',margin:'0 0 10px'}}>Reply STOP anytime to opt out. But we both know you're not going to do that. You've got this.</p>
+                <p style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.35)',margin:0}}>SMS messages sent by CKO Global LLC. Message & data rates may apply.</p>
               </div>
 
               <div style={{textAlign:'center',marginTop:'30px'}}>
@@ -850,9 +937,16 @@ IMPORTANT: EXACTLY 3 steps per week. Concise how/why. No preamble.`);
       {enrollOpen&&<EnrollmentModal name={name} referralCode={activeReferralCode} selectedIdea={selectedIdea} selectedPricing={selectedPricing} plan={plan} onClose={()=>setEnrollOpen(false)} onSuccess={handleEnrollSuccess}/>}
 
       <div style={styles.footer}>
-        <div style={{marginBottom:'15px'}}><strong style={{color:'#C9A84C'}}>Cash Machine QuickStart</strong></div>
-        <div>CKO Global INC · Kelli Owens<br/>Email: <a href="mailto:kelli@proactively-lazy.com" style={{color:'#C9A84C',textDecoration:'none'}}>kelli@proactively-lazy.com</a><br/>Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{color:'#C9A84C',textDecoration:'none'}}>proactively-lazy.com</a></div>
-        <div style={{marginTop:'15px',fontSize:'0.85rem'}}>
+        <div style={{marginBottom:'12px'}}><strong style={{color:'#C9A84C'}}>Cash Machine QuickStart</strong></div>
+        <div style={{marginBottom:'12px'}}>
+          CKO Global LLC · Operated by Kelli Owens<br/>
+          Email: <a href="mailto:kelli@proactively-lazy.com" style={{color:'#C9A84C',textDecoration:'none'}}>kelli@proactively-lazy.com</a><br/>
+          Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{color:'#C9A84C',textDecoration:'none'}}>proactively-lazy.com</a>
+        </div>
+        <div style={{fontSize:'0.8rem',color:'rgba(255,255,255,0.35)',marginBottom:'10px'}}>
+          SMS messages sent by CKO Global LLC. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.
+        </div>
+        <div style={{fontSize:'0.85rem'}}>
           <a href="/terms" target="_blank" style={{color:'rgba(255,255,255,0.5)',textDecoration:'none',marginRight:'15px'}}>Terms of Service</a>
           <a href="/privacy" target="_blank" style={{color:'rgba(255,255,255,0.5)',textDecoration:'none'}}>Privacy Policy</a>
         </div>

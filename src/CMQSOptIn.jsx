@@ -370,7 +370,7 @@ export default function CMQSOptIn() {
 
         <div style={styles.footer}>
           <div style={{ marginBottom: '15px' }}><strong style={{ color: '#C9A84C' }}>Cash Machine QuickStart</strong></div>
-          <div>CKO Global INC<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
+          <div>CKO Global LLC · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
           <div style={{ marginTop: '15px', fontSize: '0.85rem' }}>
             <a href="/terms" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
             <a href="/privacy" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Privacy Policy</a>
@@ -380,8 +380,54 @@ export default function CMQSOptIn() {
     );
   }
 
+  // ── MAIN OPT-IN FORM (what A2P reviewers see) ────────────────────────────
   return (
-    <div style={{ minHeight: '100vh', background: '#07090F', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+    <div style={{ minHeight: '100vh', background: '#07090F', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+
+      {/* ── BUSINESS CONTEXT BLOCK — Required for A2P SMS Registration ── */}
+      <div style={{ maxWidth: '600px', width: '100%', marginBottom: '24px', padding: '24px', background: '#0F1419', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <img src="/cash_machine_image.png" alt="Cash Machine QuickStart" style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+          <div>
+            <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Cash Machine QuickStart</div>
+            <div style={{ fontSize: '11px', color: '#6B7280' }}>A program by CKO Global LLC · In partnership with Loral Langemeier / Live Out Loud</div>
+          </div>
+        </div>
+
+        <p style={{ color: '#9CA3AF', fontSize: '13px', lineHeight: '1.75', marginBottom: '12px', marginTop: 0 }}>
+          <strong style={{ color: '#E5E7EB' }}>Cash Machine QuickStart</strong> is a 90-day business coaching and accountability program. We help people identify skills-based income opportunities and build a real, cash-generating business — no MBA or trust fund required. Participants receive an AI-generated action plan and SMS accountability check-ins to stay on track.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Program Length</div>
+            <div style={{ fontSize: '13px', color: '#E5E7EB', fontWeight: '600' }}>90 Days</div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Check-In Frequency</div>
+            <div style={{ fontSize: '13px', color: '#E5E7EB', fontWeight: '600' }}>3× per week via SMS</div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Operated By</div>
+            <div style={{ fontSize: '13px', color: '#E5E7EB', fontWeight: '600' }}>CKO Global LLC</div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
+            <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Contact</div>
+            <div style={{ fontSize: '12px', color: '#C9A84C', fontWeight: '600' }}>Kelli@proactively-lazy.com</div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: '12px', color: '#4B5563', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+          CKO Global LLC · Operated by Kelli Owens ·{' '}
+          <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a>
+          {' '}·{' '}
+          <a href="/privacy" style={{ color: '#6B7280', textDecoration: 'none' }}>Privacy Policy</a>
+          {' '}·{' '}
+          <a href="/terms" style={{ color: '#6B7280', textDecoration: 'none' }}>Terms of Service</a>
+        </div>
+      </div>
+
+      {/* ── ENROLLMENT FORM ── */}
       <div style={{ background: '#0F1419', border: '1px solid #1F2937', borderRadius: '8px', padding: '40px', maxWidth: '600px', width: '100%' }}>
         <img src="/cash_machine_image.png" alt="Cash Machine QuickStart" style={{ width: '100%', maxWidth: '500px', marginBottom: '30px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
 
@@ -389,7 +435,7 @@ export default function CMQSOptIn() {
           Activate Your Coaching
         </h1>
         <p style={{ color: '#9CA3AF', marginBottom: '30px', fontSize: '16px', lineHeight: '1.6' }}>
-          Complete your Cash Machine QuickStart setup to receive your 90-day accountability plan and SMS check-ins.
+          Complete your Cash Machine QuickStart setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global LLC.
         </p>
 
         {error && (
@@ -403,7 +449,7 @@ export default function CMQSOptIn() {
             { label: 'First Name *', field: 'firstName', type: 'text', required: true },
             { label: 'Last Name *', field: 'lastName', type: 'text', required: true },
             { label: 'Email *', field: 'email', type: 'email', required: true },
-            { label: 'Phone Number *', field: 'phone', type: 'tel', required: true, placeholder: '(555) 555-5555' },
+            { label: 'Mobile Phone Number *', field: 'phone', type: 'tel', required: true, placeholder: '(555) 555-5555' },
           ].map(({ label, field, type, required, placeholder }) => (
             <div key={field} style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', color: '#E5E7EB', marginBottom: '8px', fontSize: '14px' }}>{label}</label>
@@ -412,15 +458,31 @@ export default function CMQSOptIn() {
             </div>
           ))}
 
-          <div style={{ background: '#1F2937', border: '1px solid #374151', borderRadius: '4px', padding: '20px', marginBottom: '20px' }}>
-            <p style={{ color: '#C9A84C', fontWeight: 600, marginBottom: '15px', fontSize: '14px' }}>SMS Message Preferences (Optional)</p>
-            <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
-              <input type="checkbox" checked={formData.nonPromotional} onChange={(e) => setFormData({ ...formData, nonPromotional: e.target.checked })}
-                style={{ marginRight: '10px', marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }} />
-              <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.5' }}>
-                <strong>NON-PROMOTIONAL MESSAGES:</strong> I consent to receive transactional and service-related messages from CKO Global INC (account updates, accountability check-ins, progress tracking, and program-related notifications) at the phone number provided. Message frequency may vary. Message & data rates may apply. Reply HELP for help or STOP to opt-out.
+          {/* ── SMS CONSENT BLOCK — Complete CTA for A2P ── */}
+          <div style={{ background: '#1a2332', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
+            <p style={{ color: '#C9A84C', fontWeight: 700, marginBottom: '4px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📱 SMS Accountability Check-Ins</p>
+            <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '14px', marginTop: 0, lineHeight: '1.5' }}>
+              Cash Machine QuickStart delivers accountability through SMS text messages. By checking the box below you consent to receive these messages at the mobile number you provided above.
+            </p>
+
+            <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', gap: '10px' }}>
+              <input
+                type="checkbox"
+                checked={formData.nonPromotional}
+                onChange={(e) => setFormData({ ...formData, nonPromotional: e.target.checked })}
+                style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }}
+              />
+              <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.6' }}>
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Cash Machine QuickStart) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
+
+            <div style={{ marginTop: '14px', padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', fontSize: '11px', color: '#4B5563', lineHeight: '1.6' }}>
+              <strong style={{ color: '#6B7280' }}>How we contact you:</strong> SMS text messages sent to the mobile number above · No calls, no spam · Opt-out anytime by replying STOP · Consent is not a condition of purchase or program access.{' '}
+              <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+              {' '}·{' '}
+              <a href="/terms" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+            </div>
           </div>
 
           <button type="submit" style={{ width: '100%', padding: '14px', background: '#C9A84C', color: '#07090F', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
@@ -430,10 +492,14 @@ export default function CMQSOptIn() {
           </button>
 
           <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #374151', textAlign: 'center' }}>
-            <p style={{ color: '#C9A84C', fontSize: '14px', marginBottom: '10px', fontWeight: 600 }}>Cash Machine QuickStart</p>
-            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '5px' }}>CKO Global INC</p>
-            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '5px' }}>Email: Kelli@proactively-lazy.com</p>
-            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '15px' }}>Website: proactively-lazy.com</p>
+            <p style={{ color: '#C9A84C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Cash Machine QuickStart</p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>CKO Global LLC · Operated by Kelli Owens</p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>
+              <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#9CA3AF', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a>
+            </p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '12px' }}>
+              <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#9CA3AF', textDecoration: 'none' }}>proactively-lazy.com</a>
+            </p>
             <p style={{ color: '#6B7280', fontSize: '12px', lineHeight: '1.6' }}>
               By submitting this form, you agree to our{' '}
               <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
@@ -442,6 +508,7 @@ export default function CMQSOptIn() {
           </div>
         </form>
       </div>
+
       <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
     </div>
   );
