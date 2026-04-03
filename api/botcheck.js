@@ -64,7 +64,7 @@ function trackBlock(ip, reason) {
 }
 
 async function sendAlert({ ip, ua, origin, referer, reason, threat, repeatCount, path }) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.CASH_MACHINE_RESEND;
   if (!apiKey) {
     console.warn("[botcheck] RESEND_API_KEY not set — alert skipped");
     return;
