@@ -1,23 +1,20 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Income-First — 90-Day Business Launch Program
+// CKO Global LLC · Operated by Kelli Owens
+// ─────────────────────────────────────────────────────────────────────────────
+
 import React, { useState, useEffect } from 'react';
 
-// ============================================================================
-// CASH MACHINE QUICKSTART - PROGRESSIVE PLAN GENERATION
-// - Enrollment posts to GHL with tag: KelliCMQS / LoralCMQS / BetaCMQS
-// - Email plan sends full branded HTML plan via GHL
-// - Codes: KELLICMQS ($97, KelliCMQS), LORAL2026 ($69.97, LoralCMQS),
-//          CMQS/CMQS2026 (free, CMQSAccess). No code = KelliCMQS full price.
-// ============================================================================
-
 const styles = {
-  container: { minHeight: '100vh', background: '#0d1117', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
+  container: { minHeight: '100vh', background: '#06091A', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
   header: { maxWidth: '900px', margin: '0 auto 30px', textAlign: 'center', padding: '20px' },
-  brandLine: { fontSize: '0.85rem', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' },
+  brandLine: { fontSize: '0.85rem', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' },
   hero: { fontSize: '2.5rem', fontWeight: '800', lineHeight: '1.2', marginBottom: '15px' },
   tagline: { fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6' },
   progressBar: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', maxWidth: '700px', margin: '30px auto', padding: '0 20px' },
   progressStep: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', opacity: 0.4 },
   progressStepActive: { opacity: 1 },
-  progressCircle: { width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.1rem' },
+  progressCircle: { width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(216,255,44,0.1)', border: '2px solid rgba(216,255,44,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '1.1rem' },
   progressLabel: { fontSize: '0.85rem', fontWeight: '600', textAlign: 'center' },
   phase: { maxWidth: '900px', margin: '0 auto', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '40px' },
   phaseHeader: { textAlign: 'center', marginBottom: '40px' },
@@ -30,8 +27,8 @@ const styles = {
   chipGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' },
   chipRow: { display: 'flex', flexWrap: 'wrap', gap: '12px' },
   chip: { padding: '10px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '0.9rem', fontWeight: '500', cursor: 'pointer', outline: 'none' },
-  chipSelected: { background: 'rgba(201,168,76,0.2)', border: '1px solid #C9A84C', color: '#C9A84C' },
-  button: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', fontSize: '1.1rem', fontWeight: '700', border: 'none', borderRadius: '12px', cursor: 'pointer' },
+  chipSelected: { background: 'rgba(216,255,44,0.15)', border: '1px solid #D8FF2C', color: '#D8FF2C' },
+  button: { width: '100%', padding: '16px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#ffffff', fontSize: '1.1rem', fontWeight: '700', border: 'none', borderRadius: '12px', cursor: 'pointer' },
   buttonDisabled: { opacity: 0.5, cursor: 'not-allowed' },
   buttonSecondary: { padding: '12px 24px', background: 'rgba(255,255,255,0.1)', color: '#ffffff', fontSize: '1rem', fontWeight: '600', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', cursor: 'pointer' },
   buttonRow: { display: 'flex', gap: '15px', marginTop: '30px' },
@@ -43,54 +40,54 @@ const styles = {
   paymentSubtitle: { fontSize: '1rem', color: 'rgba(255,255,255,0.7)' },
   pricingCard: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', marginBottom: '20px' },
   priceRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' },
-  priceTotal: { borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #C9A84C' },
+  priceTotal: { borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #D8FF2C' },
   priceAmount: { fontWeight: '600', color: '#ffffff' },
-  includesBox: { background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '12px', padding: '20px', marginBottom: '20px' },
+  includesBox: { background: 'rgba(216,255,44,0.07)', border: '1px solid rgba(216,255,44,0.25)', borderRadius: '12px', padding: '20px', marginBottom: '20px' },
   accountabilityBox: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', marginBottom: '30px' },
-  purchaseButton: { display: 'block', width: '100%', padding: '18px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', fontSize: '1.2rem', fontWeight: '700', textAlign: 'center', textDecoration: 'none', borderRadius: '12px', border: 'none', cursor: 'pointer', marginBottom: '20px' },
+  purchaseButton: { display: 'block', width: '100%', padding: '18px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', fontSize: '1.2rem', fontWeight: '700', textAlign: 'center', textDecoration: 'none', borderRadius: '12px', border: 'none', cursor: 'pointer', marginBottom: '20px' },
   lockedOverlay: { textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', marginBottom: '30px' },
   ideasGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px', marginBottom: '30px' },
   ideaCard: { background: 'rgba(255,255,255,0.03)', border: '2px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', cursor: 'pointer' },
-  ideaCardSelected: { border: '2px solid #C9A84C', background: 'rgba(201,168,76,0.1)' },
+  ideaCardSelected: { border: '2px solid #D8FF2C', background: 'rgba(216,255,44,0.07)' },
   ideaHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' },
   ideaTitle: { fontSize: '1.2rem', fontWeight: '700', color: '#ffffff' },
   fitBadge: { padding: '4px 10px', background: 'rgba(62,207,171,0.2)', border: '1px solid #3ECFAB', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#3ECFAB' },
   ideaTagline: { fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '15px', lineHeight: '1.5' },
   ideaEarnings: { display: 'flex', gap: '20px', marginBottom: '15px' },
   earningLabel: { fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginBottom: '3px' },
-  earningAmount: { fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C' },
+  earningAmount: { fontSize: '1.1rem', fontWeight: '700', color: '#D8FF2C' },
   quickStart: { fontSize: '0.9rem', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', marginBottom: '15px' },
   proscons: { fontSize: '0.9rem', lineHeight: '1.5' },
   pricingGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '30px' },
   pricingCard2: { background: 'rgba(255,255,255,0.03)', border: '2px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', cursor: 'pointer' },
-  pricingCardSelected: { border: '2px solid #C9A84C', background: 'rgba(201,168,76,0.1)' },
-  pricingName: { fontSize: '1.2rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px' },
+  pricingCardSelected: { border: '2px solid #D8FF2C', background: 'rgba(216,255,44,0.07)' },
+  pricingName: { fontSize: '1.2rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '10px' },
   pricingPrice: { fontSize: '1.5rem', fontWeight: '700', color: '#ffffff', marginBottom: '5px' },
   pricingMonthly: { fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '15px' },
   pricingRationale: { fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '15px' },
   pricingProscons: { fontSize: '0.9rem', lineHeight: '1.5' },
   tabs: { display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '30px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' },
   tab: { padding: '10px 16px', background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', borderBottom: '2px solid transparent' },
-  tabActive: { color: '#C9A84C', borderBottom: '2px solid #C9A84C' },
+  tabActive: { color: '#D8FF2C', borderBottom: '2px solid #D8FF2C' },
   tabContent: { padding: '20px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', marginBottom: '30px' },
-  sectionTitle: { fontSize: '1.3rem', fontWeight: '700', color: '#C9A84C', marginBottom: '15px' },
+  sectionTitle: { fontSize: '1.3rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '15px' },
   sectionText: { fontSize: '1rem', lineHeight: '1.6', marginBottom: '15px' },
   weekBlock: { padding: '20px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', marginBottom: '20px' },
-  weekTitle: { fontSize: '1.2rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px' },
+  weekTitle: { fontSize: '1.2rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '10px' },
   weekSummary: { fontSize: '1rem', color: 'rgba(255,255,255,0.8)', marginBottom: '15px' },
   stepBlock: { padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', marginBottom: '12px' },
   stepWhat: { fontSize: '1.05rem', fontWeight: '700', color: '#ffffff', marginBottom: '10px' },
   stepSection: { marginBottom: '10px' },
   stepLabel: { fontSize: '0.85rem', fontWeight: '600', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' },
   stepContent: { fontSize: '0.95rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.9)' },
-  milestoneBlock: { display: 'flex', gap: '20px', padding: '15px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '8px', marginBottom: '12px' },
-  milestoneDay: { fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C', minWidth: '70px' },
+  milestoneBlock: { display: 'flex', gap: '20px', padding: '15px', background: 'rgba(216,255,44,0.07)', border: '1px solid rgba(216,255,44,0.25)', borderRadius: '8px', marginBottom: '12px' },
+  milestoneDay: { fontSize: '1.1rem', fontWeight: '700', color: '#D8FF2C', minWidth: '70px' },
   milestoneGoal: { fontSize: '1rem', lineHeight: '1.6' },
   accountabilityFooter: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '25px', marginBottom: '30px' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1001, padding: '20px' },
-  modalBox: { background: '#0d1117', border: '1px solid rgba(201,168,76,0.4)', borderRadius: '16px', maxWidth: '520px', width: '100%', padding: '36px', maxHeight: '90vh', overflowY: 'auto' },
+  modalBox: { background: '#0A1025', border: '1px solid rgba(216,255,44,0.3)', borderRadius: '16px', maxWidth: '520px', width: '100%', padding: '36px', maxHeight: '90vh', overflowY: 'auto' },
   chatbotModal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' },
-  chatbotContainer: { background: '#0d1117', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '16px', maxWidth: '700px', width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' },
+  chatbotContainer: { background: '#06091A', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '16px', maxWidth: '700px', width: '100%', maxHeight: '80vh', display: 'flex', flexDirection: 'column' },
   chatbotHeader: { padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   chatbotMessages: { flex: 1, overflowY: 'auto', padding: '20px' },
   chatbotInput: { padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' },
@@ -103,15 +100,14 @@ document.head.appendChild(ss);
 
 // ── Referral codes ────────────────────────────────────────────────────────────
 const referralCodes = {
-  KELLICMQS:  { type: 'full',     price: 97.00, name: 'Kelli — Cash Machine' },
-  LORAL2026:  { type: 'discount', price: 69.97, name: 'Loral Partnership'    },
-  CMQS:       { type: 'free',     price: 0,     name: 'CMQS Access'          },
-  CMQS2026:   { type: 'free',     price: 0,     name: 'CMQS Access'          },
-  TESTACCESS: { type: 'free',     price: 0,     name: 'Test Access'          },
+  KELLICMQS:  { type: 'full', price: 69.97, name: 'Income-First' },
+  CMQS:       { type: 'free', price: 0,     name: 'Beta Access'  },
+  CMQS2026:   { type: 'free', price: 0,     name: 'Beta Access'  },
+  TESTACCESS: { type: 'free', price: 0,     name: 'Test Access'  },
 };
 
-const TAG_MAP = { KELLICMQS: 'KelliCMQS', LORAL2026: 'LoralCMQS', CMQS: 'CMQSAccess', CMQS2026: 'CMQSAccess', TESTACCESS: 'CMQSAccess' };
-const resolveTag = (code) => (code ? TAG_MAP[code.toUpperCase()] : null) || 'KelliCMQS';
+const TAG_MAP = { KELLICMQS: 'KelliIF', CMQS: 'IFAccess', CMQS2026: 'IFAccess', TESTACCESS: 'IFAccess' };
+const resolveTag = (code) => (code ? TAG_MAP[code.toUpperCase()] : null) || 'KelliIF';
 
 const skillCategories = [
   { id: 'creative',   label: 'Creative & Arts',       emoji: '🎨' },
@@ -137,9 +133,9 @@ const BlueprintLoader = ({ phase }) => {
   const messages = [
     { tag: 'Building your blueprint...', sub: 'Mapping out your full 90-day journey.' },
     { tag: 'Building your future...', sub: 'Aligning your goals with your action plan.' },
-    { tag: 'Crossing the T\'s...', sub: 'Making sure every detail is dialed in.' },
-    { tag: 'Dotting the I\'s...', sub: 'Personalizing your Cash Machine roadmap.' },
-    { tag: 'Crunching your numbers...', sub: 'Running the math so you don\'t have to.' },
+    { tag: "Crossing the T's...", sub: 'Making sure every detail is dialed in.' },
+    { tag: "Dotting the I's...", sub: 'Personalizing your Income-First roadmap.' },
+    { tag: 'Crunching your numbers...', sub: "Running the math so you don't have to." },
     { tag: 'Locking in your strategy...', sub: 'Your plan is almost ready.' },
     { tag: 'Almost there...', sub: 'Your 90-day blueprint is being finalized.' },
   ];
@@ -150,13 +146,13 @@ const BlueprintLoader = ({ phase }) => {
   const phaseLabel = phase === 'base' ? 'Setting up your foundation...' : phase === 1 ? 'Building Month 1...' : phase === 2 ? 'Building Month 2...' : phase === 3 ? 'Building Month 3...' : 'Finalizing your Week 1 tasks...';
   const progressPct = phase === 'base' ? '12%' : phase === 1 ? '38%' : phase === 2 ? '62%' : phase === 3 ? '85%' : '98%';
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(13,17,23,0.97)', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px' }}>
-      <div style={{ width: '60px', height: '60px', border: '4px solid rgba(201,168,76,0.2)', borderTop: '4px solid #C9A84C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', marginBottom: '32px' }} />
-      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Cash Machine QuickStart</div>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(6,9,26,0.97)', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px' }}>
+      <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', marginBottom: '32px' }} />
+      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Income-First</div>
       <div style={{ fontSize: '1.6rem', fontWeight: '700', color: '#ffffff', marginBottom: '10px', minHeight: '44px', animation: 'fadeUp 0.5s ease' }}>{messages[msgIdx].tag}</div>
       <div style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', marginBottom: '36px', minHeight: '26px' }}>{messages[msgIdx].sub}</div>
       <div style={{ width: '300px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden', marginBottom: '12px' }}>
-        <div style={{ height: '100%', background: '#C9A84C', borderRadius: '99px', width: progressPct, transition: 'width 1s ease' }} />
+        <div style={{ height: '100%', background: '#D8FF2C', borderRadius: '99px', width: progressPct, transition: 'width 1s ease' }} />
       </div>
       <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', fontFamily: '"IBM Plex Mono", monospace' }}>{phaseLabel}</div>
     </div>
@@ -192,7 +188,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       <div style={styles.modalBox} onClick={e => e.stopPropagation()}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px' }}>🎯 Lock In Your Plan</h2>
         <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '24px', lineHeight: '1.5' }}>
-          Enter your details and we'll enroll you in <strong>Cash Machine QuickStart</strong> (by CKO Global LLC), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
+          Enter your details and we'll enroll you in <strong>Income-First</strong> (by CKO Global LLC), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
         </p>
         {err && <div style={styles.error}>{err}</div>}
         <div style={styles.formGroup}>
@@ -205,18 +201,18 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
           <p style={styles.helperText}>Optional but recommended — this is how your 3×/week accountability check-ins are delivered.</p>
         </div>
         {phone.trim().length > 5 && (
-          <div style={{ background: 'rgba(201,168,76,0.07)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-            <p style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', marginTop: 0 }}>📱 SMS Consent Required</p>
+          <div style={{ background: 'rgba(216,255,44,0.05)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
+            <p style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', marginTop: 0 }}>📱 SMS Consent Required</p>
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
               <input type="checkbox" checked={smsConsent} onChange={e => setSmsConsent(e.target.checked)} style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }} />
               <span style={{ color: '#D1D5DB', fontSize: '12px', lineHeight: '1.65' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Cash Machine QuickStart) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Income-First) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
             <p style={{ fontSize: '11px', color: '#4B5563', marginBottom: 0, marginTop: 0, lineHeight: '1.5' }}>
               Consent is not required as a condition of purchase.{' '}
-              <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
-              <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+              <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
+              <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
             </p>
           </div>
         )}
@@ -235,8 +231,8 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
         )}
         <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', marginTop: '16px', textAlign: 'center', lineHeight: '1.5' }}>
           By enrolling you agree to our{' '}
-          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
-          <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
+          <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
+          <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>.
         </p>
       </div>
     </div>
@@ -249,10 +245,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
   const [appliedCode, setAppliedCode]   = useState(null);
   const [codeError, setCodeError]       = useState('');
 
-  const baseProgramPrice = 97.00;
-  const processingFee    = appliedCode?.type === 'free' ? 0 : 2.97;
-  const programPrice     = appliedCode ? appliedCode.price : baseProgramPrice;
-  const totalPrice       = programPrice + processingFee;
+  const programPrice = appliedCode ? appliedCode.price : 69.97;
 
   const applyCode = () => {
     const code = referralCode.trim().toUpperCase();
@@ -265,16 +258,16 @@ const PaymentGate = ({ onReferralCodeChange }) => {
   return (
     <div style={styles.paymentGate}>
       <div style={styles.paymentHeader}>
-        <span style={{ fontSize: '2.5rem' }}>💳</span>
-        <h2 style={styles.paymentTitle}>Ready to Start Your Cash Machine?</h2>
-        <p style={styles.paymentSubtitle}>90 days of accountability, AI-powered ideas, and a personalized action plan</p>
+        <span style={{ fontSize: '2.5rem' }}>🚀</span>
+        <h2 style={styles.paymentTitle}>Ready to Launch Your Business?</h2>
+        <p style={styles.paymentSubtitle}>90 days of accountability, a personalized action plan, and an AI coach in your corner</p>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
         <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '600', marginBottom: '10px', color: 'rgba(255,255,255,0.9)' }}>Have a referral code?</label>
         {!appliedCode ? (
           <div style={{ display: 'flex', gap: '10px' }}>
             <input type="text" value={referralCode} onChange={e => { setReferralCode(e.target.value.toUpperCase()); setCodeError(''); }} placeholder="Enter code" style={{ flex: 1, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '1rem', outline: 'none' }} />
-            <button onClick={applyCode} style={{ padding: '12px 24px', background: 'rgba(201,168,76,0.2)', border: '1px solid #C9A84C', borderRadius: '8px', color: '#C9A84C', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>Apply</button>
+            <button onClick={applyCode} style={{ padding: '12px 24px', background: 'rgba(216,255,44,0.15)', border: '1px solid #D8FF2C', borderRadius: '8px', color: '#D8FF2C', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', whiteSpace: 'nowrap' }}>Apply</button>
           </div>
         ) : (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'rgba(62,207,171,0.1)', border: '1px solid rgba(62,207,171,0.3)', borderRadius: '8px' }}>
@@ -287,53 +280,54 @@ const PaymentGate = ({ onReferralCodeChange }) => {
         )}
         {codeError && <p style={{ fontSize: '0.85rem', color: '#F06292', marginTop: '8px', marginBottom: 0 }}>{codeError}</p>}
       </div>
+
       <div style={styles.pricingCard}>
-        <div style={styles.priceRow}>
-          <span>Program Access (90 Days)</span>
-          <div style={{ textAlign: 'right' }}>
-            {appliedCode && programPrice < baseProgramPrice && <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', textDecoration: 'line-through', marginBottom: '3px' }}>${baseProgramPrice.toFixed(2)}</div>}
-            <span style={styles.priceAmount}>${programPrice.toFixed(2)}</span>
-          </div>
+        <div style={{ ...styles.priceRow, ...styles.priceTotal, marginTop: 0, paddingTop: 0, borderTop: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <span>90-Day Income-First Program</span>
+          <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
         </div>
-        {processingFee > 0 && (
-          <div style={styles.priceRow}><span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>Processing Fee (Stripe)</span><span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>${processingFee.toFixed(2)}</span></div>
-        )}
-        <div style={{ ...styles.priceRow, ...styles.priceTotal }}>
+        <div style={{ ...styles.priceRow, borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #D8FF2C' }}>
           <span style={{ fontSize: '1.2rem', fontWeight: '700' }}>Total</span>
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#C9A84C' }}>${totalPrice.toFixed(2)}</span>
+          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#D8FF2C' }}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
         </div>
-        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center' }}>{appliedCode?.type === 'free' ? 'Free beta access' : 'One-time payment'} • 7-day money-back guarantee</p>
+        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center' }}>{appliedCode?.type === 'free' ? 'Beta access' : 'One-time payment'} · 7-day money-back guarantee</p>
       </div>
+
       <div style={styles.includesBox}>
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#C9A84C' }}>✅ What's Included:</h3>
+        <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#D8FF2C' }}>✅ What's Included:</h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {['🤖 AI-generated cash machine ideas based on your skills', '📋 Personalized 90-day action plan with pricing strategy', '📱 90 days of SMS accountability check-ins (up to 3× per week)', '🎯 Weekly progress coaching (12 weeks of support)', '💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)', '🎉 Milestone celebrations at 30, 60, and 90 days', '📧 Plan emailed directly to you — printable and saveable'].map((item, i) => (
+          {['🤖 AI-generated business ideas based on your skills', '📋 Personalized 90-day action plan with pricing strategy', '📱 90 days of SMS accountability check-ins (up to 3× per week)', '🎯 Weekly progress coaching (12 weeks of support)', '💬 24/7 AI Coach chatbot (knows your plan, answers questions instantly)', '🎉 Milestone celebrations at 30, 60, and 90 days', '📧 Plan emailed directly to you — printable and saveable'].map((item, i) => (
             <li key={i} style={{ marginBottom: '8px', fontSize: '0.95rem' }}>{item}</li>
           ))}
         </ul>
       </div>
+
       <div style={styles.accountabilityBox}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '10px' }}>🤝 Why Accountability Matters</h3>
         <p style={{ fontSize: '0.95rem', lineHeight: '1.6', margin: 0 }}>Think of this as your accountability partner — someone checking in three times a week to make sure you're actually doing the work. No judgment, no pressure, just: "Hey, where are you at?" Because ideas don't make money. Action does.</p>
         <p style={{ fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)' }}>You've got this. We've got your back.</p>
       </div>
-      <a href={appliedCode?.type === 'free' ? '/cmqs-opt-in?code=' + referralCode + '&type=free' : 'https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed?code=' + referralCode}
-        target={appliedCode?.type === 'free' ? '_self' : '_blank'} rel={appliedCode?.type === 'free' ? '' : 'noopener noreferrer'}
-        style={{ ...styles.purchaseButton, background: appliedCode?.type === 'free' ? 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' : 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)' }}>
-        {appliedCode?.type === 'free' ? '🎉 Activate Free Beta Access' : `Purchase Now - $${totalPrice.toFixed(2)}`}
+
+      <a
+        href={appliedCode?.type === 'free' ? '/cmqs-opt-in?code=' + referralCode + '&type=free' : 'https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed?code=' + referralCode}
+        target={appliedCode?.type === 'free' ? '_self' : '_blank'}
+        rel={appliedCode?.type === 'free' ? '' : 'noopener noreferrer'}
+        style={{ ...styles.purchaseButton, background: appliedCode?.type === 'free' ? 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' : 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
+      >
+        {appliedCode?.type === 'free' ? '🎉 Activate Free Beta Access' : `Start Income-First — $${programPrice.toFixed(2)}`}
       </a>
+
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
         <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
-          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global LLC</strong> (Cash Machine QuickStart). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
-          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
-          <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global LLC</strong> (Income-First). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
+          <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
+          <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
         </p>
       </div>
+
       <div style={{ textAlign: 'center', marginTop: '10px' }}>
-        <p style={{ fontSize: '0.85rem' }}>
-          <a href="/terms" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
-          <a href="/privacy" target="_blank" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
-        </p>
+        <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none', marginRight: '15px', fontSize: '0.85rem' }}>Terms of Service</a>
+        <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '0.85rem' }}>Privacy Policy</a>
       </div>
     </div>
   );
@@ -351,7 +345,7 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     setMessages(p => [...p, userMsg]); setInput(''); setLoading(true);
     try {
       const prompt = messages.length === 1
-        ? `You are an accountability coach for Cash Machine QuickStart.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.\nQuestion: ${input}`
+        ? `You are an accountability coach for Income-First by CKO Global LLC.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.\nQuestion: ${input}`
         : input;
       const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: messages.length === 1 ? [{ role: 'user', content: prompt }] : [...messages.slice(1), userMsg] }) });
       const data = await res.json();
@@ -370,14 +364,14 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
         <div style={styles.chatbotMessages}>
           {messages.map((msg, i) => (
             <div key={i} style={{ marginBottom: '15px', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: '12px', background: msg.role === 'user' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${msg.role === 'user' ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.1)'}`, fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{msg.content}</div>
+              <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: '12px', background: msg.role === 'user' ? 'rgba(216,255,44,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${msg.role === 'user' ? 'rgba(216,255,44,0.3)' : 'rgba(255,255,255,0.1)'}`, fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{msg.content}</div>
             </div>
           ))}
           {loading && <div style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '0.95rem', maxWidth: '80%' }}>Thinking...</div>}
         </div>
         <div style={styles.chatbotInput}>
           <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && send()} placeholder="Ask your question..." style={{ flex: 1, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '1rem', outline: 'none' }} />
-          <button onClick={send} disabled={loading || !input.trim()} style={{ padding: '12px 24px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>Send</button>
+          <button onClick={send} disabled={loading || !input.trim()} style={{ padding: '12px 24px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>Send</button>
         </div>
       </div>
     </div>
@@ -390,10 +384,10 @@ const MonthTab = ({ m, emoji, label }) => {
   return (
     <div style={styles.tabContent}>
       <h3 style={styles.sectionTitle}>{emoji} {label}: {m.goal}</h3>
-      <div style={{ padding: '15px 20px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '8px', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ padding: '15px 20px', background: 'rgba(216,255,44,0.07)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '8px', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <span style={{ fontSize: '1.5rem' }}>💡</span>
         <div>
-          <strong style={{ color: '#C9A84C', fontSize: '0.95rem' }}>Stuck or confused?</strong>
+          <strong style={{ color: '#D8FF2C', fontSize: '0.95rem' }}>Stuck or confused?</strong>
           <p style={{ margin: '3px 0 0', fontSize: '0.9rem', lineHeight: '1.5', color: 'rgba(255,255,255,0.8)' }}>Click <strong>"💬 Ask AI Coach"</strong> below. It knows your entire plan.</p>
         </div>
       </div>
@@ -414,8 +408,8 @@ const MonthTab = ({ m, emoji, label }) => {
           ))}
         </div>
       ))}
-      <div style={{ ...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
-        <strong style={{ color: '#C9A84C' }}>📊 Track These Metrics:</strong> {m.metrics}
+      <div style={{ ...styles.weekBlock, background: 'rgba(216,255,44,0.07)', border: '1px solid rgba(216,255,44,0.2)' }}>
+        <strong style={{ color: '#D8FF2C' }}>📊 Track These Metrics:</strong> {m.metrics}
       </div>
     </div>
   );
@@ -430,7 +424,7 @@ const Week1Tab = ({ tasks }) => {
       <p style={{ fontSize: '1rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.85)', marginBottom: '24px' }}>{tasks.intro}</p>
       {tasks.tasks && tasks.tasks.map((t, i) => (
         <div key={i} style={{ display: 'flex', gap: '16px', padding: '16px 18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', marginBottom: '12px' }}>
-          <div style={{ minWidth: '72px', fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '0.5px', paddingTop: '2px' }}>{t.day}</div>
+          <div style={{ minWidth: '72px', fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '0.5px', paddingTop: '2px' }}>{t.day}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '1rem', fontWeight: '700', color: '#ffffff', marginBottom: '5px' }}>{t.action}</div>
             <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>{t.why}</div>
@@ -438,7 +432,7 @@ const Week1Tab = ({ tasks }) => {
           </div>
         </div>
       ))}
-      <div style={{ marginTop: '24px', padding: '16px 20px', background: 'rgba(62,207,171,0.08)', border: '1px solid rgba(62,207,171,0.25)', borderRadius: '10px', fontSize: '0.95rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.6', fontStyle: 'italic' }}>
+      <div style={{ marginTop: '24px', padding: '16px 20px', background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '10px', fontSize: '0.95rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.6', fontStyle: 'italic' }}>
         {tasks.closingLine}
       </div>
     </div>
@@ -483,7 +477,7 @@ const CashMachineQuickStart = () => {
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem('cmqs_state');
+    const saved = localStorage.getItem('if_state');
     if (!saved) return;
     try {
       const d = JSON.parse(saved);
@@ -499,7 +493,7 @@ const CashMachineQuickStart = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cmqs_state', JSON.stringify({
+    localStorage.setItem('if_state', JSON.stringify({
       phase, hasPaid, name, procrastination, goodAt, hardPass, selectedSkills, specificIdea,
       timeAvailable, incomeGoal, ideas, selectedIdea, pricingOptions, selectedPricing, plan,
       enrolledEmail, enrolledTag, activeReferralCode,
@@ -535,7 +529,7 @@ const CashMachineQuickStart = () => {
   const generateIdeas = async () => {
     setLoading(true); setError('');
     try {
-      const parsed = await aiCall(`Generate 8 cash machine ideas using the DUAL-TRACK system for: ${name}
+      const parsed = await aiCall(`Generate 8 Income-First business ideas using the DUAL-TRACK system for: ${name}
 Procrastination: ${procrastination}
 Good at: ${goodAt}
 Hard pass: ${hardPass}
@@ -584,7 +578,7 @@ No preamble.`);
     } catch (e) { setError('Failed to generate plan foundation.'); setLoadingMonth(null); return; }
 
     const months = [
-      { num: 1, weeks: '1-4', startWeek: 1, focus: 'Build foundation, land first client/gig, start gig income' },
+      { num: 1, weeks: '1-4', startWeek: 1, focus: 'Build foundation, land first client/gig, start income' },
       { num: 2, weeks: '5-8', startWeek: 5, focus: 'Scale business, reduce gig dependency' },
       { num: 3, weeks: '9-12', startWeek: 9, focus: 'Business income > gig income. Growth systems.' },
     ];
@@ -601,7 +595,6 @@ IMPORTANT: EXACTLY 3 steps per week. Concise how/why. No preamble.`);
       } catch (e) { setError(`Month ${num} generation failed.`); }
     }
 
-    // ── Week 1 Tasks ──────────────────────────────────────────────────────────
     setLoadingMonth('week1tasks');
     try {
       const w1 = await aiCall(`Generate WEEK 1 TASKS for: ${selectedIdea.title}
@@ -618,7 +611,7 @@ Return ONLY valid JSON:
   {"day":"Day 5–6","action":"specific task","why":"1 sentence reason","timeEstimate":"X hrs"},
   {"day":"Day 7","action":"specific task — land or follow up on first paid client","why":"1 sentence reason","timeEstimate":"X hrs"}
 ],
-"closingLine":"Short motivating close, signed Kelli & the CMQS Team"}
+"closingLine":"Short motivating close, signed Kelli & the Income-First Team"}
 No preamble.`);
       setPlan(prev => ({ ...prev, week1Tasks: w1 }));
     } catch (e) { console.error('Week 1 tasks generation failed', e); }
@@ -628,7 +621,7 @@ No preamble.`);
 
   const downloadPlan = () => {
     const lines = [
-      `CASH MACHINE QUICKSTART — 90-DAY ACTION PLAN`,
+      `INCOME-FIRST — 90-DAY ACTION PLAN`,
       `For: ${name} | Idea: ${selectedIdea?.title} | Pricing: ${selectedPricing?.name} at ${selectedPricing?.price}`,
       ``, `=== DUAL-TRACK ===`,
       `Track A: ${plan.dualTrack?.trackA?.name}`,
@@ -648,11 +641,11 @@ No preamble.`);
       }),
       `=== MILESTONES ===`,
       ...(plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`) || []),
-      ``, `Generated by Cash Machine QuickStart — CKO Global LLC`, `proactively-lazy.com | kelli@proactively-lazy.com`,
+      ``, `Generated by Income-First — CKO Global LLC`, `proactively-lazy.com | kelli@proactively-lazy.com`,
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_90Day_Plan.txt`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_IncomFirst_90Day_Plan.txt`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -662,25 +655,24 @@ No preamble.`);
       {/* god-mode bypass */}
       <div onClick={() => { const n = adminClicks + 1; setAdminClicks(n); if (n >= 5) setHasPaid(true); }} style={{ position: 'fixed', bottom: '20px', right: '20px', width: '60px', height: '60px', opacity: 0, zIndex: 999, userSelect: 'none' }} />
 
-      {/* ── BLUEPRINT LOADER OVERLAY ── */}
       {loadingMonth && <BlueprintLoader phase={loadingMonth} />}
 
       {/* ── HEADER ── */}
       <div style={styles.header}>
-        <div style={styles.brandLine}>Cash Machine QuickStart · Kelli Owens + Loral Langemeier</div>
-        <h1 style={styles.hero}>You're broke.<br />We get it. Let's <span style={{ color: '#C9A84C' }}>fix that.</span></h1>
-        <p style={styles.tagline}>Get cash this week doing gig work. Build a real business over 90 days. No MBA required. No trust fund needed.</p>
+        <div style={styles.brandLine}>Income-First · CKO Global LLC</div>
+        <h1 style={styles.hero}>You already have what it takes.<br />Let's build <span style={{ color: '#D8FF2C' }}>your business.</span></h1>
+        <p style={styles.tagline}>Find a business idea built around what you know. Get your 90-day plan. Start making income. No MBA required.</p>
 
         <div style={{ maxWidth: '700px', margin: '28px auto 0', padding: '22px 24px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', textAlign: 'left' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginBottom: '16px' }}>
             <div style={{ flex: '1', minWidth: '200px' }}>
-              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
+              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.7', margin: 0 }}>
-                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Cash Machine QuickStart</strong> is a 90-day business coaching and accountability program offered by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global LLC</strong>, in partnership with Loral Langemeier / Live Out Loud. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
+                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Income-First</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global LLC</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
               </p>
             </div>
             <div style={{ flex: '1', minWidth: '180px' }}>
-              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>What You Get</div>
+              <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '8px' }}>What You Get</div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.8' }}>
                 📋 AI-generated 90-day action plan<br />
                 📱 SMS accountability check-ins (3×/week)<br />
@@ -692,8 +684,8 @@ No preamble.`);
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global LLC</span>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Operated by:</strong> Kelli Owens</span>
-            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Email:</strong>{' '}<a href="mailto:kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a></span>
-            <span><a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a></span>
+            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Email:</strong>{' '}<a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a></span>
+            <span><a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></span>
             <span>
               <a href="/privacy" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
               <a href="/terms" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Terms of Service</a>
@@ -716,15 +708,15 @@ No preamble.`);
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{ fontSize: '2rem' }}>👋</span>
-            <h2 style={styles.phaseTitle}>Let's find the money hiding in what you <span style={{ color: '#C9A84C' }}>already know how to do.</span></h2>
-            <p style={styles.phaseSubtitle}>You don't need a fancy degree or a trust fund. You need to get paid for stuff you can do right now.</p>
+            <h2 style={styles.phaseTitle}>Let's find the income hiding in what you <span style={{ color: '#D8FF2C' }}>already know how to do.</span></h2>
+            <p style={styles.phaseSubtitle}>You don't need a fancy degree or a trust fund. You need to get paid for what you can do right now.</p>
           </div>
           <div style={styles.formGroup}><label style={styles.label}>First name</label><input style={styles.input} placeholder="e.g., Alex" value={name} onChange={e => setName(e.target.value)} /></div>
           <div style={styles.formGroup}><label style={styles.label}>What do you do when you're supposed to be doing something else?</label><textarea style={{ ...styles.input, minHeight: '100px' }} placeholder="e.g., I reorganize my closet by color when I should be studying." value={procrastination} onChange={e => setProcrastination(e.target.value)} /><p style={styles.helperText}>Seriously — what's your favorite way to procrastinate? That's usually hiding money.</p></div>
           <div style={styles.formGroup}><label style={styles.label}>What do people bug you about because you're weirdly good at it?</label><textarea style={{ ...styles.input, minHeight: '100px' }} placeholder="e.g., Everyone asks me to fix their phone/computer." value={goodAt} onChange={e => setGoodAt(e.target.value)} /><p style={styles.helperText}>Think about what feels easy to YOU but everyone else struggles with.</p></div>
-          <div style={styles.formGroup}><label style={styles.label}>What's your hard pass? (Like, you'd fake sick to avoid it)</label><textarea style={{ ...styles.input, minHeight: '100px' }} placeholder="e.g., Anything with numbers. Or: Talking to strangers on the phone." value={hardPass} onChange={e => setHardPass(e.target.value)} /><p style={styles.helperText}>Be honest. We won't suggest stuff that'll make you miserable.</p></div>
+          <div style={styles.formGroup}><label style={styles.label}>What's your hard pass? (Like, you'd fake sick to avoid it)</label><textarea style={{ ...styles.input, minHeight: '100px' }} placeholder="e.g., Anything with numbers. Or: Talking to strangers on the phone." value={hardPass} onChange={e => setHardPass(e.target.value)} /><p style={styles.helperText}>Be honest. We won't suggest anything that'll make you miserable.</p></div>
           <div style={styles.formGroup}><label style={styles.label}>Pick the skills that feel like you (check all that apply)</label><div style={styles.chipGrid}>{skillCategories.map(c => <Chip key={c.id} label={`${c.emoji} ${c.label}`} selected={selectedSkills.includes(c.id)} onClick={() => setSelectedSkills(p => p.includes(c.id) ? p.filter(s => s !== c.id) : [...p, c.id])} />)}</div></div>
-          <div style={styles.formGroup}><label style={styles.label}>Already have a money idea rattling around in your head?</label><textarea style={{ ...styles.input, minHeight: '80px' }} placeholder="e.g., I want to help people declutter. Or: Honestly? No clue." value={specificIdea} onChange={e => setSpecificIdea(e.target.value)} /><p style={styles.helperText}>(Optional) If not, no worries — that's literally what this tool is for.</p></div>
+          <div style={styles.formGroup}><label style={styles.label}>Already have a business idea rattling around in your head?</label><textarea style={{ ...styles.input, minHeight: '80px' }} placeholder="e.g., I want to help people declutter. Or: Honestly? No clue." value={specificIdea} onChange={e => setSpecificIdea(e.target.value)} /><p style={styles.helperText}>(Optional) If not, no worries — that's literally what this tool is for.</p></div>
           <div style={styles.formGroup}><label style={styles.label}>Time you can commit per week</label><div style={styles.chipRow}>{['Under 5 hrs/wk', '5-10 hrs/wk', '10-20 hrs/wk', '20+ hrs/wk'].map(o => <Chip key={o} label={o} selected={timeAvailable === o} onClick={() => setTimeAvailable(o)} />)}</div></div>
           <div style={styles.formGroup}><label style={styles.label}>Monthly income goal</label><div style={styles.chipRow}>{['$500/mo', '$1,500/mo', '$5,000/mo', '$10,000+/mo'].map(o => <Chip key={o} label={o} selected={incomeGoal === o} onClick={() => setIncomeGoal(o)} />)}</div></div>
           {error && <div style={styles.error}>{error}</div>}
@@ -739,8 +731,8 @@ No preamble.`);
         <div style={styles.phase}>
           <div style={styles.phaseHeader}>
             <span style={{ fontSize: '2rem' }}>💡</span>
-            <h2 style={styles.phaseTitle}>Here's Your <span style={{ color: '#C9A84C' }}>Dual-Track System</span></h2>
-            <p style={styles.phaseSubtitle}><strong style={{ color: '#60B8E8' }}>Bridge Ideas</strong> = Cash this week.<br /><strong style={{ color: '#C9A84C' }}>Business Ideas</strong> = What you're actually building.<br />Pick ONE business idea. Use bridge ideas as needed.</p>
+            <h2 style={styles.phaseTitle}>Here's Your <span style={{ color: '#D8FF2C' }}>Dual-Track System</span></h2>
+            <p style={styles.phaseSubtitle}><strong style={{ color: '#00D4FF' }}>Bridge Ideas</strong> = Cash this week.<br /><strong style={{ color: '#D8FF2C' }}>Business Ideas</strong> = What you're actually building.<br />Pick ONE business idea. Use bridge ideas as needed.</p>
           </div>
           <div style={styles.ideasGrid}>
             {ideas.map((idea, idx) => (
@@ -748,7 +740,7 @@ No preamble.`);
                 <div style={styles.ideaHeader}>
                   <h3 style={styles.ideaTitle}>{idea.title}</h3>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <div style={{ padding: '4px 10px', background: idea.category === 'bridge' ? 'rgba(96,184,232,0.2)' : idea.category === 'wildcard' ? 'rgba(168,216,76,0.2)' : 'rgba(201,168,76,0.2)', border: `1px solid ${idea.category === 'bridge' ? '#60B8E8' : idea.category === 'wildcard' ? '#A8D84C' : '#C9A84C'}`, borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', color: idea.category === 'bridge' ? '#60B8E8' : idea.category === 'wildcard' ? '#A8D84C' : '#C9A84C', textTransform: 'uppercase' }}>{idea.category || 'business'}</div>
+                    <div style={{ padding: '4px 10px', background: idea.category === 'bridge' ? 'rgba(0,212,255,0.15)' : idea.category === 'wildcard' ? 'rgba(216,255,44,0.15)' : 'rgba(255,80,53,0.15)', border: `1px solid ${idea.category === 'bridge' ? '#00D4FF' : idea.category === 'wildcard' ? '#D8FF2C' : '#FF5035'}`, borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', color: idea.category === 'bridge' ? '#00D4FF' : idea.category === 'wildcard' ? '#D8FF2C' : '#FF5035', textTransform: 'uppercase' }}>{idea.category || 'business'}</div>
                     <div style={styles.fitBadge}>{idea.fitScore}% fit</div>
                   </div>
                 </div>
@@ -793,7 +785,7 @@ No preamble.`);
             })()
           ) : (
             <>
-              <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💡</span><h2 style={styles.phaseTitle}>You've Seen What's Possible.<br /><span style={{ color: '#C9A84C' }}>Now Let's Build It.</span></h2><p style={styles.phaseSubtitle}>You picked: <strong>{selectedIdea?.title}</strong></p></div>
+              <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💡</span><h2 style={styles.phaseTitle}>You've Seen What's Possible.<br /><span style={{ color: '#D8FF2C' }}>Now Let's Build It.</span></h2><p style={styles.phaseSubtitle}>You picked: <strong>{selectedIdea?.title}</strong></p></div>
               <div style={styles.lockedOverlay}><div style={{ fontSize: '3rem', marginBottom: '15px' }}>🎯</div><h3 style={{ fontSize: '1.3rem', marginBottom: '10px' }}>Ready for Your Dual-Track 90-Day Plan?</h3><p style={{ fontSize: '1rem', marginBottom: '30px', color: 'rgba(255,255,255,0.7)' }}>Get the complete roadmap: pricing strategy, dual-track implementation, marketing plan, and 90 days of accountability coaching.</p></div>
               <PaymentGate onReferralCodeChange={setActiveReferralCode} />
               <div style={styles.buttonRow}><button style={styles.buttonSecondary} onClick={() => setPhase(2)}>← Back to Ideas</button></div>
@@ -805,7 +797,7 @@ No preamble.`);
       {/* ── PHASE 3 ── */}
       {phase === 3 && (hasPaid || adminClicks >= 5) && (
         <div style={styles.phase}>
-          <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💰</span><h2 style={styles.phaseTitle}>Let's figure out <span style={{ color: '#C9A84C' }}>what to charge</span> for "{selectedIdea?.title}"</h2><p style={styles.phaseSubtitle}>Pricing isn't random. Here are 5 strategies that actually work.</p></div>
+          <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💰</span><h2 style={styles.phaseTitle}>Let's figure out <span style={{ color: '#D8FF2C' }}>what to charge</span> for "{selectedIdea?.title}"</h2><p style={styles.phaseSubtitle}>Pricing isn't random. Here are 5 strategies that actually work.</p></div>
           <div style={styles.pricingGrid}>
             {pricingOptions.map((o, idx) => (
               <div key={idx} style={{ ...styles.pricingCard2, ...(selectedPricing?.name === o.name ? styles.pricingCardSelected : {}) }} onClick={() => setSelectedPricing(o)}>
@@ -816,7 +808,7 @@ No preamble.`);
                 <div style={styles.pricingProscons}>
                   <div><strong style={{ color: '#3ECFAB' }}>✓</strong> {o.pros.join(', ')}</div>
                   <div style={{ marginTop: '5px' }}><strong style={{ color: '#F06292' }}>⚠</strong> {o.cons.join(', ')}</div>
-                  {o.growthPath && <div style={{ marginTop: '10px', padding: '8px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '6px', fontSize: '0.85rem', color: '#C9A84C', fontWeight: '600' }}>{o.growthPath}</div>}
+                  {o.growthPath && <div style={{ marginTop: '10px', padding: '8px', background: 'rgba(216,255,44,0.07)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '6px', fontSize: '0.85rem', color: '#D8FF2C', fontWeight: '600' }}>{o.growthPath}</div>}
                 </div>
               </div>
             ))}
@@ -838,18 +830,17 @@ No preamble.`);
             <>
               <div style={styles.phaseHeader}>
                 <span style={{ fontSize: '2rem' }}>🎉</span>
-                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#C9A84C' }}>90-Day Cash Machine Plan</span> is Ready</h2>
-                <p style={styles.phaseSubtitle}>{name}, here's your roadmap. Follow this and you'll be making money in 30 days.</p>
+                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#D8FF2C' }}>90-Day Income-First Plan</span> is Ready</h2>
+                <p style={styles.phaseSubtitle}>{name}, here's your roadmap. Follow this and you'll be making income in 30 days.</p>
               </div>
               {error && <div style={styles.error}>{error}</div>}
               {enrolledEmail && <div style={styles.successMsg}>✅ Enrolled! Plan sent to <strong>{enrolledEmail}</strong> · Tag: <strong>{enrolledTag}</strong></div>}
               {emailSent && <div style={styles.successMsg}>📧 Plan sent to {enrolledEmail}! Check your inbox.</div>}
               {emailError && <div style={styles.error}>{emailError}</div>}
 
-              {/* Action bar */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '30px', padding: '20px', background: 'rgba(201,168,76,0.05)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '12px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '30px', padding: '20px', background: 'rgba(216,255,44,0.04)', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '12px', alignItems: 'center' }}>
                 {!enrolledEmail ? (
-                  <button onClick={() => setEnrollOpen(true)} style={{ padding: '14px 24px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', fontSize: '1rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                  <button onClick={() => setEnrollOpen(true)} style={{ padding: '14px 24px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', fontSize: '1rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
                     🎯 Enroll & Send My Plan
                   </button>
                 ) : (
@@ -861,7 +852,6 @@ No preamble.`);
                 <button onClick={downloadPlan} style={{ padding: '14px 24px', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', fontSize: '1rem', fontWeight: '600', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', cursor: 'pointer' }}>📥 Download TXT</button>
               </div>
 
-              {/* Tabs */}
               <div style={styles.tabs}>
                 {[
                   { id: 'week1tasks', label: 'Week 1 Tasks', emoji: '🚀' },
@@ -883,15 +873,15 @@ No preamble.`);
               {activeTab === 'dualtrack' && plan.dualTrack && (
                 <div style={styles.tabContent}>
                   <h3 style={styles.sectionTitle}>🎯 The Dual-Track System</h3>
-                  <p style={styles.sectionText}>Track A pays bills <strong>this week</strong>. Track B builds the business that'll replace your day job.</p>
-                  <div style={{ ...styles.weekBlock, borderLeft: '4px solid #60B8E8' }}>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#60B8E8', marginBottom: '10px' }}>Track A: {plan.dualTrack.trackA?.name}</h4>
+                  <p style={styles.sectionText}>Track A pays bills <strong>this week</strong>. Track B builds the business that replaces your day job.</p>
+                  <div style={{ ...styles.weekBlock, borderLeft: '4px solid #00D4FF' }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#00D4FF', marginBottom: '10px' }}>Track A: {plan.dualTrack.trackA?.name}</h4>
                     <p style={{ marginBottom: '8px' }}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackA?.weeks1_4}</p>
                     <p style={{ marginBottom: '8px' }}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackA?.weeks5_8}</p>
                     <p style={{ marginBottom: 0 }}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackA?.weeks9_12}</p>
                   </div>
-                  <div style={{ ...styles.weekBlock, borderLeft: '4px solid #C9A84C' }}>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px' }}>Track B: {plan.dualTrack.trackB?.name}</h4>
+                  <div style={{ ...styles.weekBlock, borderLeft: '4px solid #D8FF2C' }}>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '10px' }}>Track B: {plan.dualTrack.trackB?.name}</h4>
                     <p style={{ marginBottom: '8px' }}><strong>Weeks 1-4:</strong> {plan.dualTrack.trackB?.weeks1_4}</p>
                     <p style={{ marginBottom: '8px' }}><strong>Weeks 5-8:</strong> {plan.dualTrack.trackB?.weeks5_8}</p>
                     <p style={{ marginBottom: 0 }}><strong>Weeks 9-12:</strong> {plan.dualTrack.trackB?.weeks9_12}</p>
@@ -955,7 +945,7 @@ No preamble.`);
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '30px' }}>
-                <button onClick={() => { localStorage.removeItem('cmqs_state'); window.location.reload(); }} style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>
+                <button onClick={() => { localStorage.removeItem('if_state'); window.location.reload(); }} style={{ padding: '12px 24px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' }}>
                   Start Over with New Idea
                 </button>
               </div>
@@ -968,11 +958,11 @@ No preamble.`);
       {enrollOpen && <EnrollmentModal name={name} referralCode={activeReferralCode} selectedIdea={selectedIdea} selectedPricing={selectedPricing} plan={plan} onClose={() => setEnrollOpen(false)} onSuccess={handleEnrollSuccess} />}
 
       <div style={styles.footer}>
-        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#C9A84C' }}>Cash Machine QuickStart</strong></div>
+        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
         <div style={{ marginBottom: '12px' }}>
           CKO Global LLC · Operated by Kelli Owens<br />
-          Email: <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a><br />
-          Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a>
+          Email: <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a><br />
+          Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
         </div>
         <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: '10px' }}>
           SMS messages sent by CKO Global LLC. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.

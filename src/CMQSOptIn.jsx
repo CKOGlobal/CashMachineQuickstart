@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// ========== AI COACH COMPONENT ==========
 const ChatbotHelper = ({ plan, onClose }) => {
   const [messages, setMessages] = useState([
     {
@@ -19,7 +18,7 @@ const ChatbotHelper = ({ plan, onClose }) => {
     setLoading(true);
     try {
       const contextualPrompt = messages.length === 1
-        ? `You are a Socratic coach for the Cash Machine QuickStart accountability program. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"\n\nUser question: ${input}`
+        ? `You are a Socratic coach for the Income-First accountability program by CKO Global LLC. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"\n\nUser question: ${input}`
         : input;
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -39,25 +38,17 @@ const ChatbotHelper = ({ plan, onClose }) => {
     }
   };
 
-  const styles = {
-    chatbotModal: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' },
-    chatbotContainer: { background: '#0F1419', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' },
-    chatbotHeader: { padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    chatbotMessages: { flex: 1, overflowY: 'auto', padding: '20px' },
-    chatbotInput: { padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '12px' },
-  };
-
   return (
-    <div style={styles.chatbotModal} onClick={onClose}>
-      <div style={styles.chatbotContainer} onClick={(e) => e.stopPropagation()}>
-        <div style={styles.chatbotHeader}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }} onClick={onClose}>
+      <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '16px', width: '100%', maxWidth: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#ffffff' }}>💬 Your AI Coach</h3>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', fontSize: '1.5rem', cursor: 'pointer', padding: '0', lineHeight: 1 }}>×</button>
         </div>
-        <div style={styles.chatbotMessages}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
           {messages.map((msg, idx) => (
             <div key={idx} style={{ marginBottom: '15px', display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: '12px', background: msg.role === 'user' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.05)', border: `1px solid ${msg.role === 'user' ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.1)'}`, color: '#ffffff', fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+              <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: '12px', background: msg.role === 'user' ? 'rgba(216,255,44,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${msg.role === 'user' ? 'rgba(216,255,44,0.25)' : 'rgba(255,255,255,0.1)'}`, color: '#ffffff', fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
                 {msg.content}
               </div>
             </div>
@@ -68,9 +59,9 @@ const ChatbotHelper = ({ plan, onClose }) => {
             </div>
           )}
         </div>
-        <div style={styles.chatbotInput}>
+        <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '12px' }}>
           <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && sendMessage()} placeholder="Ask your question..." style={{ flex: 1, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '1rem', outline: 'none' }} />
-          <button onClick={sendMessage} disabled={loading || !input.trim()} style={{ padding: '12px 24px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>
+          <button onClick={sendMessage} disabled={loading || !input.trim()} style={{ padding: '12px 24px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>
             Send
           </button>
         </div>
@@ -79,7 +70,6 @@ const ChatbotHelper = ({ plan, onClose }) => {
   );
 };
 
-// ========== MAIN COMPONENT ==========
 export default function CMQSOptIn() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -132,9 +122,9 @@ export default function CMQSOptIn() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          businessIdea: urlParams.get('idea') || localStorage.getItem('cmqs_business_idea'),
-          pricingModel: urlParams.get('pricing') || localStorage.getItem('cmqs_pricing'),
-          category: urlParams.get('category') || localStorage.getItem('cmqs_category'),
+          businessIdea: urlParams.get('idea') || localStorage.getItem('if_business_idea'),
+          pricingModel: urlParams.get('pricing') || localStorage.getItem('if_pricing'),
+          category: urlParams.get('category') || localStorage.getItem('if_category'),
         })
       });
       const data = await response.json();
@@ -149,37 +139,37 @@ export default function CMQSOptIn() {
   };
 
   const styles = {
-    container: { minHeight: '100vh', background: '#0d1117', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
+    container: { minHeight: '100vh', background: '#06091A', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
     header: { maxWidth: '900px', margin: '0 auto 30px', textAlign: 'center', padding: '20px' },
-    brandLine: { fontSize: '0.85rem', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' },
+    brandLine: { fontSize: '0.85rem', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' },
     hero: { fontSize: '2.5rem', fontWeight: '800', lineHeight: '1.2', marginBottom: '15px' },
     tagline: { fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6' },
     phase: { maxWidth: '900px', margin: '0 auto', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '40px' },
     tabs: { display: 'flex', gap: '10px', marginBottom: '30px', flexWrap: 'wrap' },
     tab: { padding: '12px 20px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer' },
-    tabActive: { background: 'rgba(201,168,76,0.2)', border: '1px solid #C9A84C', color: '#C9A84C' },
+    tabActive: { background: 'rgba(216,255,44,0.12)', border: '1px solid #D8FF2C', color: '#D8FF2C' },
     tabContent: { animation: 'fadeIn 0.3s ease-in' },
     sectionTitle: { fontSize: '1.6rem', fontWeight: '700', marginBottom: '20px', color: '#ffffff' },
     sectionText: { fontSize: '1rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.6', marginBottom: '25px' },
     weekBlock: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '25px', marginBottom: '20px' },
-    weekTitle: { fontSize: '1.2rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px' },
+    weekTitle: { fontSize: '1.2rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '10px' },
     weekSummary: { fontSize: '1rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginBottom: '20px' },
     stepBlock: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '20px', marginBottom: '15px' },
     stepWhat: { fontSize: '1.05rem', fontWeight: '600', color: '#ffffff', marginBottom: '15px' },
     stepSection: { marginBottom: '12px' },
-    stepLabel: { fontSize: '0.8rem', fontWeight: '700', color: '#C9A84C', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' },
+    stepLabel: { fontSize: '0.8rem', fontWeight: '700', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '5px' },
     stepContent: { fontSize: '0.95rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.6' },
     milestoneBlock: { display: 'flex', gap: '20px', background: 'rgba(62,207,171,0.1)', border: '1px solid rgba(62,207,171,0.3)', borderRadius: '10px', padding: '20px', marginBottom: '15px' },
     milestoneDay: { fontSize: '1.5rem', fontWeight: '800', color: '#3ECFAB', minWidth: '80px' },
     milestoneGoal: { fontSize: '1rem', color: 'rgba(255,255,255,0.9)', lineHeight: '1.6', display: 'flex', alignItems: 'center' },
     exportSection: { marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' },
-    accountabilityFooter: { marginTop: '40px', padding: '30px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '12px', textAlign: 'center' },
+    accountabilityFooter: { marginTop: '40px', padding: '30px', background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '12px', textAlign: 'center' },
     footer: { maxWidth: '900px', margin: '50px auto 0', padding: '30px 20px', borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center', fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }
   };
 
   const downloadPlan = () => {
     if (!plan) return;
-    let text = `CASH MACHINE QUICKSTART - YOUR 90-DAY PLAN\n========================================\n\nBusiness: ${plan.selectedIdea}\nPricing: ${plan.selectedPricing}\n\n`;
+    let text = `INCOME-FIRST — YOUR 90-DAY PLAN\n========================================\n\nBusiness: ${plan.selectedIdea}\nPricing: ${plan.selectedPricing}\n\n`;
     [1, 2, 3].forEach(n => {
       const m = plan[`month${n}`];
       if (!m) return;
@@ -194,15 +184,15 @@ export default function CMQSOptIn() {
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'cash-machine-plan.txt'; a.click();
+    a.href = url; a.download = 'income-first-plan.txt'; a.click();
   };
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#07090F', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ background: '#0F1419', border: '1px solid #1F2937', borderRadius: '8px', padding: '40px', maxWidth: '600px', textAlign: 'center' }}>
-          <div style={{ width: '60px', height: '60px', border: '4px solid rgba(201,168,76,0.2)', borderTop: '4px solid #C9A84C', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-          <h2 style={{ color: '#C9A84C', marginBottom: '15px', fontSize: '20px' }}>Generating Your 90-Day Plan...</h2>
+      <div style={{ minHeight: '100vh', background: '#06091A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '8px', padding: '40px', maxWidth: '600px', textAlign: 'center' }}>
+          <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
+          <h2 style={{ color: '#D8FF2C', marginBottom: '15px', fontSize: '20px' }}>Generating Your 90-Day Plan...</h2>
           <p style={{ color: '#9CA3AF', fontSize: '14px', lineHeight: '1.6', marginBottom: '10px' }}>{loadingMessages[loadingMessageIndex]}</p>
           <p style={{ color: '#6B7280', fontSize: '13px' }}>Building your custom roadmap with AI. This takes about 30 seconds.</p>
         </div>
@@ -215,14 +205,14 @@ export default function CMQSOptIn() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <div style={styles.brandLine}>Cash Machine QuickStart</div>
+          <div style={styles.brandLine}>Income-First</div>
           <h1 style={styles.hero}>Your 90-Day Plan Is Ready</h1>
           <p style={styles.tagline}>Here's your complete roadmap. Accountability check-ins start now.</p>
-          <div style={{ marginTop: '30px', padding: '20px', background: 'rgba(201,168,76,0.1)', border: '2px solid rgba(201,168,76,0.4)', borderRadius: '12px', textAlign: 'left' }}>
+          <div style={{ marginTop: '30px', padding: '20px', background: 'rgba(216,255,44,0.07)', border: '2px solid rgba(216,255,44,0.3)', borderRadius: '12px', textAlign: 'left' }}>
             <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>💡</div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#C9A84C', marginBottom: '10px' }}>Stuck on a task? Don't sit there wondering - ASK FOR HELP.</h3>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#D8FF2C', marginBottom: '10px' }}>Stuck on a task? Don't sit there wondering - ASK FOR HELP.</h3>
             <p style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px', color: 'rgba(255,255,255,0.85)' }}>Your AI Coach knows this entire plan. It won't just give you answers - it'll ask questions to help you figure it out yourself.</p>
-            <button onClick={() => setChatbotOpen(true)} style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', fontSize: '1.05rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>
+            <button onClick={() => setChatbotOpen(true)} style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', fontSize: '1.05rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>
               💬 Ask AI Coach
             </button>
           </div>
@@ -240,8 +230,8 @@ export default function CMQSOptIn() {
           {activeTab === 'month1' && plan.month1 && (
             <div style={styles.tabContent}>
               <h3 style={styles.sectionTitle}>🚀 Month 1: {plan.month1.goal}</h3>
-              <div style={{ padding: '15px 20px', background: 'rgba(62,207,171,0.1)', border: '1px solid rgba(62,207,171,0.3)', borderRadius: '8px', marginBottom: '25px', fontSize: '0.9rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.9)' }}>
-                <strong style={{ color: '#3ECFAB' }}>📌 Getting Stuck Is Normal.</strong> When you hit a task and think "I don't know how to do this" — that's your cue to click "Ask AI Coach" above.
+              <div style={{ padding: '15px 20px', background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '8px', marginBottom: '25px', fontSize: '0.9rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.9)' }}>
+                <strong style={{ color: '#D8FF2C' }}>📌 Getting Stuck Is Normal.</strong> When you hit a task and think "I don't know how to do this" — that's your cue to click "Ask AI Coach" above.
               </div>
               {plan.month1.weeks.map((week) => (
                 <div key={week.week} style={styles.weekBlock}>
@@ -260,8 +250,8 @@ export default function CMQSOptIn() {
                   ))}
                 </div>
               ))}
-              <div style={{ ...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
-                <strong style={{ color: '#C9A84C' }}>📊 Track These Metrics:</strong> {plan.month1.metrics}
+              <div style={{ ...styles.weekBlock, background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)' }}>
+                <strong style={{ color: '#D8FF2C' }}>📊 Track These Metrics:</strong> {plan.month1.metrics}
               </div>
             </div>
           )}
@@ -286,8 +276,8 @@ export default function CMQSOptIn() {
                   ))}
                 </div>
               ))}
-              <div style={{ ...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
-                <strong style={{ color: '#C9A84C' }}>📊 Track These Metrics:</strong> {plan.month2.metrics}
+              <div style={{ ...styles.weekBlock, background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)' }}>
+                <strong style={{ color: '#D8FF2C' }}>📊 Track These Metrics:</strong> {plan.month2.metrics}
               </div>
             </div>
           )}
@@ -312,8 +302,8 @@ export default function CMQSOptIn() {
                   ))}
                 </div>
               ))}
-              <div style={{ ...styles.weekBlock, background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.3)' }}>
-                <strong style={{ color: '#C9A84C' }}>📊 Track These Metrics:</strong> {plan.month3.metrics}
+              <div style={{ ...styles.weekBlock, background: 'rgba(216,255,44,0.06)', border: '1px solid rgba(216,255,44,0.2)' }}>
+                <strong style={{ color: '#D8FF2C' }}>📊 Track These Metrics:</strong> {plan.month3.metrics}
               </div>
             </div>
           )}
@@ -351,7 +341,7 @@ export default function CMQSOptIn() {
           )}
 
           <div style={styles.exportSection}>
-            <button onClick={() => setChatbotOpen(true)} style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #C9A84C 0%, #E8C468 100%)', color: '#0d1117', fontSize: '1rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer', marginRight: '15px' }}>
+            <button onClick={() => setChatbotOpen(true)} style={{ padding: '14px 28px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', fontSize: '1rem', fontWeight: '700', border: 'none', borderRadius: '8px', cursor: 'pointer', marginRight: '15px' }}>
               💬 Ask AI Coach
             </button>
             <button onClick={downloadPlan} style={{ padding: '14px 28px', background: 'rgba(255,255,255,0.1)', color: '#ffffff', fontSize: '1rem', fontWeight: '600', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', cursor: 'pointer' }}>
@@ -369,8 +359,8 @@ export default function CMQSOptIn() {
         {chatbotOpen && <ChatbotHelper plan={plan} onClose={() => setChatbotOpen(false)} />}
 
         <div style={styles.footer}>
-          <div style={{ marginBottom: '15px' }}><strong style={{ color: '#C9A84C' }}>Cash Machine QuickStart</strong></div>
-          <div>CKO Global LLC · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#C9A84C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
+          <div style={{ marginBottom: '15px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
+          <div>CKO Global LLC · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
           <div style={{ marginTop: '15px', fontSize: '0.85rem' }}>
             <a href="/terms" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
             <a href="/privacy" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Privacy Policy</a>
@@ -380,22 +370,20 @@ export default function CMQSOptIn() {
     );
   }
 
-  // ── MAIN OPT-IN FORM (what A2P reviewers see) ────────────────────────────
   return (
-    <div style={{ minHeight: '100vh', background: '#07090F', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+    <div style={{ minHeight: '100vh', background: '#06091A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
 
-      {/* ── BUSINESS CONTEXT BLOCK — Required for A2P SMS Registration ── */}
-      <div style={{ maxWidth: '600px', width: '100%', marginBottom: '24px', padding: '24px', background: '#0F1419', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '8px' }}>
+      <div style={{ maxWidth: '600px', width: '100%', marginBottom: '24px', padding: '24px', background: '#0A1025', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <img src="/cash_machine_image.png" alt="Cash Machine QuickStart" style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+          <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'linear-gradient(135deg, #D8FF2C, #9BE600)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>💰</div>
           <div>
-            <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#C9A84C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Cash Machine QuickStart</div>
-            <div style={{ fontSize: '11px', color: '#6B7280' }}>A program by CKO Global LLC · In partnership with Loral Langemeier / Live Out Loud</div>
+            <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Income-First</div>
+            <div style={{ fontSize: '11px', color: '#6B7280' }}>A 90-Day Business Launch Program by CKO Global LLC</div>
           </div>
         </div>
 
         <p style={{ color: '#9CA3AF', fontSize: '13px', lineHeight: '1.75', marginBottom: '12px', marginTop: 0 }}>
-          <strong style={{ color: '#E5E7EB' }}>Cash Machine QuickStart</strong> is a 90-day business coaching and accountability program. We help people identify skills-based income opportunities and build a real, cash-generating business — no MBA or trust fund required. Participants receive an AI-generated action plan and SMS accountability check-ins to stay on track.
+          <strong style={{ color: '#E5E7EB' }}>Income-First</strong> is a 90-day business coaching and accountability program. We help people identify skills-based income opportunities and build a real, cash-generating business. Participants receive an AI-generated action plan and SMS accountability check-ins to stay on track.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
@@ -413,13 +401,13 @@ export default function CMQSOptIn() {
           </div>
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
             <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Contact</div>
-            <div style={{ fontSize: '12px', color: '#C9A84C', fontWeight: '600' }}>Kelli@proactively-lazy.com</div>
+            <div style={{ fontSize: '12px', color: '#D8FF2C', fontWeight: '600' }}>Kelli@proactively-lazy.com</div>
           </div>
         </div>
 
         <div style={{ fontSize: '12px', color: '#4B5563', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
           CKO Global LLC · Operated by Kelli Owens ·{' '}
-          <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A84C', textDecoration: 'none' }}>proactively-lazy.com</a>
+          <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
           {' '}·{' '}
           <a href="/privacy" style={{ color: '#6B7280', textDecoration: 'none' }}>Privacy Policy</a>
           {' '}·{' '}
@@ -427,15 +415,12 @@ export default function CMQSOptIn() {
         </div>
       </div>
 
-      {/* ── ENROLLMENT FORM ── */}
-      <div style={{ background: '#0F1419', border: '1px solid #1F2937', borderRadius: '8px', padding: '40px', maxWidth: '600px', width: '100%' }}>
-        <img src="/cash_machine_image.png" alt="Cash Machine QuickStart" style={{ width: '100%', maxWidth: '500px', marginBottom: '30px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
-
-        <h1 style={{ color: '#C9A84C', marginBottom: '10px', fontSize: '28px', fontFamily: 'Syne, sans-serif', fontWeight: 800 }}>
+      <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '8px', padding: '40px', maxWidth: '600px', width: '100%' }}>
+        <h1 style={{ color: '#D8FF2C', marginBottom: '10px', fontSize: '28px', fontFamily: 'Syne, sans-serif', fontWeight: 800 }}>
           Activate Your Coaching
         </h1>
         <p style={{ color: '#9CA3AF', marginBottom: '30px', fontSize: '16px', lineHeight: '1.6' }}>
-          Complete your Cash Machine QuickStart setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global LLC.
+          Complete your Income-First setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global LLC.
         </p>
 
         {error && (
@@ -458,11 +443,10 @@ export default function CMQSOptIn() {
             </div>
           ))}
 
-          {/* ── SMS CONSENT BLOCK — Complete CTA for A2P ── */}
-          <div style={{ background: '#1a2332', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
-            <p style={{ color: '#C9A84C', fontWeight: 700, marginBottom: '4px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📱 SMS Accountability Check-Ins</p>
+          <div style={{ background: 'rgba(216,255,44,0.05)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
+            <p style={{ color: '#D8FF2C', fontWeight: 700, marginBottom: '4px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📱 SMS Accountability Check-Ins</p>
             <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '14px', marginTop: 0, lineHeight: '1.5' }}>
-              Cash Machine QuickStart delivers accountability through SMS text messages. By checking the box below you consent to receive these messages at the mobile number you provided above.
+              Income-First delivers accountability through SMS text messages. By checking the box below you consent to receive these messages at the mobile number you provided above.
             </p>
 
             <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', gap: '10px' }}>
@@ -473,26 +457,24 @@ export default function CMQSOptIn() {
                 style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }}
               />
               <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.6' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Cash Machine QuickStart) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Income-First) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
 
             <div style={{ marginTop: '14px', padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', fontSize: '11px', color: '#4B5563', lineHeight: '1.6' }}>
               <strong style={{ color: '#6B7280' }}>How we contact you:</strong> SMS text messages sent to the mobile number above · No calls, no spam · Opt-out anytime by replying STOP · Consent is not a condition of purchase or program access.{' '}
-              <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>
+              <a href="/privacy" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>
               {' '}·{' '}
-              <a href="/terms" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>
+              <a href="/terms" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
             </div>
           </div>
 
-          <button type="submit" style={{ width: '100%', padding: '14px', background: '#C9A84C', color: '#07090F', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}
-            onMouseOver={(e) => e.target.style.background = '#E8C870'}
-            onMouseOut={(e) => e.target.style.background = '#C9A84C'}>
+          <button type="submit" style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}>
             Activate My Coaching
           </button>
 
           <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #374151', textAlign: 'center' }}>
-            <p style={{ color: '#C9A84C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Cash Machine QuickStart</p>
+            <p style={{ color: '#D8FF2C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Income-First</p>
             <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>CKO Global LLC · Operated by Kelli Owens</p>
             <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>
               <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#9CA3AF', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a>
@@ -502,8 +484,8 @@ export default function CMQSOptIn() {
             </p>
             <p style={{ color: '#6B7280', fontSize: '12px', lineHeight: '1.6' }}>
               By submitting this form, you agree to our{' '}
-              <a href="/privacy" style={{ color: '#C9A84C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
-              <a href="/terms" style={{ color: '#C9A84C', textDecoration: 'none' }}>Terms of Service</a>.
+              <a href="/privacy" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}and{' '}
+              <a href="/terms" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>.
             </p>
           </div>
         </form>

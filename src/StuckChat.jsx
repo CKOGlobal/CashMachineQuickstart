@@ -8,35 +8,25 @@ export default function StuckChat() {
   const [escalating, setEscalating] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Get URL params
   const params = new URLSearchParams(window.location.search);
   const week = params.get('week') || '1';
   const contactId = params.get('contact') || 'test';
 
   useEffect(() => {
-    // Load their plan context from localStorage
-    const savedState = localStorage.getItem('cmqs_state');
+    const savedState = localStorage.getItem('if_state');
     if (savedState) {
       const state = JSON.parse(savedState);
       setContext(state);
-      
-      // Add initial AI greeting
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Cash Machine expert. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.
-
-What's got you stuck? I'm here to help you get moving again.`
+        content: `Hey! I'm your Income-First coach. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.\n\nWhat's got you stuck? I'm here to help you get moving again.`
       }]);
     } else {
-      // Fallback if no saved state
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Cash Machine expert. You're on Week ${week}.
-
-What's got you stuck? Tell me what's going on and I'll help you get unstuck.`
+        content: `Hey! I'm your Income-First coach. You're on Week ${week}.\n\nWhat's got you stuck? Tell me what's going on and I'll help you get unstuck.`
       }]);
     }
-
     scrollToBottom();
   }, []);
 
@@ -50,15 +40,13 @@ What's got you stuck? Tell me what's going on and I'll help you get unstuck.`
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
 
     try {
-      // Build AI context
-      const systemPrompt = `You are the Cash Machine QuickStart support expert helping a student who is stuck.
+      const systemPrompt = `You are the Income-First support coach helping a student who is stuck.
 
 Context:
 - Current Week: ${week}
@@ -85,7 +73,7 @@ The student replied "STUCK" to this week's check-in. Your job:
 
 6. **Keep responses focused** - 2-3 short paragraphs max, actionable guidance
 
-Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out.`;
+Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global LLC.`;
 
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -100,14 +88,10 @@ Be conversational, supportive, and specific. You're their accountability partner
       });
 
       const data = await res.json();
-      const aiMessage = { role: 'assistant', content: data.reply };
-      setMessages(prev => [...prev, aiMessage]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       console.error('Chat error:', err);
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: 'Sorry, I had trouble processing that. Can you try rephrasing?'
-      }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I had trouble processing that. Can you try rephrasing?' }]);
     } finally {
       setLoading(false);
     }
@@ -116,9 +100,7 @@ Be conversational, supportive, and specific. You're their accountability partner
   const handleEscalate = async () => {
     if (escalating) return;
     setEscalating(true);
-
     try {
-      // Send chat transcript to GHL via webhook
       const transcript = messages
         .map(m => `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`)
         .join('\n\n');
@@ -134,14 +116,9 @@ Be conversational, supportive, and specific. You're their accountability partner
         })
       });
 
-      // Show success message
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `✅ Got it. I've notified Kelli and you'll get a text in the next few minutes with a link to book a 20-minute call.
-
-She'll review this chat and your plan before you talk, so she'll know exactly where you're stuck.
-
-You're not alone in this! 💪`
+        content: `✅ Got it. I've notified Kelli and you'll get a text in the next few minutes with a link to book a 20-minute call.\n\nShe'll review this chat and your plan before you talk, so she'll know exactly where you're stuck.\n\nYou're not alone in this! 💪`
       }]);
     } catch (err) {
       console.error('Escalation error:', err);
@@ -158,179 +135,44 @@ You're not alone in this! 💪`
     }
   };
 
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      background: '#07090F',
-      color: '#fff',
-      fontFamily: "'IBM Plex Mono', monospace",
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    header: {
-      padding: '20px',
-      borderBottom: '1px solid rgba(255,255,255,0.1)',
-      background: 'rgba(255,255,255,0.02)',
-    },
-    headerTitle: {
-      fontSize: '1.2rem',
-      fontWeight: '600',
-      color: '#C9A84C',
-      marginBottom: '5px',
-    },
-    headerSubtitle: {
-      fontSize: '0.9rem',
-      color: 'rgba(255,255,255,0.6)',
-    },
-    chatArea: {
-      flex: 1,
-      overflowY: 'auto',
-      padding: '20px',
-      maxWidth: '800px',
-      width: '100%',
-      margin: '0 auto',
-    },
-    message: {
-      marginBottom: '20px',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    messageUser: {
-      alignItems: 'flex-end',
-    },
-    messageAssistant: {
-      alignItems: 'flex-start',
-    },
-    messageBubble: {
-      maxWidth: '80%',
-      padding: '12px 16px',
-      borderRadius: '12px',
-      fontSize: '0.95rem',
-      lineHeight: '1.5',
-      whiteSpace: 'pre-wrap',
-    },
-    bubbleUser: {
-      background: 'rgba(96,184,232,0.2)',
-      border: '1px solid rgba(96,184,232,0.3)',
-      color: '#fff',
-    },
-    bubbleAssistant: {
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      color: 'rgba(255,255,255,0.9)',
-    },
-    inputArea: {
-      borderTop: '1px solid rgba(255,255,255,0.1)',
-      background: 'rgba(255,255,255,0.02)',
-      padding: '15px 20px 120px',
-      maxWidth: '800px',
-      width: '100%',
-      margin: '0 auto',
-    },
-    inputContainer: {
-      display: 'flex',
-      gap: '10px',
-      marginBottom: '15px',
-    },
-    input: {
-      flex: 1,
-      padding: '12px',
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '8px',
-      color: '#fff',
-      fontFamily: "'IBM Plex Mono', monospace",
-      fontSize: '0.95rem',
-      outline: 'none',
-    },
-    sendButton: {
-      padding: '12px 24px',
-      background: '#60B8E8',
-      border: 'none',
-      borderRadius: '8px',
-      color: '#07090F',
-      fontWeight: '700',
-      fontSize: '0.95rem',
-      cursor: 'pointer',
-      fontFamily: "'IBM Plex Mono', monospace",
-      transition: 'all 0.2s',
-    },
-    escalateButton: {
-      width: '100%',
-      padding: '16px',
-      background: 'rgba(240,98,146,0.2)',
-      border: '1px solid rgba(240,98,146,0.4)',
-      borderRadius: '8px',
-      color: '#F06292',
-      fontWeight: '600',
-      fontSize: '0.95rem',
-      cursor: 'pointer',
-      fontFamily: "'IBM Plex Mono', monospace",
-      transition: 'all 0.2s',
-    },
-    loading: {
-      padding: '12px',
-      color: 'rgba(255,255,255,0.5)',
-      fontSize: '0.9rem',
-      fontStyle: 'italic',
-    },
-  };
-
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div style={styles.headerTitle}>
-          🤝 Cash Machine Expert - Week {week}
+    <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', fontFamily: "'IBM Plex Mono', monospace", display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
+        <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#D8FF2C', marginBottom: '5px' }}>
+          🤝 Income-First Coach — Week {week}
         </div>
-        <div style={styles.headerSubtitle}>
+        <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
           {context?.selectedIdea?.title || 'Your Business Idea'}
         </div>
       </div>
 
-      <div style={styles.chatArea}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px', maxWidth: '800px', width: '100%', margin: '0 auto' }}>
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              ...styles.message,
-              ...(msg.role === 'user' ? styles.messageUser : styles.messageAssistant)
-            }}
-          >
-            <div
-              style={{
-                ...styles.messageBubble,
-                ...(msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant)
-              }}
-            >
+          <div key={idx} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+            <div style={{ maxWidth: '80%', padding: '12px 16px', borderRadius: '12px', background: msg.role === 'user' ? 'rgba(216,255,44,0.12)' : 'rgba(255,255,255,0.05)', border: `1px solid ${msg.role === 'user' ? 'rgba(216,255,44,0.25)' : 'rgba(255,255,255,0.1)'}`, color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
               {msg.content}
             </div>
           </div>
         ))}
-        {loading && (
-          <div style={styles.loading}>AI is thinking...</div>
-        )}
+        {loading && <div style={{ padding: '12px', color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', fontStyle: 'italic' }}>AI is thinking...</div>}
         <div ref={messagesEndRef} />
       </div>
 
-      <div style={styles.inputArea}>
-        <div style={styles.inputContainer}>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', padding: '15px 20px 120px', maxWidth: '800px', width: '100%', margin: '0 auto' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            style={styles.input}
+            style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.95rem', outline: 'none' }}
             disabled={loading}
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
-            style={{
-              ...styles.sendButton,
-              opacity: (loading || !input.trim()) ? 0.5 : 1,
-              cursor: (loading || !input.trim()) ? 'not-allowed' : 'pointer',
-            }}
+            style={{ padding: '12px 24px', background: '#D8FF2C', border: 'none', borderRadius: '8px', color: '#06091A', fontWeight: '700', fontSize: '0.95rem', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', fontFamily: "'IBM Plex Mono', monospace", opacity: loading || !input.trim() ? 0.5 : 1 }}
           >
             Send
           </button>
@@ -339,12 +181,9 @@ You're not alone in this! 💪`
         <button
           onClick={handleEscalate}
           disabled={escalating}
-          style={{
-            ...styles.escalateButton,
-            opacity: escalating ? 0.5 : 1,
-          }}
+          style={{ width: '100%', padding: '16px', background: 'rgba(240,98,146,0.2)', border: '1px solid rgba(240,98,146,0.4)', borderRadius: '8px', color: '#F06292', fontWeight: '600', fontSize: '0.95rem', cursor: escalating ? 'not-allowed' : 'pointer', fontFamily: "'IBM Plex Mono', monospace", opacity: escalating ? 0.5 : 1 }}
         >
-          {escalating ? 'Sending notification...' : 'This isn\'t helping - I need to talk to Kelli'}
+          {escalating ? 'Sending notification...' : "This isn't helping - I need to talk to Kelli"}
         </button>
       </div>
     </div>
