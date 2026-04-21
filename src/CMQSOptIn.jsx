@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+// ──────────────────────────────────────────────────────────────────────────────
+// ChatbotHelper — unchanged from previous version
+// ──────────────────────────────────────────────────────────────────────────────
 const ChatbotHelper = ({ plan, onClose }) => {
   const [messages, setMessages] = useState([
     {
@@ -70,6 +73,9 @@ const ChatbotHelper = ({ plan, onClose }) => {
   );
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Main CMQSOptIn — activate flow for paid (Stripe) and free (?type=free) entries
+// ──────────────────────────────────────────────────────────────────────────────
 export default function CMQSOptIn() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -80,6 +86,7 @@ export default function CMQSOptIn() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState(null);
   const [error, setError] = useState('');
   const [plan, setPlan] = useState(null);
   const [activeTab, setActiveTab] = useState('month1');
@@ -97,13 +104,15 @@ export default function CMQSOptIn() {
     "Generating marketing plan...",
     "Building objection responses...",
     "Creating milestone tracker...",
+    "Locking in your strategy...",
     "Almost done..."
   ];
 
   React.useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
-        setLoadingMessageIndex(prev => prev < loadingMessages.length - 1 ? prev + 1 : prev);
+        // Loop through messages so users keep seeing fresh copy on long runs
+        setLoadingMessageIndex(prev => (prev + 1) % loadingMessages.length);
       }, 2800);
       return () => clearInterval(interval);
     } else {
@@ -111,33 +120,175 @@ export default function CMQSOptIn() {
     }
   }, [loading]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const getSavedState = () => {
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const response = await fetch('/api/cmqs-submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          businessIdea: urlParams.get('idea') || localStorage.getItem('if_business_idea'),
-          pricingModel: urlParams.get('pricing') || localStorage.getItem('if_pricing'),
-          category: urlParams.get('category') || localStorage.getItem('if_category'),
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to generate plan');
-      setPlan(data.plan);
-      setSubmitted(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      const s = localStorage.getItem('if_state');
+      return s ? JSON.parse(s) : null;
+    } catch {
+      return null;
     }
   };
 
+  const aiCall = async (content) => {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content }] })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.reply) {
+      throw new Error(data?.error || 'AI service returned an error');
+    }
+    const cleaned = data.reply.replace(/```json\n?|\n?```/g, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch {
+      throw new Error('Could not parse plan data. Please try again.');
+    }
+  };
+
+  const generateMonth = async (monthNum, ctx, previousContext = '') => {
+    const focusMap = {
+      1: 'Build foundation, land first client/gig, start generating income',
+      2: 'Scale the business, refine offer, reduce ramp-up time, increase repeat customers',
+      3: 'Build systems, ensure revenue consistency, prepare for scale and long-term growth'
+    };
+    const weekStart = (monthNum - 1) * 4 + 1;
+
+    return await aiCall(`Generate MONTH ${monthNum} (weeks ${weekStart}-${weekStart + 3}) of a 12-week Income-First business launch plan.
+
+Person: ${ctx.firstName}
+Business: ${ctx.businessIdea}
+Pricing: ${ctx.pricingModel}
+Good at: ${ctx.goodAt || 'Solving problems others find hard'}
+Time available: ${ctx.timeAvailable || '5-10 hrs/wk'}
+Focus for Month ${monthNum}: ${focusMap[monthNum]}
+${previousContext ? `Previous months covered: ${previousContext}` : ''}
+
+Return ONLY valid JSON, no markdown, no preamble:
+{
+  "goal": "One-sentence Month ${monthNum} goal",
+  "weeks": [
+    {"week": ${weekStart}, "summary": "1-2 sentence theme for the week", "steps": [
+      {"what": "Specific action step", "how": "1-2 sentences on how to do it", "why": "1 sentence on why it matters", "time": "X hrs", "success": "What success looks like"},
+      {"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."},
+      {"what": "...", "how": "...", "why": "...", "time": "...", "success": "..."}
+    ]},
+    {"week": ${weekStart + 1}, "summary": "", "steps": [{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""}]},
+    {"week": ${weekStart + 2}, "summary": "", "steps": [{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""}]},
+    {"week": ${weekStart + 3}, "summary": "", "steps": [{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""},{"what":"","how":"","why":"","time":"","success":""}]}
+  ],
+  "metrics": "Specific metrics to track this month"
+}
+
+Requirements: EXACTLY 3 steps per week. Concise how/why (1-2 sentences each). Actionable, not fluffy. No preamble.`);
+  };
+
+  // ── Submit handler: progressive plan generation + GHL enrollment ───────────
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setLoadingPhase('starting');
+    setError('');
+
+    try {
+      // Build context from localStorage (main flow state) + URL params + defaults
+      const saved = getSavedState();
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const ctx = {
+        firstName: formData.firstName || saved?.name || 'Friend',
+        businessIdea: urlParams.get('idea') || saved?.selectedIdea?.title || 'Skills-based service business',
+        pricingModel: urlParams.get('pricing') || saved?.selectedPricing?.price || '$35-50/hr',
+        category: urlParams.get('category') || saved?.selectedIdea?.category || 'business',
+        goodAt: saved?.goodAt || '',
+        timeAvailable: saved?.timeAvailable || '',
+      };
+
+      // Progressive generation — each call runs in its own Vercel function invocation
+      setLoadingPhase('month1');
+      const month1 = await generateMonth(1, ctx);
+
+      setLoadingPhase('month2');
+      const month2 = await generateMonth(2, ctx, month1.goal);
+
+      setLoadingPhase('month3');
+      const month3 = await generateMonth(3, ctx, `${month1.goal}; ${month2.goal}`);
+
+      setLoadingPhase('marketing');
+      const marketing = await aiCall(`Create a marketing plan for: ${ctx.businessIdea} at ${ctx.pricingModel}.
+
+Return ONLY valid JSON, no markdown, no preamble:
+{
+  "channels": ["3-5 specific, concrete channels — name platforms, not 'social media'"],
+  "dmScript": "Personalized DM template (3-4 sentences) — warm, problem-solver voice, never pushy",
+  "socialPost": "Social media post template — authentic, story-driven, not salesy",
+  "emailTemplate": "Cold email outreach template — value-first, short",
+  "objections": {
+    "tooExpensive": "Response to price objection (2-3 sentences, confident but warm)",
+    "needToThink": "Response to delay objection",
+    "doItMyself": "Response to DIY objection"
+  },
+  "budget": "Budget allocation strategy (2-3 sentences, realistic for a new business)"
+}
+Voice: empathy-led, never predatory, never transactional. No preamble.`);
+
+      // Milestones — hardcoded (no AI call needed, saves ~20s)
+      const milestones = [
+        { day: 7, goal: 'First customer conversation or bridge gig booked' },
+        { day: 14, goal: 'First paid service delivered' },
+        { day: 30, goal: '$500+ in month-one revenue generated' },
+        { day: 60, goal: 'Repeat customers and first referrals flowing' },
+        { day: 90, goal: '$1,500+ monthly revenue locked in' }
+      ];
+
+      const fullPlan = {
+        selectedIdea: ctx.businessIdea,
+        selectedPricing: ctx.pricingModel,
+        category: ctx.category,
+        month1,
+        month2,
+        month3,
+        marketing,
+        milestones
+      };
+
+      setPlan(fullPlan);
+
+      // Push to GHL (same endpoint the main flow's EnrollmentModal uses)
+      setLoadingPhase('enrolling');
+      try {
+        await fetch('/api/cmqs-enroll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            email: formData.email,
+            phone: formData.phone,
+            smsConsent: formData.nonPromotional,
+            referralCode: urlParams.get('code') || '',
+            selectedIdea: { title: ctx.businessIdea, category: ctx.category },
+            selectedPricing: { name: 'Income-First Rate', price: ctx.pricingModel },
+            plan: fullPlan
+          })
+        });
+      } catch (enrollErr) {
+        // Don't block the user from seeing their plan if GHL push fails —
+        // log it and they still get their roadmap on screen
+        console.error('GHL enrollment failed but plan is ready:', enrollErr);
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || 'Something went wrong generating your plan. Please try again.');
+    } finally {
+      setLoading(false);
+      setLoadingPhase(null);
+    }
+  };
+
+  // ── Styles ─────────────────────────────────────────────────────────────────
   const styles = {
     container: { minHeight: '100vh', background: '#06091A', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
     header: { maxWidth: '900px', margin: '0 auto 30px', textAlign: 'center', padding: '20px' },
@@ -187,20 +338,52 @@ export default function CMQSOptIn() {
     a.href = url; a.download = 'income-first-plan.txt'; a.click();
   };
 
+  // ── Loading screen with phase-aware progress ───────────────────────────────
   if (loading) {
+    const phaseProgress = {
+      'starting': 5,
+      'month1': 25,
+      'month2': 45,
+      'month3': 65,
+      'marketing': 85,
+      'enrolling': 95
+    };
+    const phaseLabels = {
+      'starting': 'Getting started...',
+      'month1': 'Building Month 1 (weeks 1-4)...',
+      'month2': 'Building Month 2 (weeks 5-8)...',
+      'month3': 'Building Month 3 (weeks 9-12)...',
+      'marketing': 'Creating your marketing plan...',
+      'enrolling': 'Activating your accountability check-ins...'
+    };
+    const pct = phaseProgress[loadingPhase] || 5;
+    const phaseLabel = phaseLabels[loadingPhase] || 'Getting started...';
+
     return (
       <div style={{ minHeight: '100vh', background: '#06091A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '8px', padding: '40px', maxWidth: '600px', textAlign: 'center' }}>
-          <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 20px' }} />
-          <h2 style={{ color: '#D8FF2C', marginBottom: '15px', fontSize: '20px' }}>Generating Your 90-Day Plan...</h2>
-          <p style={{ color: '#9CA3AF', fontSize: '14px', lineHeight: '1.6', marginBottom: '10px' }}>{loadingMessages[loadingMessageIndex]}</p>
-          <p style={{ color: '#6B7280', fontSize: '13px' }}>Building your custom roadmap with AI. This takes about 30 seconds.</p>
+        <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '12px', padding: '48px 40px', maxWidth: '560px', width: '100%', textAlign: 'center' }}>
+          <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', margin: '0 auto 28px' }} />
+          <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px' }}>Income-First</div>
+          <h2 style={{ color: '#ffffff', marginBottom: '10px', fontSize: '22px', fontWeight: '700', lineHeight: '1.3' }}>
+            Building your 90-day plan...
+          </h2>
+          <p style={{ color: '#E5E7EB', fontSize: '15px', lineHeight: '1.5', marginBottom: '8px', fontWeight: '500', minHeight: '24px' }}>
+            {loadingMessages[loadingMessageIndex]}
+          </p>
+          <p style={{ color: '#9CA3AF', fontSize: '13px', marginBottom: '28px', minHeight: '20px' }}>
+            {phaseLabel}
+          </p>
+          <div style={{ width: '100%', maxWidth: '320px', height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '99px', overflow: 'hidden', margin: '0 auto 14px' }}>
+            <div style={{ height: '100%', background: 'linear-gradient(90deg, #D8FF2C, #9BE600)', borderRadius: '99px', width: `${pct}%`, transition: 'width 0.8s ease' }} />
+          </div>
+          <p style={{ color: '#6B7280', fontSize: '12px', margin: 0 }}>This takes about 90 seconds. Your personalized roadmap is on the way.</p>
         </div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
+  // ── Plan display ───────────────────────────────────────────────────────────
   if (submitted && plan) {
     return (
       <div style={styles.container}>
@@ -370,6 +553,14 @@ export default function CMQSOptIn() {
     );
   }
 
+  // ── Activate form (initial view) ───────────────────────────────────────────
+  const canSubmit =
+    formData.firstName.trim() &&
+    formData.lastName.trim() &&
+    formData.email.trim() &&
+    formData.phone.trim() &&
+    formData.nonPromotional;
+
   return (
     <div style={{ minHeight: '100vh', background: '#06091A', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
 
@@ -469,9 +660,30 @@ export default function CMQSOptIn() {
             </div>
           </div>
 
-          <button type="submit" style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}>
+          <button
+            type="submit"
+            disabled={!canSubmit}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: canSubmit ? 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' : 'rgba(255,255,255,0.1)',
+              color: canSubmit ? '#fff' : 'rgba(255,255,255,0.4)',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '16px',
+              fontWeight: 600,
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+              transition: 'all 0.2s ease'
+            }}
+          >
             Activate My Coaching
           </button>
+
+          {!canSubmit && (formData.firstName || formData.lastName || formData.email || formData.phone) && (
+            <p style={{ fontSize: '11px', color: '#F06292', marginTop: '8px', textAlign: 'center' }}>
+              {!formData.nonPromotional ? 'Please check the SMS consent box to continue.' : 'Please fill in all required fields.'}
+            </p>
+          )}
 
           <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #374151', textAlign: 'center' }}>
             <p style={{ color: '#D8FF2C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Income-First</p>
