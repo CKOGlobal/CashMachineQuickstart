@@ -18,6 +18,7 @@ const MODEL = "claude-sonnet-4-6";
 
 const ALLOWED_ORIGINS = [
   "https://cash-machine-quickstart.vercel.app",
+  "https://cashmachine.proactively-lazy.com",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:4173",

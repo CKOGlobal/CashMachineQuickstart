@@ -7,7 +7,7 @@ React + Vite front end with Vercel serverless functions in `/api`. AI by Anthrop
 The free part (intake → business ideas) is open to everyone. Everything after the paywall needs a **personal access link**:
 
 ```
-https://cash-machine-quickstart.vercel.app/access?t=<signed token>
+https://cashmachine.proactively-lazy.com/access?t=<signed token>
 ```
 
 1. Buyer pays on the FastPay link.
@@ -31,7 +31,7 @@ The server re-checks the link on every paid call: AI coach/plan (`/api/chat`), e
 | `GHL_STUCK_WEBHOOK_URL` | yes | GHL inbound webhook for "I'm stuck" (unchanged) |
 | `GHL_ACCESS_WEBHOOK_URL` | recommended | GHL inbound webhook that receives `email, contact_id, cmqs_access_link, cmqs_access_token` |
 | `CMQS_FREE_CODES` | optional | Comma-separated free codes, e.g. `BETA2026,VIPFRIENDS`. Unset = no free codes. |
-| `CMQS_SITE_URL` | optional | Defaults to `https://cash-machine-quickstart.vercel.app` |
+| `CMQS_SITE_URL` | yes | `https://cashmachine.proactively-lazy.com` — the address used in access links |
 
 Generate secrets with any password generator (40+ characters, letters and numbers).
 
@@ -39,7 +39,7 @@ Generate secrets with any password generator (40+ characters, letters and number
 
 **Workflow: "CMQS – Payment received → access link"**
 - Trigger: the FastPay / order-submitted / payment-received trigger for this product.
-- Action **Webhook**: `POST https://cash-machine-quickstart.vercel.app/api/cmqs-grant-access`
+- Action **Webhook**: `POST https://cashmachine.proactively-lazy.com/api/cmqs-grant-access`
   - Custom data: `secret` = the `CMQS_WEBHOOK_SECRET` value. GHL sends the contact's email, first name and contact id automatically.
 
 **Workflow: "CMQS – Store access link"** (trigger: Inbound Webhook = `GHL_ACCESS_WEBHOOK_URL`)
@@ -48,12 +48,12 @@ Generate secrets with any password generator (40+ characters, letters and number
 
 **Weekly check-in SMS "stuck" link** — append the token so it opens on any phone:
 ```
-https://cash-machine-quickstart.vercel.app/stuck-chat?week=3&contact={{contact.id}}&t={{contact.cmqs_access_token}}
+https://cashmachine.proactively-lazy.com/stuck-chat?week=3&contact={{contact.id}}&t={{contact.cmqs_access_token}}
 ```
 
 **Existing `payment-webhook` call** (if a workflow uses it): add custom data `secret` = `CMQS_WEBHOOK_SECRET`. Its `plan_url` is now the student's access link.
 
-**FastPay success redirect**: point it to `https://cash-machine-quickstart.vercel.app/cmqs-opt-in`. Buyers see "your access link is on its way" until they open the link.
+**FastPay success redirect**: point it to `https://cashmachine.proactively-lazy.com/cmqs-opt-in`. Buyers see "your access link is on its way" until they open the link.
 
 ## Hard spend cap
 

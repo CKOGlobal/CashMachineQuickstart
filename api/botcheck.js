@@ -12,6 +12,7 @@ const TRACKER_TTL_MS = 10 * 60 * 1000;
 
 const ALLOWED_ORIGINS = new Set([
   "https://cash-machine-quickstart.vercel.app",
+  "https://cashmachine.proactively-lazy.com",
   "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:4173",
