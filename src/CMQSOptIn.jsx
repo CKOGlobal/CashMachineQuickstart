@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { authFetch, captureTokenFromUrl, verifyAccess } from './access';
+import { LockedScreen } from './LockedScreen';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // ChatbotHelper — unchanged from previous version
@@ -20,19 +22,13 @@ const ChatbotHelper = ({ plan, onClose }) => {
     setInput('');
     setLoading(true);
     try {
-      const contextualPrompt = messages.length === 1
-        ? `You are a Socratic coach for the Income-First accountability program by CKO Global LLC. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"\n\nUser question: ${input}`
-        : input;
-      const res = await fetch('/api/chat', {
+      const systemPrompt = `You are a Socratic coach for the Income-First accountability program by CKO Global LLC. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"`;
+      const res = await authFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: messages.length === 1
-            ? [{ role: 'user', content: contextualPrompt }]
-            : [...messages.slice(1), userMessage]
-        })
+        body: JSON.stringify({ system: systemPrompt, messages: [...messages.slice(1), userMessage] })
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I hit a technical snag. Try asking again?' }]);
@@ -92,6 +88,17 @@ export default function CMQSOptIn() {
   const [activeTab, setActiveTab] = useState('month1');
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [access, setAccess] = useState({ status: 'checking' });
+
+  // Paid page: only opens with a valid personal access link (from the enrollment email/SMS)
+  useEffect(() => {
+    const token = captureTokenFromUrl();
+    verifyAccess(token || undefined).then(r => {
+      if (!r.valid) { setAccess({ status: r.error ? 'error' : 'locked' }); return; }
+      setAccess({ status: 'ok', email: r.email });
+      setFormData(f => ({ ...f, email: r.email, firstName: f.firstName || r.name || '' }));
+    });
+  }, []);
 
   const loadingMessages = [
     "Analyzing your business idea...",
@@ -131,9 +138,8 @@ export default function CMQSOptIn() {
   };
 
   const aiCall = async (content) => {
-    const res = await fetch('/api/chat', {
+    const res = await authFetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [{ role: 'user', content }] })
     });
     const data = await res.json();
@@ -259,9 +265,8 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
       // Push to GHL (same endpoint the main flow's EnrollmentModal uses)
       setLoadingPhase('enrolling');
       try {
-        await fetch('/api/cmqs-enroll', {
+        const enrollRes = await authFetch('/api/cmqs-enroll', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             name: `${formData.firstName} ${formData.lastName}`.trim(),
             email: formData.email,
@@ -273,6 +278,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
             plan: fullPlan
           })
         });
+        if (!enrollRes.ok) console.error('GHL enrollment failed:', enrollRes.status);
       } catch (enrollErr) {
         // Don't block the user from seeing their plan if GHL push fails —
         // log it and they still get their roadmap on screen
@@ -337,6 +343,14 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
     const a = document.createElement('a');
     a.href = url; a.download = 'income-first-plan.txt'; a.click();
   };
+
+  // ── Access gate ────────────────────────────────────────────────────────────
+  if (access.status === 'checking') {
+    return <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Checking your access...</div>;
+  }
+  if (access.status !== 'ok') {
+    return <LockedScreen reason={access.status === 'error' ? 'error' : undefined} />;
+  }
 
   // ── Loading screen with phase-aware progress ───────────────────────────────
   if (loading) {
@@ -630,7 +644,9 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
             <div key={field} style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', color: '#E5E7EB', marginBottom: '8px', fontSize: '14px' }}>{label}</label>
               <input type={type} required={required} placeholder={placeholder} value={formData[field]} onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
-                style={{ width: '100%', padding: '12px', background: '#1F2937', border: '1px solid #374151', borderRadius: '4px', color: '#E5E7EB', fontSize: '16px', boxSizing: 'border-box' }} />
+                readOnly={field === 'email'}
+                style={{ width: '100%', padding: '12px', background: '#1F2937', border: '1px solid #374151', borderRadius: '4px', color: '#E5E7EB', fontSize: '16px', boxSizing: 'border-box', ...(field === 'email' ? { opacity: 0.7, cursor: 'not-allowed' } : {}) }} />
+              {field === 'email' && <p style={{ color: '#6B7280', fontSize: '12px', margin: '6px 0 0' }}>Locked to the email on your enrollment.</p>}
             </div>
           ))}
 

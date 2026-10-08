@@ -1,12 +1,26 @@
+// Requires a valid access link (x-cmqs-access header) so only enrolled students can
+// create "needs a call" tasks in GHL.
+
+import { requireAccess, rateLimit } from './_lib/access.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { contact_id, week, chat_transcript, business_idea } = req.body;
+  const access = requireAccess(req, res);
+  if (!access) return;
 
-    if (!contact_id || !week) {
+  if (!rateLimit(`stuck:${access.email}`, 3, 60 * 60 * 1000)) {
+    return res.status(429).json({ error: 'Kelli has already been notified. Hang tight for her text.' });
+  }
+
+  try {
+    const { week, business_idea } = req.body;
+    const contact_id = access.contactId || req.body.contact_id || '';
+    const chat_transcript = String(req.body.chat_transcript || '').slice(0, 20000);
+
+    if (!week) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -26,6 +40,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           contact_id,
+          email: access.email,
           event: 'stuck_escalation',
           week,
           business_idea: business_idea || 'Unknown',
@@ -35,7 +50,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Log for debugging (you can remove this in production)
     console.log('Stuck escalation:', {
       contact_id,
       week,
@@ -51,7 +65,6 @@ export default async function handler(req, res) {
     console.error('Stuck escalation error:', error);
     return res.status(500).json({
       error: 'Failed to process escalation',
-      message: error.message,
     });
   }
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { authFetch, captureTokenFromUrl, verifyAccess } from './access';
+import { LockedScreen } from './LockedScreen';
 
 export default function StuckChat() {
   const [messages, setMessages] = useState([]);
@@ -6,11 +8,18 @@ export default function StuckChat() {
   const [loading, setLoading] = useState(false);
   const [context, setContext] = useState(null);
   const [escalating, setEscalating] = useState(false);
+  const [access, setAccess] = useState({ status: 'checking' });
   const messagesEndRef = useRef(null);
 
   const params = new URLSearchParams(window.location.search);
   const week = params.get('week') || '1';
-  const contactId = params.get('contact') || 'test';
+  const contactId = params.get('contact') || '';
+
+  // SMS links carry the student's access link as ?t=…; otherwise use the one saved in this browser
+  useEffect(() => {
+    const token = captureTokenFromUrl();
+    verifyAccess(token || undefined).then(r => setAccess({ status: r.valid ? 'ok' : r.error ? 'error' : 'locked' }));
+  }, []);
 
   useEffect(() => {
     const savedState = localStorage.getItem('if_state');
@@ -75,19 +84,16 @@ The student replied "STUCK" to this week's check-in. Your job:
 
 Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global LLC.`;
 
-      const res = await fetch('/api/chat', {
+      // Anthropic takes the system prompt separately, and the conversation must start with the student
+      const history = [...messages, userMessage];
+      const firstUser = history.findIndex(m => m.role === 'user');
+      const res = await authFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages,
-            userMessage
-          ]
-        })
+        body: JSON.stringify({ system: systemPrompt, messages: history.slice(firstUser) })
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       console.error('Chat error:', err);
@@ -105,9 +111,8 @@ Be conversational, supportive, and specific. You're their accountability partner
         .map(m => `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`)
         .join('\n\n');
 
-      await fetch('/api/stuck-escalation', {
+      const res = await authFetch('/api/stuck-escalation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contact_id: contactId,
           week: parseInt(week),
@@ -115,6 +120,7 @@ Be conversational, supportive, and specific. You're their accountability partner
           business_idea: context?.selectedIdea?.title || 'Unknown',
         })
       });
+      if (!res.ok) throw new Error((await res.json()).error);
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -134,6 +140,11 @@ Be conversational, supportive, and specific. You're their accountability partner
       sendMessage();
     }
   };
+
+  if (access.status === 'checking') {
+    return <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Checking your access...</div>;
+  }
+  if (access.status !== 'ok') return <LockedScreen reason={access.status === 'error' ? 'error' : undefined} />;
 
   return (
     <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', fontFamily: "'IBM Plex Mono', monospace", display: 'flex', flexDirection: 'column' }}>

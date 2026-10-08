@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState, useEffect } from 'react';
+import { authFetch, verifyAccess, setAccessToken, PURCHASE_URL } from './access';
 
 const styles = {
   container: { minHeight: '100vh', background: '#06091A', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
@@ -99,15 +100,12 @@ ss.textContent = `@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:ro
 document.head.appendChild(ss);
 
 // ── Referral codes ────────────────────────────────────────────────────────────
+// Attribution codes only (full price). Free/beta codes live on the server
+// (CMQS_FREE_CODES env var) so they never ship in the page code.
 const referralCodes = {
   KELLICMQS:  { type: 'full', price: 69.97, name: 'Income-First' },
-  CMQS:       { type: 'free', price: 0,     name: 'Beta Access'  },
-  CMQS2026:   { type: 'free', price: 0,     name: 'Beta Access'  },
-  TESTACCESS: { type: 'free', price: 0,     name: 'Test Access'  },
+  LORAL2026:  { type: 'full', price: 69.97, name: 'Income-First' },
 };
-
-const TAG_MAP = { KELLICMQS: 'KelliIF', CMQS: 'IFAccess', CMQS2026: 'IFAccess', TESTACCESS: 'IFAccess' };
-const resolveTag = (code) => (code ? TAG_MAP[code.toUpperCase()] : null) || 'KelliIF';
 
 const skillCategories = [
   { id: 'creative',   label: 'Creative & Arts',       emoji: '🎨' },
@@ -171,9 +169,8 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
     if (!email.trim()) { setErr('Email is required'); return; }
     setLoading(true); setErr('');
     try {
-      const res = await fetch('/api/cmqs-enroll', {
+      const res = await authFetch('/api/cmqs-enroll', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email: email.trim(), phone: phone.trim(), smsConsent, referralCode: referralCode || '', selectedIdea, selectedPricing, plan }),
       });
       const data = await res.json();
@@ -244,14 +241,35 @@ const PaymentGate = ({ onReferralCodeChange }) => {
   const [referralCode, setReferralCode] = useState('');
   const [appliedCode, setAppliedCode]   = useState(null);
   const [codeError, setCodeError]       = useState('');
+  const [freeEmail, setFreeEmail]       = useState('');
+  const [redeeming, setRedeeming]       = useState(false);
 
-  const programPrice = appliedCode ? appliedCode.price : 69.97;
+  const programPrice = appliedCode?.price ?? 69.97;
 
   const applyCode = () => {
     const code = referralCode.trim().toUpperCase();
     if (!code) { setCodeError('Please enter a referral code'); return; }
     if (referralCodes[code]) { setAppliedCode(referralCodes[code]); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(code); }
-    else { setCodeError('Invalid referral code'); setAppliedCode(null); }
+    else { setAppliedCode({ type: 'free', price: 0, name: 'Access Code' }); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(code); }
+  };
+
+  // Free codes are checked on the server, which issues the access link directly.
+  const redeemFreeCode = async () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freeEmail.trim())) { setCodeError('Enter the email you want your plan sent to'); return; }
+    setRedeeming(true); setCodeError('');
+    try {
+      const res = await fetch('/api/cmqs-redeem-code', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: referralCode.trim().toUpperCase(), email: freeEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid code');
+      setAccessToken(data.token);
+      window.location.href = '/cmqs-opt-in?code=' + encodeURIComponent(referralCode.trim().toUpperCase());
+    } catch (e) {
+      setCodeError(e.message === 'Invalid code' ? 'Invalid referral code' : e.message);
+      setAppliedCode(null);
+    } finally { setRedeeming(false); }
   };
   const removeCode = () => { setReferralCode(''); setAppliedCode(null); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(''); };
 
@@ -308,14 +326,23 @@ const PaymentGate = ({ onReferralCodeChange }) => {
         <p style={{ fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)' }}>You've got this. We've got your back.</p>
       </div>
 
-      <a
-        href={appliedCode?.type === 'free' ? '/cmqs-opt-in?code=' + referralCode + '&type=free' : 'https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed?code=' + referralCode}
-        target={appliedCode?.type === 'free' ? '_self' : '_blank'}
-        rel={appliedCode?.type === 'free' ? '' : 'noopener noreferrer'}
-        style={{ ...styles.purchaseButton, background: appliedCode?.type === 'free' ? 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' : 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
-      >
-        {appliedCode?.type === 'free' ? '🎉 Activate Free Beta Access' : `Start Income-First — $${programPrice.toFixed(2)}`}
-      </a>
+      {appliedCode?.type === 'free' ? (
+        <div style={{ marginBottom: '20px' }}>
+          <input type="email" value={freeEmail} onChange={e => { setFreeEmail(e.target.value); setCodeError(''); }} placeholder="you@email.com" style={{ width: '100%', boxSizing: 'border-box', padding: '12px 16px', marginBottom: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '1rem', outline: 'none' }} />
+          <button onClick={redeemFreeCode} disabled={redeeming} style={{ ...styles.purchaseButton, width: '100%', border: 'none', cursor: redeeming ? 'not-allowed' : 'pointer', opacity: redeeming ? 0.6 : 1, background: 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' }}>
+            {redeeming ? 'Checking code...' : '🎉 Activate Free Beta Access'}
+          </button>
+        </div>
+      ) : (
+        <a
+          href={PURCHASE_URL + '?code=' + encodeURIComponent(referralCode)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ ...styles.purchaseButton, background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
+        >
+          {`Start Income-First — $${programPrice.toFixed(2)}`}
+        </a>
+      )}
 
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
         <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
@@ -344,11 +371,10 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     const userMsg = { role: 'user', content: input };
     setMessages(p => [...p, userMsg]); setInput(''); setLoading(true);
     try {
-      const prompt = messages.length === 1
-        ? `You are an accountability coach for Income-First by CKO Global LLC.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.\nQuestion: ${input}`
-        : input;
-      const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: messages.length === 1 ? [{ role: 'user', content: prompt }] : [...messages.slice(1), userMsg] }) });
+      const system = `You are an accountability coach for Income-First by CKO Global LLC.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
+      const res = await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ system, messages: [...messages.slice(1), userMsg] }) });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       setMessages(p => [...p, { role: 'assistant', content: data.reply }]);
     } catch { setMessages(p => [...p, { role: 'assistant', content: 'Sorry, technical snag. Try again?' }]); }
     finally { setLoading(false); }
@@ -455,7 +481,6 @@ const CashMachineQuickStart = () => {
   const [emailSending, setEmailSending]     = useState(false);
   const [emailSent, setEmailSent]           = useState(false);
   const [emailError, setEmailError]         = useState('');
-  const [adminClicks, setAdminClicks]       = useState(0);
   const [activeReferralCode, setActiveReferralCode] = useState('');
 
   const [name, setName]                     = useState('');
@@ -476,12 +501,15 @@ const CashMachineQuickStart = () => {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
+  // Paid steps unlock only with a valid personal access link (checked by the server)
+  useEffect(() => { verifyAccess().then(r => setHasPaid(!!r.valid)); }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem('if_state');
     if (!saved) return;
     try {
       const d = JSON.parse(saved);
-      setPhase(d.phase || 1); setHasPaid(d.hasPaid || false); setName(d.name || '');
+      setPhase(d.phase || 1); setName(d.name || '');
       setProcrastination(d.procrastination || ''); setGoodAt(d.goodAt || ''); setHardPass(d.hardPass || '');
       setSelectedSkills(d.selectedSkills || []); setSpecificIdea(d.specificIdea || '');
       setTimeAvailable(d.timeAvailable || ''); setIncomeGoal(d.incomeGoal || '');
@@ -505,8 +533,8 @@ const CashMachineQuickStart = () => {
   const sendEmailPlan = async (emailAddr) => {
     setEmailSending(true); setEmailError(''); setEmailSent(false);
     try {
-      const res = await fetch('/api/cmqs-email-plan', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const res = await authFetch('/api/cmqs-email-plan', {
+        method: 'POST',
         body: JSON.stringify({ name, email: emailAddr, selectedIdea, selectedPricing, plan }),
       });
       if (res.ok) setEmailSent(true);
@@ -520,32 +548,25 @@ const CashMachineQuickStart = () => {
     await sendEmailPlan(email);
   };
 
-  const aiCall = async (content) => {
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content }] }) });
+  const parseReply = async (res) => {
     const data = await res.json();
+    if (!res.ok || !data.reply) throw new Error(data.error || 'AI service error');
     return JSON.parse(data.reply.replace(/```json\n?|\n?```/g, '').trim());
   };
+
+  const aiCall = async (content) =>
+    parseReply(await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content }] }) }));
 
   const generateIdeas = async () => {
     setLoading(true); setError('');
     try {
-      const parsed = await aiCall(`Generate 8 Income-First business ideas using the DUAL-TRACK system for: ${name}
-Procrastination: ${procrastination}
-Good at: ${goodAt}
-Hard pass: ${hardPass}
-Skills: ${selectedSkills.join(', ')}
-${specificIdea ? `Specific idea: ${specificIdea}` : ''}
-Time: ${timeAvailable} | Goal: ${incomeGoal}
-
-IDEAS 1-2: BRIDGE (category:"bridge") — gig platforms, start TODAY, cash THIS WEEK
-IDEAS 3-7: BUSINESS (category:"business") — skills-based services, scalable, exit potential, first client in 7 days
-IDEA 8: WILDCARD (category:"wildcard") — creative/unique
-
-Return ONLY valid JSON array:
-[{"title":"","tagline":"","category":"bridge|business|wildcard","monthOne":"$X-Y first week","yearTwo":"18-mo potential","quickStart":"Step 1...","pros":[],"cons":[],"fitScore":85}]
-No preamble.`);
+      // Free step: the server builds the prompt from these fields
+      const parsed = await parseReply(await fetch('/api/chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'ideas', intake: { name, procrastination, goodAt, hardPass, selectedSkills, specificIdea, timeAvailable, incomeGoal } }),
+      }));
       setIdeas(parsed); setPhase(2);
-    } catch (e) { setError('Failed to generate ideas. Please try again.'); }
+    } catch (e) { setError(e instanceof SyntaxError || !e.message ? 'Failed to generate ideas. Please try again.' : e.message); }
     finally { setLoading(false); }
   };
 
@@ -652,9 +673,6 @@ No preamble.`);
   // ── RENDER ──────────────────────────────────────────────────────────────────
   return (
     <div style={styles.container}>
-      {/* god-mode bypass */}
-      <div onClick={() => { const n = adminClicks + 1; setAdminClicks(n); if (n >= 5) setHasPaid(true); }} style={{ position: 'fixed', bottom: '20px', right: '20px', width: '60px', height: '60px', opacity: 0, zIndex: 999, userSelect: 'none' }} />
-
       {loadingMonth && <BlueprintLoader phase={loadingMonth} />}
 
       {/* ── HEADER ── */}
@@ -767,7 +785,7 @@ No preamble.`);
           {error && <div style={styles.error}>{error}</div>}
           <div style={styles.buttonRow}>
             <button style={styles.buttonSecondary} onClick={() => setPhase(1)}>← Back</button>
-            <button style={{ ...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {}) }} onClick={() => { if (!hasPaid && adminClicks < 5) { setPhase(2.5); } else { generatePricing(); } }} disabled={loading || !selectedIdea}>
+            <button style={{ ...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {}) }} onClick={() => { if (!hasPaid) { setPhase(2.5); } else { generatePricing(); } }} disabled={loading || !selectedIdea}>
               {loading ? '🤖 Generating Pricing...' : 'Get Your Complete Plan →'}
             </button>
           </div>
@@ -777,7 +795,7 @@ No preamble.`);
       {/* ── PHASE 2.5 ── */}
       {phase === 2.5 && (
         <div style={styles.phase}>
-          {(hasPaid || adminClicks >= 5) ? (
+          {hasPaid ? (
             (() => {
               if (pricingOptions.length === 0 && !loading) generatePricing();
               else if (pricingOptions.length > 0) setPhase(3);
@@ -795,7 +813,7 @@ No preamble.`);
       )}
 
       {/* ── PHASE 3 ── */}
-      {phase === 3 && (hasPaid || adminClicks >= 5) && (
+      {phase === 3 && hasPaid && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💰</span><h2 style={styles.phaseTitle}>Let's figure out <span style={{ color: '#D8FF2C' }}>what to charge</span> for "{selectedIdea?.title}"</h2><p style={styles.phaseSubtitle}>Pricing isn't random. Here are 5 strategies that actually work.</p></div>
           <div style={styles.pricingGrid}>
