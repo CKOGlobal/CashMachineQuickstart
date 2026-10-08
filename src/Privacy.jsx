@@ -11,22 +11,22 @@ export default function Privacy() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Who We Are</h2>
           <p style={{ marginBottom: '20px' }}>
-            Income-First is operated by <strong>CKO Global Inc</strong> (Kelli Owens). Our website is <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>. Questions? Email us at <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>.
+            Cash Machine QuickStart is operated by <strong>CKO Global Inc</strong> (Kelli Owens). Our website is <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>. Questions? Email us at <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>What Information We Collect</h2>
           <p style={{ marginBottom: '20px' }}>
-            We collect your name, email address, and mobile phone number when you enroll in or sign up for SMS updates through Income-First. We also collect program-related information such as your selected business idea, skills, time availability, and income goals in order to generate your personalized 90-day plan.
+            We collect your name, email address, and mobile phone number when you enroll in or sign up for SMS updates through Cash Machine QuickStart. We also collect program-related information such as your selected business idea, skills, time availability, and income goals in order to generate your personalized 90-day plan.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>How Data Is Used</h2>
           <p style={{ marginBottom: '20px' }}>
-            We use your data solely for sending accountability check-ins, progress reminders, and coaching support related to the Income-First program. We may also send occasional program-related updates if you have opted in to receive communications from us. We do not use your data for unrelated marketing without your explicit consent.
+            We use your data solely for sending accountability check-ins, progress reminders, and coaching support related to the Cash Machine QuickStart program. We may also send occasional program-related updates if you have opted in to receive communications from us. We do not use your data for unrelated marketing without your explicit consent.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>SMS Opt-In Details</h2>
           <p style={{ marginBottom: '20px' }}>
-            If you provide your mobile phone number and check the SMS consent box during enrollment, you consent to receive recurring SMS text messages from CKO Global Inc (Income-First). Messages include accountability check-ins, progress reminders, milestone notifications, and program support. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time. Reply <strong>HELP</strong> for help. SMS consent is not required as a condition of purchase or program access.
+            If you provide your mobile phone number and check the SMS consent box during enrollment, you consent to receive recurring SMS text messages from CKO Global Inc (Cash Machine QuickStart). Messages include accountability check-ins, progress reminders, milestone notifications, and program support. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time. Reply <strong>HELP</strong> for help. SMS consent is not required as a condition of purchase or program access.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Cookies &amp; Tracking</h2>
@@ -46,7 +46,7 @@ export default function Privacy() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Opt-In</h2>
           <p style={{ marginBottom: '20px' }}>
-            You opt in to SMS messages by checking the SMS consent checkbox when you activate your Income-First (Cash Machine QuickStart) coaching and submitting the activation form. Text-message check-ins are how the accountability coaching is delivered, so consent is required to activate coaching. Consent is never required to make a purchase, and we do not send marketing text messages.
+            You opt in to SMS messages by checking the SMS consent checkbox when you activate your Cash Machine QuickStart coaching and submitting the activation form. Text-message check-ins are how the accountability coaching is delivered, so consent is required to activate coaching. Consent is never required to make a purchase, and we do not send marketing text messages.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Opt-Out</h2>
@@ -74,7 +74,7 @@ export default function Privacy() {
         </div>
 
         <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <a href="/" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '14px' }}>← Back to Income-First</a>
+          <a href="/" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '14px' }}>← Back to Cash Machine QuickStart</a>
         </div>
       </div>
     </div>

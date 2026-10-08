@@ -22,7 +22,7 @@ const ChatbotHelper = ({ plan, onClose }) => {
     setInput('');
     setLoading(true);
     try {
-      const systemPrompt = `You are a Socratic coach for the Income-First accountability program by CKO Global Inc. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"`;
+      const systemPrompt = `You are a Socratic coach for the Cash Machine QuickStart accountability program by CKO Global Inc. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"`;
       const res = await authFetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify({ system: systemPrompt, messages: [...messages.slice(1), userMessage] })
@@ -162,7 +162,7 @@ export default function CMQSOptIn() {
     };
     const weekStart = (monthNum - 1) * 4 + 1;
 
-    return await aiCall(`Generate MONTH ${monthNum} (weeks ${weekStart}-${weekStart + 3}) of a 12-week Income-First business launch plan.
+    return await aiCall(`Generate MONTH ${monthNum} (weeks ${weekStart}-${weekStart + 3}) of a 12-week Cash Machine QuickStart business launch plan.
 
 Person: ${ctx.firstName}
 Business: ${ctx.businessIdea}
@@ -274,7 +274,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
             smsConsent: formData.nonPromotional,
             referralCode: urlParams.get('code') || '',
             selectedIdea: { title: ctx.businessIdea, category: ctx.category },
-            selectedPricing: { name: 'Income-First Rate', price: ctx.pricingModel },
+            selectedPricing: { name: 'Cash Machine QuickStart Rate', price: ctx.pricingModel },
             plan: fullPlan
           })
         });
@@ -377,7 +377,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
       <div style={{ minHeight: '100vh', background: '#06091A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ background: '#0A1025', border: '1px solid rgba(216,255,44,0.15)', borderRadius: '12px', padding: '48px 40px', maxWidth: '560px', width: '100%', textAlign: 'center' }}>
           <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', margin: '0 auto 28px' }} />
-          <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px' }}>Income-First</div>
+          <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '11px', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '14px' }}>Cash Machine QuickStart</div>
           <h2 style={{ color: '#ffffff', marginBottom: '10px', fontSize: '22px', fontWeight: '700', lineHeight: '1.3' }}>
             Building your 90-day plan...
           </h2>
@@ -402,7 +402,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <div style={styles.brandLine}>Income-First</div>
+          <div style={styles.brandLine}>Cash Machine QuickStart</div>
           <h1 style={styles.hero}>Your 90-Day Plan Is Ready</h1>
           <p style={styles.tagline}>Here's your complete roadmap. Accountability check-ins start now.</p>
           <div style={{ marginTop: '30px', padding: '20px', background: 'rgba(216,255,44,0.07)', border: '2px solid rgba(216,255,44,0.3)', borderRadius: '12px', textAlign: 'left' }}>
@@ -556,7 +556,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
         {chatbotOpen && <ChatbotHelper plan={plan} onClose={() => setChatbotOpen(false)} />}
 
         <div style={styles.footer}>
-          <div style={{ marginBottom: '15px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
+          <div style={{ marginBottom: '15px' }}><strong style={{ color: '#D8FF2C' }}>Cash Machine QuickStart</strong></div>
           <div>CKO Global Inc · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
           <div style={{ marginTop: '15px', fontSize: '0.85rem' }}>
             <a href="/terms" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
@@ -582,13 +582,13 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'linear-gradient(135deg, #D8FF2C, #9BE600)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>💰</div>
           <div>
-            <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Income-First</div>
+            <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Cash Machine QuickStart</div>
             <div style={{ fontSize: '11px', color: '#6B7280' }}>A 90-Day Business Launch Program by CKO Global Inc</div>
           </div>
         </div>
 
         <p style={{ color: '#9CA3AF', fontSize: '13px', lineHeight: '1.75', marginBottom: '12px', marginTop: 0 }}>
-          <strong style={{ color: '#E5E7EB' }}>Income-First</strong> is a 90-day business coaching and accountability program. We help people identify skills-based income opportunities and build a real, cash-generating business. Participants receive an AI-generated action plan and SMS accountability check-ins to stay on track.
+          <strong style={{ color: '#E5E7EB' }}>Cash Machine QuickStart</strong> is a 90-day business coaching and accountability program. We help people identify skills-based income opportunities and build a real, cash-generating business. Participants receive an AI-generated action plan and SMS accountability check-ins to stay on track.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
@@ -625,7 +625,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           Activate Your Coaching
         </h1>
         <p style={{ color: '#9CA3AF', marginBottom: '30px', fontSize: '16px', lineHeight: '1.6' }}>
-          Complete your Income-First setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global Inc.
+          Complete your Cash Machine QuickStart setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global Inc.
         </p>
 
         {error && (
@@ -664,7 +664,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
                 style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }}
               />
               <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.6' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Income-First) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Cash Machine QuickStart) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
 
@@ -702,7 +702,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           )}
 
           <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #374151', textAlign: 'center' }}>
-            <p style={{ color: '#D8FF2C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Income-First</p>
+            <p style={{ color: '#D8FF2C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Cash Machine QuickStart</p>
             <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>CKO Global Inc · Operated by Kelli Owens</p>
             <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>
               <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#9CA3AF', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a>

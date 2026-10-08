@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Income-First — 90-Day Business Launch Program
+// Cash Machine QuickStart — 90-Day Business Launch Program
 // CKO Global Inc · Operated by Kelli Owens
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -103,8 +103,8 @@ document.head.appendChild(ss);
 // Attribution codes only (full price). Free/beta codes live on the server
 // (CMQS_FREE_CODES env var) so they never ship in the page code.
 const referralCodes = {
-  KELLICMQS:  { type: 'full', price: 69.97, name: 'Income-First' },
-  LORAL2026:  { type: 'full', price: 69.97, name: 'Income-First' },
+  KELLICMQS:  { type: 'full', price: 69.97, name: 'Cash Machine QuickStart' },
+  LORAL2026:  { type: 'full', price: 69.97, name: 'Cash Machine QuickStart' },
 };
 
 const skillCategories = [
@@ -132,7 +132,7 @@ const BlueprintLoader = ({ phase }) => {
     { tag: 'Building your blueprint...', sub: 'Mapping out your full 90-day journey.' },
     { tag: 'Building your future...', sub: 'Aligning your goals with your action plan.' },
     { tag: "Crossing the T's...", sub: 'Making sure every detail is dialed in.' },
-    { tag: "Dotting the I's...", sub: 'Personalizing your Income-First roadmap.' },
+    { tag: "Dotting the I's...", sub: 'Personalizing your Cash Machine QuickStart roadmap.' },
     { tag: 'Crunching your numbers...', sub: "Running the math so you don't have to." },
     { tag: 'Locking in your strategy...', sub: 'Your plan is almost ready.' },
     { tag: 'Almost there...', sub: 'Your 90-day blueprint is being finalized.' },
@@ -146,7 +146,7 @@ const BlueprintLoader = ({ phase }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(6,9,26,0.97)', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px' }}>
       <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', marginBottom: '32px' }} />
-      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Income-First</div>
+      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Cash Machine QuickStart</div>
       <div style={{ fontSize: '1.6rem', fontWeight: '700', color: '#ffffff', marginBottom: '10px', minHeight: '44px', animation: 'fadeUp 0.5s ease' }}>{messages[msgIdx].tag}</div>
       <div style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', marginBottom: '36px', minHeight: '26px' }}>{messages[msgIdx].sub}</div>
       <div style={{ width: '300px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden', marginBottom: '12px' }}>
@@ -185,7 +185,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       <div style={styles.modalBox} onClick={e => e.stopPropagation()}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px' }}>🎯 Lock In Your Plan</h2>
         <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '24px', lineHeight: '1.5' }}>
-          Enter your details and we'll enroll you in <strong>Income-First</strong> (by CKO Global Inc), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
+          Enter your details and we'll enroll you in <strong>Cash Machine QuickStart</strong> (by CKO Global Inc), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
         </p>
         {err && <div style={styles.error}>{err}</div>}
         <div style={styles.formGroup}>
@@ -203,7 +203,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
               <input type="checkbox" checked={smsConsent} onChange={e => setSmsConsent(e.target.checked)} style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }} />
               <span style={{ color: '#D1D5DB', fontSize: '12px', lineHeight: '1.65' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Income-First) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Cash Machine QuickStart) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
             <p style={{ fontSize: '11px', color: '#4B5563', marginBottom: 0, marginTop: 0, lineHeight: '1.5' }}>
@@ -301,7 +301,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
 
       <div style={styles.pricingCard}>
         <div style={{ ...styles.priceRow, ...styles.priceTotal, marginTop: 0, paddingTop: 0, borderTop: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <span>90-Day Income-First Program</span>
+          <span>90-Day Cash Machine QuickStart Program</span>
           <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
         </div>
         <div style={{ ...styles.priceRow, borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #D8FF2C' }}>
@@ -340,13 +340,13 @@ const PaymentGate = ({ onReferralCodeChange }) => {
           rel="noopener noreferrer"
           style={{ ...styles.purchaseButton, background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
         >
-          {`Start Income-First — $${programPrice.toFixed(2)}`}
+          {`Start Cash Machine QuickStart — $${programPrice.toFixed(2)}`}
         </a>
       )}
 
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
         <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
-          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global Inc</strong> (Income-First). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
+          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global Inc</strong> (Cash Machine QuickStart). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
           <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
           <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
         </p>
@@ -371,7 +371,7 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     const userMsg = { role: 'user', content: input };
     setMessages(p => [...p, userMsg]); setInput(''); setLoading(true);
     try {
-      const system = `You are an accountability coach for Income-First by CKO Global Inc.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
+      const system = `You are an accountability coach for Cash Machine QuickStart by CKO Global Inc.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
       const res = await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ system, messages: [...messages.slice(1), userMsg] }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -632,7 +632,7 @@ Return ONLY valid JSON:
   {"day":"Day 5–6","action":"specific task","why":"1 sentence reason","timeEstimate":"X hrs"},
   {"day":"Day 7","action":"specific task — land or follow up on first paid client","why":"1 sentence reason","timeEstimate":"X hrs"}
 ],
-"closingLine":"Short motivating close, signed Kelli & the Income-First Team"}
+"closingLine":"Short motivating close, signed Kelli & the Cash Machine QuickStart Team"}
 No preamble.`);
       setPlan(prev => ({ ...prev, week1Tasks: w1 }));
     } catch (e) { console.error('Week 1 tasks generation failed', e); }
@@ -662,11 +662,11 @@ No preamble.`);
       }),
       `=== MILESTONES ===`,
       ...(plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`) || []),
-      ``, `Generated by Income-First — CKO Global Inc`, `proactively-lazy.com | kelli@proactively-lazy.com`,
+      ``, `Generated by Cash Machine QuickStart — CKO Global Inc`, `proactively-lazy.com | kelli@proactively-lazy.com`,
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_IncomFirst_90Day_Plan.txt`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_CashMachineQuickStart_90Day_Plan.txt`; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -677,7 +677,7 @@ No preamble.`);
 
       {/* ── HEADER ── */}
       <div style={styles.header}>
-        <div style={styles.brandLine}>Income-First · CKO Global Inc</div>
+        <div style={styles.brandLine}>Cash Machine QuickStart · CKO Global Inc</div>
         <h1 style={styles.hero}>You already have what it takes.<br />Let's build <span style={{ color: '#D8FF2C' }}>your business.</span></h1>
         <p style={styles.tagline}>Find a business idea built around what you know. Get your 90-day plan. Start making income. No MBA required.</p>
 
@@ -686,7 +686,7 @@ No preamble.`);
             <div style={{ flex: '1', minWidth: '200px' }}>
               <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.7', margin: 0 }}>
-                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Income-First</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global Inc</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
+                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Cash Machine QuickStart</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global Inc</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
               </p>
             </div>
             <div style={{ flex: '1', minWidth: '180px' }}>
@@ -848,7 +848,7 @@ No preamble.`);
             <>
               <div style={styles.phaseHeader}>
                 <span style={{ fontSize: '2rem' }}>🎉</span>
-                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#D8FF2C' }}>90-Day Income-First Plan</span> is Ready</h2>
+                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#D8FF2C' }}>90-Day Cash Machine QuickStart Plan</span> is Ready</h2>
                 <p style={styles.phaseSubtitle}>{name}, here's your roadmap. Follow this and you'll be making income in 30 days.</p>
               </div>
               {error && <div style={styles.error}>{error}</div>}
@@ -976,7 +976,7 @@ No preamble.`);
       {enrollOpen && <EnrollmentModal name={name} referralCode={activeReferralCode} selectedIdea={selectedIdea} selectedPricing={selectedPricing} plan={plan} onClose={() => setEnrollOpen(false)} onSuccess={handleEnrollSuccess} />}
 
       <div style={styles.footer}>
-        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
+        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Cash Machine QuickStart</strong></div>
         <div style={{ marginBottom: '12px' }}>
           CKO Global Inc · Operated by Kelli Owens<br />
           Email: <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a><br />

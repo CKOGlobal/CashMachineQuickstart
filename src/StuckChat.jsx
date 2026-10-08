@@ -28,12 +28,12 @@ export default function StuckChat() {
       setContext(state);
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Income-First coach. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.\n\nWhat's got you stuck? I'm here to help you get moving again.`
+        content: `Hey! I'm your Cash Machine QuickStart coach. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.\n\nWhat's got you stuck? I'm here to help you get moving again.`
       }]);
     } else {
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Income-First coach. You're on Week ${week}.\n\nWhat's got you stuck? Tell me what's going on and I'll help you get unstuck.`
+        content: `Hey! I'm your Cash Machine QuickStart coach. You're on Week ${week}.\n\nWhat's got you stuck? Tell me what's going on and I'll help you get unstuck.`
       }]);
     }
     scrollToBottom();
@@ -55,7 +55,7 @@ export default function StuckChat() {
     setLoading(true);
 
     try {
-      const systemPrompt = `You are the Income-First support coach helping a student who is stuck.
+      const systemPrompt = `You are the Cash Machine QuickStart support coach helping a student who is stuck.
 
 Context:
 - Current Week: ${week}
@@ -82,7 +82,7 @@ The student replied "STUCK" to this week's check-in. Your job:
 
 6. **Keep responses focused** - 2-3 short paragraphs max, actionable guidance
 
-Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global Inc.`;
+Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Cash Machine QuickStart by CKO Global Inc.`;
 
       // Anthropic takes the system prompt separately, and the conversation must start with the student
       const history = [...messages, userMessage];
@@ -150,7 +150,7 @@ Be conversational, supportive, and specific. You're their accountability partner
     <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', fontFamily: "'IBM Plex Mono', monospace", display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
         <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#D8FF2C', marginBottom: '5px' }}>
-          🤝 Income-First Coach — Week {week}
+          🤝 Cash Machine QuickStart Coach — Week {week}
         </div>
         <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
           {context?.selectedIdea?.title || 'Your Business Idea'}

@@ -36,7 +36,7 @@ function buildIdeasPrompt(intake = {}) {
   const skills = Array.isArray(intake.selectedSkills)
     ? intake.selectedSkills.slice(0, 12).map(s => clip(s, 40)).join(", ")
     : "";
-  return `Generate 8 Income-First business ideas using the DUAL-TRACK system for: ${clip(intake.name, 80)}
+  return `Generate 8 Cash Machine QuickStart business ideas using the DUAL-TRACK system for: ${clip(intake.name, 80)}
 Procrastination: ${clip(intake.procrastination, 500)}
 Good at: ${clip(intake.goodAt, 500)}
 Hard pass: ${clip(intake.hardPass, 500)}
