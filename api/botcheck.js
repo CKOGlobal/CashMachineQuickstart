@@ -1,6 +1,6 @@
 // api/botcheck.js — Bot/scraper detection + Resend email alerts
 // ============================================================
-// Cash Machine QuickStart — CKO Global LLC
+// Cash Machine QuickStart — CKO Global Inc
 // Import and call rejectIfBot(req, res) at the top of any API route.
 // ============================================================
 
@@ -128,7 +128,7 @@ async function sendAlert({ ip, ua, origin, referer, reason, threat, repeatCount,
         </div>
       </div>
       <div style="padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 11px; color: #4B5563; text-align: center;">
-        Cash Machine QuickStart Security Monitor · CKO Global LLC
+        Cash Machine QuickStart Security Monitor · CKO Global Inc
       </div>
     </div>
   `;

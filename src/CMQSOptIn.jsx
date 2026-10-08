@@ -22,7 +22,7 @@ const ChatbotHelper = ({ plan, onClose }) => {
     setInput('');
     setLoading(true);
     try {
-      const systemPrompt = `You are a Socratic coach for the Income-First accountability program by CKO Global LLC. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"`;
+      const systemPrompt = `You are a Socratic coach for the Income-First accountability program by CKO Global Inc. Your job is to help students DISCOVER answers, not give them answers.\n\nUser's Plan:\n- Business: ${plan.selectedIdea}\n- Pricing: ${plan.selectedPricing}\n- Category: ${plan.category}\n- Full 90-day breakdown: ${JSON.stringify(plan).substring(0, 500)}\n\nYour coaching style:\n- ALWAYS ask "What have you tried already?" before helping\n- Ask questions that lead them to the answer (Socratic method)\n- Be supportive but don't rescue - they need to figure it out\n- If they say "I don't know," ask "If you DID know, what would you guess?"\n- Keep responses SHORT (2-3 sentences max) - more questions, less explaining\n- Never say "you should" - instead ask "what options do you see?"`;
       const res = await authFetch('/api/chat', {
         method: 'POST',
         body: JSON.stringify({ system: systemPrompt, messages: [...messages.slice(1), userMessage] })
@@ -557,7 +557,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
 
         <div style={styles.footer}>
           <div style={{ marginBottom: '15px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
-          <div>CKO Global LLC · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
+          <div>CKO Global Inc · Operated by Kelli Owens<br />Email: <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a><br />Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></div>
           <div style={{ marginTop: '15px', fontSize: '0.85rem' }}>
             <a href="/terms" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>
             <a href="/privacy" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none' }}>Privacy Policy</a>
@@ -583,7 +583,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'linear-gradient(135deg, #D8FF2C, #9BE600)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>💰</div>
           <div>
             <div style={{ fontSize: '13px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '2px' }}>Income-First</div>
-            <div style={{ fontSize: '11px', color: '#6B7280' }}>A 90-Day Business Launch Program by CKO Global LLC</div>
+            <div style={{ fontSize: '11px', color: '#6B7280' }}>A 90-Day Business Launch Program by CKO Global Inc</div>
           </div>
         </div>
 
@@ -602,7 +602,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           </div>
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
             <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Operated By</div>
-            <div style={{ fontSize: '13px', color: '#E5E7EB', fontWeight: '600' }}>CKO Global LLC</div>
+            <div style={{ fontSize: '13px', color: '#E5E7EB', fontWeight: '600' }}>CKO Global Inc</div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px 12px' }}>
             <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Contact</div>
@@ -611,7 +611,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
         </div>
 
         <div style={{ fontSize: '12px', color: '#4B5563', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-          CKO Global LLC · Operated by Kelli Owens ·{' '}
+          CKO Global Inc · Operated by Kelli Owens ·{' '}
           <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
           {' '}·{' '}
           <a href="/privacy" style={{ color: '#6B7280', textDecoration: 'none' }}>Privacy Policy</a>
@@ -625,7 +625,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           Activate Your Coaching
         </h1>
         <p style={{ color: '#9CA3AF', marginBottom: '30px', fontSize: '16px', lineHeight: '1.6' }}>
-          Complete your Income-First setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global LLC.
+          Complete your Income-First setup to receive your personalized 90-day business action plan and SMS accountability check-ins from CKO Global Inc.
         </p>
 
         {error && (
@@ -664,7 +664,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
                 style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }}
               />
               <span style={{ color: '#D1D5DB', fontSize: '13px', lineHeight: '1.6' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Income-First) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Income-First) at the mobile number provided, including accountability check-ins, progress reminders, program updates, and service notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
 
@@ -703,7 +703,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
 
           <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #374151', textAlign: 'center' }}>
             <p style={{ color: '#D8FF2C', fontSize: '14px', marginBottom: '6px', fontWeight: 600 }}>Income-First</p>
-            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>CKO Global LLC · Operated by Kelli Owens</p>
+            <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>CKO Global Inc · Operated by Kelli Owens</p>
             <p style={{ color: '#9CA3AF', fontSize: '12px', marginBottom: '3px' }}>
               <a href="mailto:Kelli@proactively-lazy.com" style={{ color: '#9CA3AF', textDecoration: 'none' }}>Kelli@proactively-lazy.com</a>
             </p>

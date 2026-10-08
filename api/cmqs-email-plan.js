@@ -141,7 +141,7 @@ export default async function handler(req, res) {
 
     <div style="text-align:center; padding:24px; border-top:1px solid #e5e7eb; margin-top:16px;">
       <p style="color:#C9A84C; font-weight:700; margin:0 0 6px;">Cash Machine QuickStart</p>
-      <p style="color:#9CA3AF; font-size:13px; margin:0 0 4px;">CKO Global INC · Kelli Owens</p>
+      <p style="color:#9CA3AF; font-size:13px; margin:0 0 4px;">CKO Global Inc · Kelli Owens</p>
       <p style="color:#9CA3AF; font-size:13px; margin:0;">
         <a href="https://proactively-lazy.com" style="color:#C9A84C;">proactively-lazy.com</a> ·
         <a href="mailto:kelli@proactively-lazy.com" style="color:#C9A84C;">kelli@proactively-lazy.com</a>

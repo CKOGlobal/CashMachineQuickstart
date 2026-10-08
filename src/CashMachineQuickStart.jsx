@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Income-First — 90-Day Business Launch Program
-// CKO Global LLC · Operated by Kelli Owens
+// CKO Global Inc · Operated by Kelli Owens
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState, useEffect } from 'react';
@@ -185,7 +185,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       <div style={styles.modalBox} onClick={e => e.stopPropagation()}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px' }}>🎯 Lock In Your Plan</h2>
         <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '24px', lineHeight: '1.5' }}>
-          Enter your details and we'll enroll you in <strong>Income-First</strong> (by CKO Global LLC), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
+          Enter your details and we'll enroll you in <strong>Income-First</strong> (by CKO Global Inc), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
         </p>
         {err && <div style={styles.error}>{err}</div>}
         <div style={styles.formGroup}>
@@ -203,7 +203,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
               <input type="checkbox" checked={smsConsent} onChange={e => setSmsConsent(e.target.checked)} style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }} />
               <span style={{ color: '#D1D5DB', fontSize: '12px', lineHeight: '1.65' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Income-First) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Income-First) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
             <p style={{ fontSize: '11px', color: '#4B5563', marginBottom: 0, marginTop: 0, lineHeight: '1.5' }}>
@@ -346,7 +346,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
 
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
         <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
-          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global LLC</strong> (Income-First). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
+          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global Inc</strong> (Income-First). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
           <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
           <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
         </p>
@@ -371,7 +371,7 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     const userMsg = { role: 'user', content: input };
     setMessages(p => [...p, userMsg]); setInput(''); setLoading(true);
     try {
-      const system = `You are an accountability coach for Income-First by CKO Global LLC.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
+      const system = `You are an accountability coach for Income-First by CKO Global Inc.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
       const res = await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ system, messages: [...messages.slice(1), userMsg] }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -662,7 +662,7 @@ No preamble.`);
       }),
       `=== MILESTONES ===`,
       ...(plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`) || []),
-      ``, `Generated by Income-First — CKO Global LLC`, `proactively-lazy.com | kelli@proactively-lazy.com`,
+      ``, `Generated by Income-First — CKO Global Inc`, `proactively-lazy.com | kelli@proactively-lazy.com`,
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -677,7 +677,7 @@ No preamble.`);
 
       {/* ── HEADER ── */}
       <div style={styles.header}>
-        <div style={styles.brandLine}>Income-First · CKO Global LLC</div>
+        <div style={styles.brandLine}>Income-First · CKO Global Inc</div>
         <h1 style={styles.hero}>You already have what it takes.<br />Let's build <span style={{ color: '#D8FF2C' }}>your business.</span></h1>
         <p style={styles.tagline}>Find a business idea built around what you know. Get your 90-day plan. Start making income. No MBA required.</p>
 
@@ -686,7 +686,7 @@ No preamble.`);
             <div style={{ flex: '1', minWidth: '200px' }}>
               <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.7', margin: 0 }}>
-                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Income-First</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global LLC</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
+                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Income-First</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global Inc</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
               </p>
             </div>
             <div style={{ flex: '1', minWidth: '180px' }}>
@@ -700,7 +700,7 @@ No preamble.`);
             </div>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global LLC</span>
+            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global Inc</span>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Operated by:</strong> Kelli Owens</span>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Email:</strong>{' '}<a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a></span>
             <span><a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></span>
@@ -959,7 +959,7 @@ No preamble.`);
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>🤝 Your Accountability Check-Ins Start Now</h3>
                 <p style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px' }}>You'll receive SMS check-ins 3× per week for the next 90 days. Every Monday, Wednesday, and Friday, we'll ask where you're at. Reply DONE, STUCK, or ALMOST. That's it.</p>
                 <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)', margin: '0 0 10px' }}>Reply STOP anytime to opt out. But we both know you're not going to do that. You've got this.</p>
-                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>SMS messages sent by CKO Global LLC. Message & data rates may apply.</p>
+                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>SMS messages sent by CKO Global Inc. Message & data rates may apply.</p>
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '30px' }}>
@@ -978,12 +978,12 @@ No preamble.`);
       <div style={styles.footer}>
         <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
         <div style={{ marginBottom: '12px' }}>
-          CKO Global LLC · Operated by Kelli Owens<br />
+          CKO Global Inc · Operated by Kelli Owens<br />
           Email: <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a><br />
           Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
         </div>
         <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: '10px' }}>
-          SMS messages sent by CKO Global LLC. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.
+          SMS messages sent by CKO Global Inc. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.
         </div>
         <div style={{ fontSize: '0.85rem' }}>
           <a href="/terms" target="_blank" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>

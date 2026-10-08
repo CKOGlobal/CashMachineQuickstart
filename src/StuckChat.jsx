@@ -82,7 +82,7 @@ The student replied "STUCK" to this week's check-in. Your job:
 
 6. **Keep responses focused** - 2-3 short paragraphs max, actionable guidance
 
-Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global LLC.`;
+Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global Inc.`;
 
       // Anthropic takes the system prompt separately, and the conversation must start with the student
       const history = [...messages, userMessage];

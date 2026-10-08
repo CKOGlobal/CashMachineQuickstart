@@ -11,7 +11,7 @@ export default function Privacy() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Who We Are</h2>
           <p style={{ marginBottom: '20px' }}>
-            Income-First is operated by <strong>CKO Global LLC</strong> (Kelli Owens). Our website is <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>. Questions? Email us at <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>.
+            Income-First is operated by <strong>CKO Global Inc</strong> (Kelli Owens). Our website is <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>. Questions? Email us at <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>What Information We Collect</h2>
@@ -26,7 +26,7 @@ export default function Privacy() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>SMS Opt-In Details</h2>
           <p style={{ marginBottom: '20px' }}>
-            If you provide your mobile phone number and check the SMS consent box during enrollment, you consent to receive recurring SMS text messages from CKO Global LLC (Income-First). Messages include accountability check-ins, progress reminders, milestone notifications, and program support. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time. Reply <strong>HELP</strong> for help. SMS consent is not required as a condition of purchase or program access.
+            If you provide your mobile phone number and check the SMS consent box during enrollment, you consent to receive recurring SMS text messages from CKO Global Inc (Income-First). Messages include accountability check-ins, progress reminders, milestone notifications, and program support. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message and data rates may apply. Reply <strong>STOP</strong> to unsubscribe at any time. Reply <strong>HELP</strong> for help. SMS consent is not required as a condition of purchase or program access.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Cookies &amp; Tracking</h2>
@@ -68,7 +68,7 @@ export default function Privacy() {
           <p style={{ marginBottom: '20px' }}>
             If you have questions about this Privacy Policy, please contact us at:{' '}
             <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a>
-            <br />CKO Global LLC · <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
+            <br />CKO Global Inc · <a href="https://proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
           </p>
 
         </div>

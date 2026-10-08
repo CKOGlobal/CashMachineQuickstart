@@ -11,12 +11,12 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '0', marginBottom: '15px' }}>Age Restriction (18+)</h2>
           <p style={{ marginBottom: '20px' }}>
-            You must be at least <strong>18 years of age</strong> to use Income-First or opt in to receive SMS messages from CKO Global LLC. This program is intended solely for adults aged 18 and older. By enrolling and submitting your information, you represent and warrant that you are 18 years of age or older. We do not knowingly collect personal information from or send SMS messages to anyone under the age of 18. If we discover that a person under 18 has enrolled, we will immediately terminate their access, cancel their enrollment, and delete their data.
+            You must be at least <strong>18 years of age</strong> to use Income-First or opt in to receive SMS messages from CKO Global Inc. This program is intended solely for adults aged 18 and older. By enrolling and submitting your information, you represent and warrant that you are 18 years of age or older. We do not knowingly collect personal information from or send SMS messages to anyone under the age of 18. If we discover that a person under 18 has enrolled, we will immediately terminate their access, cancel their enrollment, and delete their data.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>SMS Program Terms</h2>
           <p style={{ marginBottom: '20px' }}>
-            By opting in to receive SMS messages from Income-First, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global LLC</strong> (Income-First), operated by Kelli Owens.
+            By opting in to receive SMS messages from Income-First, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global Inc</strong> (Income-First), operated by Kelli Owens.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Description of SMS Program &amp; Messaging Use Cases</h2>
