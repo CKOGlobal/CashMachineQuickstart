@@ -24,6 +24,9 @@ const ALLOWED_ORIGINS = [
   "http://localhost:4173",
 ];
 
+// This project's preview deployments
+const PREVIEW_ORIGIN = /^https:\/\/cash-machine-quickstart-[a-z0-9-]+-ckoglobals-projects\.vercel\.app$/;
+
 const HOUR = 60 * 60 * 1000;
 const FREE_IDEAS_PER_HOUR   = 5;
 const PAID_CALLS_PER_HOUR   = 60;
@@ -71,7 +74,7 @@ export default async function handler(req, res) {
   if (rejectIfBot(req, res)) return;
   // ── CORS — locked to platform domains only ──
   const origin = req.headers["origin"] || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin)
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || PREVIEW_ORIGIN.test(origin)
     ? origin
     : "https://cash-machine-quickstart.vercel.app";
   res.setHeader("Access-Control-Allow-Origin",  allowedOrigin);

@@ -30,10 +30,13 @@ The server re-checks the link on every paid call: AI coach/plan (`/api/chat`), e
 | `GHL_CMQS_WEBHOOK_URL` | yes | GHL inbound webhook for enrollments (unchanged) |
 | `GHL_STUCK_WEBHOOK_URL` | yes | GHL inbound webhook for "I'm stuck" (unchanged) |
 | `GHL_ACCESS_WEBHOOK_URL` | recommended | GHL inbound webhook that receives `email, contact_id, cmqs_access_link, cmqs_access_token` |
+| `CMQS_BLOCKED_EMAILS` | optional | Comma-separated buyer emails to cut off (refunds, chargebacks). Their link and any shared copy stop working after redeploy. |
 | `CMQS_FREE_CODES` | optional | Comma-separated free codes, e.g. `BETA2026,VIPFRIENDS`. Unset = no free codes. |
 | `CMQS_SITE_URL` | yes | `https://cashmachine.proactively-lazy.com` — the address used in access links |
 
 Generate secrets with any password generator (40+ characters, letters and numbers).
+
+Preview deployments sit behind Vercel's login, so GHL can't reach them. Test the full purchase flow on the custom domain after merge, with GHL Workflow A left in Draft until then.
 
 ## GHL setup
 

@@ -50,10 +50,19 @@ export function verifyAccessToken(token) {
   try {
     const p = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
     if (!p.e || !p.exp || p.exp < Math.floor(Date.now() / 1000)) return null;
+    if (isBlocked(p.e)) return null;
     return { email: p.e, name: p.n, contactId: p.c, source: p.s, code: p.k, exp: p.exp };
   } catch {
     return null;
   }
+}
+
+// Refunds / chargebacks: add the buyer's email to CMQS_BLOCKED_EMAILS (comma-separated)
+// and redeploy. Their link — and any copy they shared — stops working immediately.
+function isBlocked(email) {
+  return (process.env.CMQS_BLOCKED_EMAILS || '')
+    .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+    .includes(String(email).toLowerCase());
 }
 
 export function accessLink(token) {
@@ -71,11 +80,11 @@ export function requireAccess(req, res) {
 }
 
 // Shared-secret check for server-to-server calls from GHL.
-// Accepts the secret in the x-cmqs-secret header OR a "secret" body field
-// (GHL's standard Webhook action can only send body fields).
+// Accepts the secret in the x-cmqs-secret header, a top-level "secret" body field,
+// or customData.secret (where GHL's standard Webhook action puts custom data).
 export function requireWebhookSecret(req, res) {
   const expected = process.env.CMQS_WEBHOOK_SECRET;
-  const given = req.headers['x-cmqs-secret'] || req.body?.secret || '';
+  const given = req.headers['x-cmqs-secret'] || req.body?.secret || req.body?.customData?.secret || '';
   if (!expected) {
     console.error('[access] CMQS_WEBHOOK_SECRET is not set — rejecting webhook');
     res.status(500).json({ error: 'Webhook secret not configured' });

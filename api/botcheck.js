@@ -17,6 +17,9 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
   "http://localhost:4173",
 ]);
+// This project's preview deployments
+const PREVIEW_ORIGIN = /^https:\/\/cash-machine-quickstart-[a-z0-9-]+-ckoglobals-projects\.vercel\.app$/;
+const isAllowedOrigin = (o) => ALLOWED_ORIGINS.has(o) || PREVIEW_ORIGIN.test(o);
 
 const BAD_UA_PATTERNS = [
   "python-requests","python-urllib","python-httpx","scrapy","wget","curl",
@@ -39,7 +42,7 @@ function classifyThreat(reason, origin, referer, ua) {
       return { level: "HIGH", label: `Known Scraper Tool: ${pattern}` };
     }
   }
-  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+  if (origin && !isAllowedOrigin(origin)) {
     return { level: "MEDIUM", label: `Unauthorized Origin: ${origin}` };
   }
   if (reason.includes("Headless")) {
@@ -166,8 +169,10 @@ export function checkRequest(req) {
   const referer = req.headers["referer"] || "";
   const ua      = (req.headers["user-agent"] || "").toLowerCase();
 
-  const originOk  = ALLOWED_ORIGINS.has(origin);
-  const refererOk = [...ALLOWED_ORIGINS].some(o => referer.startsWith(o));
+  const originOk  = isAllowedOrigin(origin);
+  let refererOrigin = "";
+  try { refererOrigin = referer ? new URL(referer).origin : ""; } catch { /* malformed referer */ }
+  const refererOk = isAllowedOrigin(refererOrigin);
 
   if (!originOk && !refererOk) {
     if (!origin && !referer) {

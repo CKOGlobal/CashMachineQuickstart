@@ -19,7 +19,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!requireWebhookSecret(req, res)) return;
 
-  const b = req.body || {};
+  // GHL sends contact fields at the top level; custom data arrives under customData
+  const b = { ...(req.body?.customData || {}), ...(req.body || {}) };
   const email = String(b.email || b.contact?.email || '').trim().toLowerCase();
   const firstName = b.first_name || b.firstName || b.contact?.first_name || (b.full_name || b.name || '').split(' ')[0] || '';
   const contactId = b.contact_id || b.contactId || b.contact?.id || '';
