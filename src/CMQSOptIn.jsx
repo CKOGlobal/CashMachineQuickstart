@@ -653,7 +653,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
           <div style={{ background: 'rgba(216,255,44,0.05)', border: '1px solid rgba(216,255,44,0.2)', borderRadius: '6px', padding: '20px', marginBottom: '20px' }}>
             <p style={{ color: '#D8FF2C', fontWeight: 700, marginBottom: '4px', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📱 SMS Accountability Check-Ins</p>
             <p style={{ color: '#6B7280', fontSize: '12px', marginBottom: '14px', marginTop: 0, lineHeight: '1.5' }}>
-              Income-First delivers accountability through SMS text messages. By checking the box below you consent to receive these messages at the mobile number you provided above.
+              Your coaching is delivered by text message. These check-ins are part of the program you purchased, so consent is required to activate it. We don't send marketing texts.
             </p>
 
             <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', gap: '10px' }}>
@@ -669,7 +669,7 @@ Voice: empathy-led, never predatory, never transactional. No preamble.`);
             </label>
 
             <div style={{ marginTop: '14px', padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '5px', fontSize: '11px', color: '#4B5563', lineHeight: '1.6' }}>
-              <strong style={{ color: '#6B7280' }}>How we contact you:</strong> SMS text messages sent to the mobile number above · No calls, no spam · Opt-out anytime by replying STOP · Consent is not a condition of purchase or program access.{' '}
+              <strong style={{ color: '#6B7280' }}>How we contact you:</strong> SMS text messages sent to the mobile number above · No calls, no spam · Opt-out anytime by replying STOP (your plan and AI coach stay available; only the texts stop) · Consent to marketing messages is never a condition of purchase.{' '}
               <a href="/privacy" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>
               {' '}·{' '}
               <a href="/terms" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
