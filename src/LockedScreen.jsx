@@ -19,7 +19,7 @@ export function LockedScreen({ reason }) {
         <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', lineHeight: '1.6', margin: '0 0 24px' }}>
           Can&rsquo;t find it? Check spam, or email <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C' }}>kelli@proactively-lazy.com</a>.
         </p>
-        <a href={PURCHASE_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '12px 22px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', marginRight: '10px', marginBottom: '10px' }}>Enroll — $69.97</a>
+        <a href={PURCHASE_URL} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', padding: '12px 22px', background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)', color: '#fff', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', marginRight: '10px', marginBottom: '10px' }}>Enroll — $97</a>
         <a href="/" style={{ display: 'inline-block', padding: '12px 22px', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', borderRadius: '8px', textDecoration: 'none', fontWeight: '600' }}>Back to start</a>
       </div>
     </div>

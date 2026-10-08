@@ -103,8 +103,8 @@ document.head.appendChild(ss);
 // Attribution codes only (full price). Free/beta codes live on the server
 // (CMQS_FREE_CODES env var) so they never ship in the page code.
 const referralCodes = {
-  KELLICMQS:  { type: 'full', price: 69.97, name: 'Cash Machine QuickStart' },
-  LORAL2026:  { type: 'full', price: 69.97, name: 'Cash Machine QuickStart' },
+  KELLICMQS:  { type: 'full', price: 97, name: 'Cash Machine QuickStart' },
+  LORAL2026:  { type: 'full', price: 97, name: 'Cash Machine QuickStart' },
 };
 
 const skillCategories = [
@@ -244,7 +244,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
   const [freeEmail, setFreeEmail]       = useState('');
   const [redeeming, setRedeeming]       = useState(false);
 
-  const programPrice = appliedCode?.price ?? 69.97;
+  const programPrice = appliedCode?.price ?? 97;
 
   const applyCode = () => {
     const code = referralCode.trim().toUpperCase();
@@ -302,11 +302,11 @@ const PaymentGate = ({ onReferralCodeChange }) => {
       <div style={styles.pricingCard}>
         <div style={{ ...styles.priceRow, ...styles.priceTotal, marginTop: 0, paddingTop: 0, borderTop: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <span>90-Day Cash Machine QuickStart Program</span>
-          <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
+          <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}</span>
         </div>
         <div style={{ ...styles.priceRow, borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #D8FF2C' }}>
           <span style={{ fontSize: '1.2rem', fontWeight: '700' }}>Total</span>
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#D8FF2C' }}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
+          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#D8FF2C' }}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}</span>
         </div>
         <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center' }}>{appliedCode?.type === 'free' ? 'Beta access' : 'One-time payment'} · 7-day money-back guarantee</p>
       </div>
@@ -340,7 +340,7 @@ const PaymentGate = ({ onReferralCodeChange }) => {
           rel="noopener noreferrer"
           style={{ ...styles.purchaseButton, background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
         >
-          {`Start Cash Machine QuickStart — $${programPrice.toFixed(2)}`}
+          {`Start Cash Machine QuickStart — $${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}
         </a>
       )}
 
