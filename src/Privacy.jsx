@@ -41,17 +41,17 @@ export default function Privacy() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Data Retention</h2>
           <p style={{ marginBottom: '20px' }}>
-            We retain your information as long as you are subscribed to our SMS service or enrolled in the program. You may request deletion at any time by replying STOP to any message or contacting us directly at kelli@proactively-lazy.com.
+            We retain your information as long as you are subscribed to our SMS service or enrolled in the program. Reply STOP to any message to stop text messages. To request deletion of your information, email kelli@proactively-lazy.com.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Opt-In</h2>
           <p style={{ marginBottom: '20px' }}>
-            You opt in to SMS messages by checking the SMS consent checkbox during enrollment and submitting the enrollment form. Consent is voluntary and not required to participate in the program.
+            You opt in to SMS messages by checking the SMS consent checkbox when you activate your Income-First (Cash Machine QuickStart) coaching and submitting the activation form. Text-message check-ins are how the accountability coaching is delivered, so consent is required to activate coaching. Consent is never required to make a purchase, and we do not send marketing text messages.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Opt-Out</h2>
           <p style={{ marginBottom: '20px' }}>
-            Reply STOP to any message to unsubscribe from our SMS list. After unsubscribing, we will remove your number from our list and you will receive no further messages. You may also contact us directly to be removed.
+            Reply STOP to any message to unsubscribe from our SMS list. After unsubscribing, we will remove your number from our list and you will receive no further messages. You may also contact us directly to be removed. Replying STOP ends the text messages only; your 90-day plan and AI coach remain available.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>User Rights</h2>

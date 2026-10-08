@@ -16,7 +16,7 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>SMS Program Terms</h2>
           <p style={{ marginBottom: '20px' }}>
-            By opting in to receive SMS messages from Income-First, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global Inc</strong> (Income-First), operated by Kelli Owens.
+            Income-First is the coaching program sold as Cash Machine QuickStart. By opting in to receive SMS messages from Income-First, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global Inc</strong> (Income-First), operated by Kelli Owens.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Description of SMS Program &amp; Messaging Use Cases</h2>
@@ -45,7 +45,7 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Instructions to Opt Out — Text STOP</h2>
           <p style={{ marginBottom: '20px' }}>
-            You can cancel the SMS service at any time by replying <strong>STOP</strong> to any message. After you send STOP, we will send you a final confirmation SMS and you will no longer receive messages from us. If you want to rejoin, simply sign up again and messaging will resume.
+            You can cancel the SMS service at any time by replying <strong>STOP</strong> to any message. After you send STOP, we will send you a final confirmation SMS and you will no longer receive messages from us. If you want to rejoin, simply sign up again and messaging will resume. Replying STOP ends the text messages only; your 90-day plan and AI coach remain available.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Support Contact Information</h2>
