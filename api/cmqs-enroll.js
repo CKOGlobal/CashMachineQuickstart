@@ -1,6 +1,10 @@
 // api/cmqs-enroll.js
 // Posts enrolled student to GHL with correct tag based on referral code
-// Tags: KelliCMQS (default), LoralCMQS (LORAL2026), BetaCMQS (BETA/BETA2026)
+// Tags: KelliCMQS (default), LoralCMQS (LORAL2026), CMQSAccess (free-code students)
+// Requires a valid access link (x-cmqs-access header). The enrolled email comes
+// from the access link, not the form, so nobody can enroll on someone else's purchase.
+
+import { requireAccess } from './_lib/access.js';
 
 const TAG_MAP = {
   LORAL2026:   'LoralCMQS',
@@ -10,9 +14,10 @@ const TAG_MAP = {
   KELLICMQS:   'KelliCMQS',
 };
 
-function resolveTag(referralCode) {
-  if (!referralCode) return 'KelliCMQS';
-  return TAG_MAP[referralCode.trim().toUpperCase()] || 'KelliCMQS';
+function resolveTag(referralCode, access) {
+  const code = (referralCode || access.code || '').trim().toUpperCase();
+  if (TAG_MAP[code]) return TAG_MAP[code];
+  return access.source === 'code' ? 'CMQSAccess' : 'KelliCMQS';
 }
 
 export default async function handler(req, res) {
@@ -20,9 +25,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const access = requireAccess(req, res);
+  if (!access) return;
+
   const {
     name,
-    email,
     phone,
     referralCode,
     selectedIdea,
@@ -30,11 +37,12 @@ export default async function handler(req, res) {
     plan,
   } = req.body;
 
-  if (!email || !name) {
-    return res.status(400).json({ error: 'Name and email are required' });
+  if (!name) {
+    return res.status(400).json({ error: 'Name is required' });
   }
 
-  const tag = resolveTag(referralCode);
+  const email = access.email;
+  const tag = resolveTag(referralCode, access);
 
   const week1Steps = plan?.month1?.weeks?.[0]?.steps
     ?.map((s, i) => `${i + 1}. ${s.what}\n   HOW: ${s.how}\n   TIME: ${s.time}`)
@@ -47,13 +55,14 @@ export default async function handler(req, res) {
   const ghlPayload = {
     firstName:  name.split(' ')[0],
     lastName:   name.split(' ').slice(1).join(' ') || '',
-    email:      email.trim().toLowerCase(),
+    email,
     phone:      phone?.trim() || '',
     tags:       [tag],
     source:     'CashMachineQuickStart',
 
     customField: {
-      cmqs_referral_code:     referralCode?.toUpperCase() || '',
+      cmqs_referral_code:     (referralCode || access.code || '').toUpperCase(),
+      cmqs_access_source:     access.source,
       cmqs_attribution_tag:   tag,
       cmqs_business_idea:     selectedIdea?.title || '',
       cmqs_idea_category:     selectedIdea?.category || '',
@@ -83,7 +92,7 @@ export default async function handler(req, res) {
     if (!ghlRes.ok) {
       const errText = await ghlRes.text();
       console.error('GHL webhook error:', ghlRes.status, errText);
-      return res.status(500).json({ error: 'GHL enrollment failed', detail: errText });
+      return res.status(500).json({ error: 'GHL enrollment failed' });
     }
 
     return res.status(200).json({ success: true, tag });

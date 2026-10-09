@@ -6,6 +6,7 @@ import StuckChat from './StuckChat';
 import CMQSOptIn from './CMQSOptIn';
 import Privacy from './Privacy';
 import Terms from './Terms';
+import AccessLanding from './AccessLanding';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/cmqs-opt-in" element={<CMQSOptIn />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/access" element={<AccessLanding />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,7 +1,13 @@
+// Called by GHL only. Requires CMQS_WEBHOOK_SECRET as header x-cmqs-secret
+// or as a "secret" custom-data field in the GHL Webhook action.
+
+import { requireWebhookSecret, accessLink, createAccessToken } from './_lib/access.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  if (!requireWebhookSecret(req, res)) return;
 
   try {
     const {
@@ -28,7 +34,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4000,
         messages: [{
           role: 'user',
@@ -78,8 +84,8 @@ Each task string must be under 200 characters. Be specific and actionable.`
     const cleanJson = planText.replace(/```json\n?|\n?```/g, '').trim();
     const plan = JSON.parse(cleanJson);
 
-    // Create plan URL (you can store plans in a database or use contact_id as key)
-    const plan_url = `https://cash-machine-quickstart.vercel.app/plan/${contact_id}`;
+    // Personal access link (the old /plan/<id> page never existed)
+    const plan_url = accessLink(createAccessToken({ email, name, contactId: contact_id, source: 'paid' }));
 
     // Return data for GHL to store in custom fields
     const response = {
@@ -117,7 +123,6 @@ Each task string must be under 200 characters. Be specific and actionable.`
     console.error('Payment webhook error:', error);
     return res.status(500).json({
       error: 'Failed to generate plan',
-      message: error.message,
     });
   }
 }

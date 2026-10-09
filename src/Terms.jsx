@@ -11,17 +11,17 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '0', marginBottom: '15px' }}>Age Restriction (18+)</h2>
           <p style={{ marginBottom: '20px' }}>
-            You must be at least <strong>18 years of age</strong> to use Income-First or opt in to receive SMS messages from CKO Global LLC. This program is intended solely for adults aged 18 and older. By enrolling and submitting your information, you represent and warrant that you are 18 years of age or older. We do not knowingly collect personal information from or send SMS messages to anyone under the age of 18. If we discover that a person under 18 has enrolled, we will immediately terminate their access, cancel their enrollment, and delete their data.
+            You must be at least <strong>18 years of age</strong> to use Cash Machine QuickStart or opt in to receive SMS messages from CKO Global Inc. This program is intended solely for adults aged 18 and older. By enrolling and submitting your information, you represent and warrant that you are 18 years of age or older. We do not knowingly collect personal information from or send SMS messages to anyone under the age of 18. If we discover that a person under 18 has enrolled, we will immediately terminate their access, cancel their enrollment, and delete their data.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>SMS Program Terms</h2>
           <p style={{ marginBottom: '20px' }}>
-            By opting in to receive SMS messages from Income-First, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global LLC</strong> (Income-First), operated by Kelli Owens.
+            By opting in to receive SMS messages from Cash Machine QuickStart, you agree to receive accountability check-ins, progress reminders, and coaching support messages from <strong>CKO Global Inc</strong>, operated by Kelli Owens.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Description of SMS Program &amp; Messaging Use Cases</h2>
           <p style={{ marginBottom: '20px' }}>
-            Income-First uses SMS messaging to deliver a 90-day accountability coaching experience. Messages sent through this program include:
+            Cash Machine QuickStart uses SMS messaging to deliver a 90-day accountability coaching experience. Messages sent through this program include:
           </p>
           <ul style={{ marginLeft: '20px', marginBottom: '20px' }}>
             <li style={{ marginBottom: '8px' }}>Accountability check-ins (Mon, Wed, Fri) asking where you are in your plan</li>
@@ -35,7 +35,7 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Message Frequency</h2>
           <p style={{ marginBottom: '20px' }}>
-            You will receive up to 3 messages per week for 90 days (approximately 36 messages total). Message frequency may vary based on your progress and participation in the program.
+            You will receive up to 3 messages per week during the 90-day program. Message frequency may vary based on your progress and participation in the program.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Disclosures for Message and Data Rates</h2>
@@ -45,7 +45,7 @@ export default function Terms() {
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Instructions to Opt Out — Text STOP</h2>
           <p style={{ marginBottom: '20px' }}>
-            You can cancel the SMS service at any time by replying <strong>STOP</strong> to any message. After you send STOP, we will send you a final confirmation SMS and you will no longer receive messages from us. If you want to rejoin, simply sign up again and messaging will resume.
+            You can cancel the SMS service at any time by replying <strong>STOP</strong> to any message. After you send STOP, we will send you a final confirmation SMS and you will no longer receive messages from us. If you want to rejoin, simply sign up again and messaging will resume. Replying STOP ends the text messages only; your 90-day plan and AI coach remain available.
           </p>
 
           <h2 style={{ color: '#D8FF2C', fontSize: '20px', marginTop: '30px', marginBottom: '15px' }}>Support Contact Information</h2>
@@ -71,7 +71,7 @@ export default function Terms() {
         </div>
 
         <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <a href="/" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '14px' }}>← Back to Income-First</a>
+          <a href="/" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '14px' }}>← Back to Cash Machine QuickStart</a>
         </div>
       </div>
     </div>

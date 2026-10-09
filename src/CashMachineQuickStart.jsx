@@ -1,9 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Income-First — 90-Day Business Launch Program
-// CKO Global LLC · Operated by Kelli Owens
+// Cash Machine QuickStart — 90-Day Business Launch Program
+// CKO Global Inc · Operated by Kelli Owens
 // ─────────────────────────────────────────────────────────────────────────────
 
 import React, { useState, useEffect } from 'react';
+import { authFetch, verifyAccess, setAccessToken, PURCHASE_URL } from './access';
 
 const styles = {
   container: { minHeight: '100vh', background: '#06091A', color: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', padding: '20px' },
@@ -99,15 +100,12 @@ ss.textContent = `@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:ro
 document.head.appendChild(ss);
 
 // ── Referral codes ────────────────────────────────────────────────────────────
+// Attribution codes only (full price). Free/beta codes live on the server
+// (CMQS_FREE_CODES env var) so they never ship in the page code.
 const referralCodes = {
-  KELLICMQS:  { type: 'full', price: 69.97, name: 'Income-First' },
-  CMQS:       { type: 'free', price: 0,     name: 'Beta Access'  },
-  CMQS2026:   { type: 'free', price: 0,     name: 'Beta Access'  },
-  TESTACCESS: { type: 'free', price: 0,     name: 'Test Access'  },
+  KELLICMQS:  { type: 'full', price: 97, name: 'Cash Machine QuickStart' },
+  LORAL2026:  { type: 'full', price: 97, name: 'Cash Machine QuickStart' },
 };
-
-const TAG_MAP = { KELLICMQS: 'KelliIF', CMQS: 'IFAccess', CMQS2026: 'IFAccess', TESTACCESS: 'IFAccess' };
-const resolveTag = (code) => (code ? TAG_MAP[code.toUpperCase()] : null) || 'KelliIF';
 
 const skillCategories = [
   { id: 'creative',   label: 'Creative & Arts',       emoji: '🎨' },
@@ -134,7 +132,7 @@ const BlueprintLoader = ({ phase }) => {
     { tag: 'Building your blueprint...', sub: 'Mapping out your full 90-day journey.' },
     { tag: 'Building your future...', sub: 'Aligning your goals with your action plan.' },
     { tag: "Crossing the T's...", sub: 'Making sure every detail is dialed in.' },
-    { tag: "Dotting the I's...", sub: 'Personalizing your Income-First roadmap.' },
+    { tag: "Dotting the I's...", sub: 'Personalizing your Cash Machine QuickStart roadmap.' },
     { tag: 'Crunching your numbers...', sub: "Running the math so you don't have to." },
     { tag: 'Locking in your strategy...', sub: 'Your plan is almost ready.' },
     { tag: 'Almost there...', sub: 'Your 90-day blueprint is being finalized.' },
@@ -148,7 +146,7 @@ const BlueprintLoader = ({ phase }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(6,9,26,0.97)', zIndex: 999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px' }}>
       <div style={{ width: '60px', height: '60px', border: '4px solid rgba(216,255,44,0.15)', borderTop: '4px solid #D8FF2C', borderRadius: '50%', animation: 'spin 1.2s linear infinite', marginBottom: '32px' }} />
-      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Income-First</div>
+      <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: '0.75rem', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Cash Machine QuickStart</div>
       <div style={{ fontSize: '1.6rem', fontWeight: '700', color: '#ffffff', marginBottom: '10px', minHeight: '44px', animation: 'fadeUp 0.5s ease' }}>{messages[msgIdx].tag}</div>
       <div style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', marginBottom: '36px', minHeight: '26px' }}>{messages[msgIdx].sub}</div>
       <div style={{ width: '300px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', overflow: 'hidden', marginBottom: '12px' }}>
@@ -171,9 +169,8 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
     if (!email.trim()) { setErr('Email is required'); return; }
     setLoading(true); setErr('');
     try {
-      const res = await fetch('/api/cmqs-enroll', {
+      const res = await authFetch('/api/cmqs-enroll', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email: email.trim(), phone: phone.trim(), smsConsent, referralCode: referralCode || '', selectedIdea, selectedPricing, plan }),
       });
       const data = await res.json();
@@ -188,7 +185,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
       <div style={styles.modalBox} onClick={e => e.stopPropagation()}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '8px' }}>🎯 Lock In Your Plan</h2>
         <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.7)', marginBottom: '24px', lineHeight: '1.5' }}>
-          Enter your details and we'll enroll you in <strong>Income-First</strong> (by CKO Global LLC), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
+          Enter your details and we'll enroll you in <strong>Cash Machine QuickStart</strong> (by CKO Global Inc), send your 90-day plan to your inbox, and fire off your Week 1 tasks email right away.
         </p>
         {err && <div style={styles.error}>{err}</div>}
         <div style={styles.formGroup}>
@@ -206,7 +203,7 @@ const EnrollmentModal = ({ name, referralCode, selectedIdea, selectedPricing, pl
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '10px' }}>
               <input type="checkbox" checked={smsConsent} onChange={e => setSmsConsent(e.target.checked)} style={{ marginTop: '3px', width: '18px', height: '18px', cursor: 'pointer', flexShrink: 0 }} />
               <span style={{ color: '#D1D5DB', fontSize: '12px', lineHeight: '1.65' }}>
-                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global LLC</strong> (Income-First) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
+                I consent to receive recurring SMS text messages from <strong style={{ color: '#E5E7EB' }}>CKO Global Inc</strong> (Cash Machine QuickStart) at the mobile number I provided, including accountability check-ins, progress reminders, and program notifications. <strong>Message frequency: up to 3 messages per week for 90 days.</strong> Message &amp; data rates may apply. Reply <strong>HELP</strong> for help. Reply <strong>STOP</strong> to unsubscribe at any time.
               </span>
             </label>
             <p style={{ fontSize: '11px', color: '#4B5563', marginBottom: 0, marginTop: 0, lineHeight: '1.5' }}>
@@ -244,14 +241,35 @@ const PaymentGate = ({ onReferralCodeChange }) => {
   const [referralCode, setReferralCode] = useState('');
   const [appliedCode, setAppliedCode]   = useState(null);
   const [codeError, setCodeError]       = useState('');
+  const [freeEmail, setFreeEmail]       = useState('');
+  const [redeeming, setRedeeming]       = useState(false);
 
-  const programPrice = appliedCode ? appliedCode.price : 69.97;
+  const programPrice = appliedCode?.price ?? 97;
 
   const applyCode = () => {
     const code = referralCode.trim().toUpperCase();
     if (!code) { setCodeError('Please enter a referral code'); return; }
     if (referralCodes[code]) { setAppliedCode(referralCodes[code]); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(code); }
-    else { setCodeError('Invalid referral code'); setAppliedCode(null); }
+    else { setAppliedCode({ type: 'free', price: 0, name: 'Access Code' }); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(code); }
+  };
+
+  // Free codes are checked on the server, which issues the access link directly.
+  const redeemFreeCode = async () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(freeEmail.trim())) { setCodeError('Enter the email you want your plan sent to'); return; }
+    setRedeeming(true); setCodeError('');
+    try {
+      const res = await fetch('/api/cmqs-redeem-code', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: referralCode.trim().toUpperCase(), email: freeEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid code');
+      setAccessToken(data.token);
+      window.location.href = '/cmqs-opt-in?code=' + encodeURIComponent(referralCode.trim().toUpperCase());
+    } catch (e) {
+      setCodeError(e.message === 'Invalid code' ? 'Invalid referral code' : e.message);
+      setAppliedCode(null);
+    } finally { setRedeeming(false); }
   };
   const removeCode = () => { setReferralCode(''); setAppliedCode(null); setCodeError(''); if (onReferralCodeChange) onReferralCodeChange(''); };
 
@@ -283,12 +301,12 @@ const PaymentGate = ({ onReferralCodeChange }) => {
 
       <div style={styles.pricingCard}>
         <div style={{ ...styles.priceRow, ...styles.priceTotal, marginTop: 0, paddingTop: 0, borderTop: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <span>90-Day Income-First Program</span>
-          <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
+          <span>90-Day Cash Machine QuickStart Program</span>
+          <span style={styles.priceAmount}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}</span>
         </div>
         <div style={{ ...styles.priceRow, borderBottom: 'none', marginTop: '10px', paddingTop: '15px', borderTop: '2px solid #D8FF2C' }}>
           <span style={{ fontSize: '1.2rem', fontWeight: '700' }}>Total</span>
-          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#D8FF2C' }}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(2)}`}</span>
+          <span style={{ fontSize: '1.5rem', fontWeight: '700', color: '#D8FF2C' }}>{appliedCode?.type === 'free' ? 'FREE' : `$${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}</span>
         </div>
         <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '10px', textAlign: 'center' }}>{appliedCode?.type === 'free' ? 'Beta access' : 'One-time payment'} · 7-day money-back guarantee</p>
       </div>
@@ -308,18 +326,27 @@ const PaymentGate = ({ onReferralCodeChange }) => {
         <p style={{ fontSize: '0.9rem', marginTop: '15px', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)' }}>You've got this. We've got your back.</p>
       </div>
 
-      <a
-        href={appliedCode?.type === 'free' ? '/cmqs-opt-in?code=' + referralCode + '&type=free' : 'https://link.fastpaydirect.com/payment-link/69c56d24c6a0e600f4d05aed?code=' + referralCode}
-        target={appliedCode?.type === 'free' ? '_self' : '_blank'}
-        rel={appliedCode?.type === 'free' ? '' : 'noopener noreferrer'}
-        style={{ ...styles.purchaseButton, background: appliedCode?.type === 'free' ? 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' : 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
-      >
-        {appliedCode?.type === 'free' ? '🎉 Activate Free Beta Access' : `Start Income-First — $${programPrice.toFixed(2)}`}
-      </a>
+      {appliedCode?.type === 'free' ? (
+        <div style={{ marginBottom: '20px' }}>
+          <input type="email" value={freeEmail} onChange={e => { setFreeEmail(e.target.value); setCodeError(''); }} placeholder="you@email.com" style={{ width: '100%', boxSizing: 'border-box', padding: '12px 16px', marginBottom: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#ffffff', fontSize: '1rem', outline: 'none' }} />
+          <button onClick={redeemFreeCode} disabled={redeeming} style={{ ...styles.purchaseButton, width: '100%', border: 'none', cursor: redeeming ? 'not-allowed' : 'pointer', opacity: redeeming ? 0.6 : 1, background: 'linear-gradient(135deg, #3ECFAB 0%, #60E8C0 100%)' }}>
+            {redeeming ? 'Checking code...' : '🎉 Activate Free Beta Access'}
+          </button>
+        </div>
+      ) : (
+        <a
+          href={PURCHASE_URL + '?code=' + encodeURIComponent(referralCode)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ ...styles.purchaseButton, background: 'linear-gradient(135deg, #FF5035 0%, #FF7A1A 100%)' }}
+        >
+          {`Start Cash Machine QuickStart — $${programPrice.toFixed(programPrice % 1 ? 2 : 0)}`}
+        </a>
+      )}
 
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px 16px', marginBottom: '20px' }}>
         <p style={{ fontSize: '11px', color: '#6B7280', lineHeight: '1.6', margin: 0 }}>
-          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global LLC</strong> (Income-First). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
+          <strong style={{ color: '#9CA3AF' }}>📱 SMS Accountability Check-Ins:</strong> After enrollment, you'll be prompted to consent to SMS messages from <strong style={{ color: '#9CA3AF' }}>CKO Global Inc</strong> (Cash Machine QuickStart). Messages include check-ins, progress reminders, and program notifications. Frequency: up to 3 messages per week for 90 days. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info. Consent is not required for purchase.{' '}
           <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Privacy Policy</a>{' '}·{' '}
           <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none' }}>Terms of Service</a>
         </p>
@@ -344,11 +371,10 @@ const ChatbotHelper = ({ plan, selectedIdea, selectedPricing, onClose }) => {
     const userMsg = { role: 'user', content: input };
     setMessages(p => [...p, userMsg]); setInput(''); setLoading(true);
     try {
-      const prompt = messages.length === 1
-        ? `You are an accountability coach for Income-First by CKO Global LLC.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.\nQuestion: ${input}`
-        : input;
-      const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: messages.length === 1 ? [{ role: 'user', content: prompt }] : [...messages.slice(1), userMsg] }) });
+      const system = `You are an accountability coach for Cash Machine QuickStart by CKO Global Inc.\nIdea: ${selectedIdea?.title} (${selectedIdea?.category})\nPricing: ${selectedPricing?.name} at ${selectedPricing?.price}\nPlan: ${JSON.stringify(plan).substring(0, 300)}\nRole: short, direct, no excuses. Ask "What have you tried?" before giving solutions.`;
+      const res = await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ system, messages: [...messages.slice(1), userMsg] }) });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       setMessages(p => [...p, { role: 'assistant', content: data.reply }]);
     } catch { setMessages(p => [...p, { role: 'assistant', content: 'Sorry, technical snag. Try again?' }]); }
     finally { setLoading(false); }
@@ -455,7 +481,6 @@ const CashMachineQuickStart = () => {
   const [emailSending, setEmailSending]     = useState(false);
   const [emailSent, setEmailSent]           = useState(false);
   const [emailError, setEmailError]         = useState('');
-  const [adminClicks, setAdminClicks]       = useState(0);
   const [activeReferralCode, setActiveReferralCode] = useState('');
 
   const [name, setName]                     = useState('');
@@ -476,12 +501,15 @@ const CashMachineQuickStart = () => {
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
+  // Paid steps unlock only with a valid personal access link (checked by the server)
+  useEffect(() => { verifyAccess().then(r => setHasPaid(!!r.valid)); }, []);
+
   useEffect(() => {
     const saved = localStorage.getItem('if_state');
     if (!saved) return;
     try {
       const d = JSON.parse(saved);
-      setPhase(d.phase || 1); setHasPaid(d.hasPaid || false); setName(d.name || '');
+      setPhase(d.phase || 1); setName(d.name || '');
       setProcrastination(d.procrastination || ''); setGoodAt(d.goodAt || ''); setHardPass(d.hardPass || '');
       setSelectedSkills(d.selectedSkills || []); setSpecificIdea(d.specificIdea || '');
       setTimeAvailable(d.timeAvailable || ''); setIncomeGoal(d.incomeGoal || '');
@@ -505,8 +533,8 @@ const CashMachineQuickStart = () => {
   const sendEmailPlan = async (emailAddr) => {
     setEmailSending(true); setEmailError(''); setEmailSent(false);
     try {
-      const res = await fetch('/api/cmqs-email-plan', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const res = await authFetch('/api/cmqs-email-plan', {
+        method: 'POST',
         body: JSON.stringify({ name, email: emailAddr, selectedIdea, selectedPricing, plan }),
       });
       if (res.ok) setEmailSent(true);
@@ -520,32 +548,25 @@ const CashMachineQuickStart = () => {
     await sendEmailPlan(email);
   };
 
-  const aiCall = async (content) => {
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: [{ role: 'user', content }] }) });
+  const parseReply = async (res) => {
     const data = await res.json();
+    if (!res.ok || !data.reply) throw new Error(data.error || 'AI service error');
     return JSON.parse(data.reply.replace(/```json\n?|\n?```/g, '').trim());
   };
+
+  const aiCall = async (content) =>
+    parseReply(await authFetch('/api/chat', { method: 'POST', body: JSON.stringify({ messages: [{ role: 'user', content }] }) }));
 
   const generateIdeas = async () => {
     setLoading(true); setError('');
     try {
-      const parsed = await aiCall(`Generate 8 Income-First business ideas using the DUAL-TRACK system for: ${name}
-Procrastination: ${procrastination}
-Good at: ${goodAt}
-Hard pass: ${hardPass}
-Skills: ${selectedSkills.join(', ')}
-${specificIdea ? `Specific idea: ${specificIdea}` : ''}
-Time: ${timeAvailable} | Goal: ${incomeGoal}
-
-IDEAS 1-2: BRIDGE (category:"bridge") — gig platforms, start TODAY, cash THIS WEEK
-IDEAS 3-7: BUSINESS (category:"business") — skills-based services, scalable, exit potential, first client in 7 days
-IDEA 8: WILDCARD (category:"wildcard") — creative/unique
-
-Return ONLY valid JSON array:
-[{"title":"","tagline":"","category":"bridge|business|wildcard","monthOne":"$X-Y first week","yearTwo":"18-mo potential","quickStart":"Step 1...","pros":[],"cons":[],"fitScore":85}]
-No preamble.`);
+      // Free step: the server builds the prompt from these fields
+      const parsed = await parseReply(await fetch('/api/chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'ideas', intake: { name, procrastination, goodAt, hardPass, selectedSkills, specificIdea, timeAvailable, incomeGoal } }),
+      }));
       setIdeas(parsed); setPhase(2);
-    } catch (e) { setError('Failed to generate ideas. Please try again.'); }
+    } catch (e) { setError(e instanceof SyntaxError || !e.message ? 'Failed to generate ideas. Please try again.' : e.message); }
     finally { setLoading(false); }
   };
 
@@ -611,7 +632,7 @@ Return ONLY valid JSON:
   {"day":"Day 5–6","action":"specific task","why":"1 sentence reason","timeEstimate":"X hrs"},
   {"day":"Day 7","action":"specific task — land or follow up on first paid client","why":"1 sentence reason","timeEstimate":"X hrs"}
 ],
-"closingLine":"Short motivating close, signed Kelli & the Income-First Team"}
+"closingLine":"Short motivating close, signed Kelli & the Cash Machine QuickStart Team"}
 No preamble.`);
       setPlan(prev => ({ ...prev, week1Tasks: w1 }));
     } catch (e) { console.error('Week 1 tasks generation failed', e); }
@@ -641,25 +662,22 @@ No preamble.`);
       }),
       `=== MILESTONES ===`,
       ...(plan.milestones?.map(m => `Day ${m.day}: ${m.goal}`) || []),
-      ``, `Generated by Income-First — CKO Global LLC`, `proactively-lazy.com | kelli@proactively-lazy.com`,
+      ``, `Generated by Cash Machine QuickStart — CKO Global Inc`, `proactively-lazy.com | kelli@proactively-lazy.com`,
     ];
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_IncomFirst_90Day_Plan.txt`; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = `${name.replace(/\s+/g, '_')}_CashMachineQuickStart_90Day_Plan.txt`; a.click();
     URL.revokeObjectURL(url);
   };
 
   // ── RENDER ──────────────────────────────────────────────────────────────────
   return (
     <div style={styles.container}>
-      {/* god-mode bypass */}
-      <div onClick={() => { const n = adminClicks + 1; setAdminClicks(n); if (n >= 5) setHasPaid(true); }} style={{ position: 'fixed', bottom: '20px', right: '20px', width: '60px', height: '60px', opacity: 0, zIndex: 999, userSelect: 'none' }} />
-
       {loadingMonth && <BlueprintLoader phase={loadingMonth} />}
 
       {/* ── HEADER ── */}
       <div style={styles.header}>
-        <div style={styles.brandLine}>Income-First · CKO Global LLC</div>
+        <div style={styles.brandLine}>Cash Machine QuickStart · CKO Global Inc</div>
         <h1 style={styles.hero}>You already have what it takes.<br />Let's build <span style={{ color: '#D8FF2C' }}>your business.</span></h1>
         <p style={styles.tagline}>Find a business idea built around what you know. Get your 90-day plan. Start making income. No MBA required.</p>
 
@@ -668,7 +686,7 @@ No preamble.`);
             <div style={{ flex: '1', minWidth: '200px' }}>
               <div style={{ fontSize: '10px', fontFamily: '"IBM Plex Mono", monospace', color: '#D8FF2C', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '5px' }}>About This Program</div>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', lineHeight: '1.7', margin: 0 }}>
-                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Income-First</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global LLC</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
+                <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Cash Machine QuickStart</strong> is a 90-day business launch and accountability program operated by <strong style={{ color: 'rgba(255,255,255,0.85)' }}>CKO Global Inc</strong>. We help people identify skills-based income opportunities and build a cash-generating business from scratch.
               </p>
             </div>
             <div style={{ flex: '1', minWidth: '180px' }}>
@@ -682,7 +700,7 @@ No preamble.`);
             </div>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global LLC</span>
+            <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Company:</strong> CKO Global Inc</span>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Operated by:</strong> Kelli Owens</span>
             <span><strong style={{ color: 'rgba(255,255,255,0.55)' }}>Email:</strong>{' '}<a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a></span>
             <span><a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a></span>
@@ -767,7 +785,7 @@ No preamble.`);
           {error && <div style={styles.error}>{error}</div>}
           <div style={styles.buttonRow}>
             <button style={styles.buttonSecondary} onClick={() => setPhase(1)}>← Back</button>
-            <button style={{ ...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {}) }} onClick={() => { if (!hasPaid && adminClicks < 5) { setPhase(2.5); } else { generatePricing(); } }} disabled={loading || !selectedIdea}>
+            <button style={{ ...styles.button, ...(loading || !selectedIdea ? styles.buttonDisabled : {}) }} onClick={() => { if (!hasPaid) { setPhase(2.5); } else { generatePricing(); } }} disabled={loading || !selectedIdea}>
               {loading ? '🤖 Generating Pricing...' : 'Get Your Complete Plan →'}
             </button>
           </div>
@@ -777,7 +795,7 @@ No preamble.`);
       {/* ── PHASE 2.5 ── */}
       {phase === 2.5 && (
         <div style={styles.phase}>
-          {(hasPaid || adminClicks >= 5) ? (
+          {hasPaid ? (
             (() => {
               if (pricingOptions.length === 0 && !loading) generatePricing();
               else if (pricingOptions.length > 0) setPhase(3);
@@ -795,7 +813,7 @@ No preamble.`);
       )}
 
       {/* ── PHASE 3 ── */}
-      {phase === 3 && (hasPaid || adminClicks >= 5) && (
+      {phase === 3 && hasPaid && (
         <div style={styles.phase}>
           <div style={styles.phaseHeader}><span style={{ fontSize: '2rem' }}>💰</span><h2 style={styles.phaseTitle}>Let's figure out <span style={{ color: '#D8FF2C' }}>what to charge</span> for "{selectedIdea?.title}"</h2><p style={styles.phaseSubtitle}>Pricing isn't random. Here are 5 strategies that actually work.</p></div>
           <div style={styles.pricingGrid}>
@@ -830,7 +848,7 @@ No preamble.`);
             <>
               <div style={styles.phaseHeader}>
                 <span style={{ fontSize: '2rem' }}>🎉</span>
-                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#D8FF2C' }}>90-Day Income-First Plan</span> is Ready</h2>
+                <h2 style={styles.phaseTitle}>Your <span style={{ color: '#D8FF2C' }}>90-Day Cash Machine QuickStart Plan</span> is Ready</h2>
                 <p style={styles.phaseSubtitle}>{name}, here's your roadmap. Follow this and you'll be making income in 30 days.</p>
               </div>
               {error && <div style={styles.error}>{error}</div>}
@@ -941,7 +959,7 @@ No preamble.`);
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>🤝 Your Accountability Check-Ins Start Now</h3>
                 <p style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '15px' }}>You'll receive SMS check-ins 3× per week for the next 90 days. Every Monday, Wednesday, and Friday, we'll ask where you're at. Reply DONE, STUCK, or ALMOST. That's it.</p>
                 <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.7)', margin: '0 0 10px' }}>Reply STOP anytime to opt out. But we both know you're not going to do that. You've got this.</p>
-                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>SMS messages sent by CKO Global LLC. Message & data rates may apply.</p>
+                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>SMS messages sent by CKO Global Inc. Message & data rates may apply.</p>
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '30px' }}>
@@ -958,14 +976,14 @@ No preamble.`);
       {enrollOpen && <EnrollmentModal name={name} referralCode={activeReferralCode} selectedIdea={selectedIdea} selectedPricing={selectedPricing} plan={plan} onClose={() => setEnrollOpen(false)} onSuccess={handleEnrollSuccess} />}
 
       <div style={styles.footer}>
-        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Income-First</strong></div>
+        <div style={{ marginBottom: '12px' }}><strong style={{ color: '#D8FF2C' }}>Cash Machine QuickStart</strong></div>
         <div style={{ marginBottom: '12px' }}>
-          CKO Global LLC · Operated by Kelli Owens<br />
+          CKO Global Inc · Operated by Kelli Owens<br />
           Email: <a href="mailto:kelli@proactively-lazy.com" style={{ color: '#D8FF2C', textDecoration: 'none' }}>kelli@proactively-lazy.com</a><br />
           Website: <a href="https://proactively-lazy.com" target="_blank" rel="noopener noreferrer" style={{ color: '#D8FF2C', textDecoration: 'none' }}>proactively-lazy.com</a>
         </div>
         <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', marginBottom: '10px' }}>
-          SMS messages sent by CKO Global LLC. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.
+          SMS messages sent by CKO Global Inc. Up to 3 messages per week. Msg &amp; data rates may apply. Reply STOP to cancel, HELP for info.
         </div>
         <div style={{ fontSize: '0.85rem' }}>
           <a href="/terms" target="_blank" style={{ color: 'rgba(255,255,255,0.5)', textDecoration: 'none', marginRight: '15px' }}>Terms of Service</a>

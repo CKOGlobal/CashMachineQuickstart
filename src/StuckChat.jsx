@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { authFetch, captureTokenFromUrl, verifyAccess } from './access';
+import { LockedScreen } from './LockedScreen';
 
 export default function StuckChat() {
   const [messages, setMessages] = useState([]);
@@ -6,11 +8,18 @@ export default function StuckChat() {
   const [loading, setLoading] = useState(false);
   const [context, setContext] = useState(null);
   const [escalating, setEscalating] = useState(false);
+  const [access, setAccess] = useState({ status: 'checking' });
   const messagesEndRef = useRef(null);
 
   const params = new URLSearchParams(window.location.search);
   const week = params.get('week') || '1';
-  const contactId = params.get('contact') || 'test';
+  const contactId = params.get('contact') || '';
+
+  // SMS links carry the student's access link as ?t=…; otherwise use the one saved in this browser
+  useEffect(() => {
+    const token = captureTokenFromUrl();
+    verifyAccess(token || undefined).then(r => setAccess({ status: r.valid ? 'ok' : r.error ? 'error' : 'locked' }));
+  }, []);
 
   useEffect(() => {
     const savedState = localStorage.getItem('if_state');
@@ -19,12 +28,12 @@ export default function StuckChat() {
       setContext(state);
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Income-First coach. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.\n\nWhat's got you stuck? I'm here to help you get moving again.`
+        content: `Hey! I'm your Cash Machine QuickStart coach. I see you're on Week ${week}${state.selectedIdea ? ` working on ${state.selectedIdea.title}` : ''}.\n\nWhat's got you stuck? I'm here to help you get moving again.`
       }]);
     } else {
       setMessages([{
         role: 'assistant',
-        content: `Hey! I'm your Income-First coach. You're on Week ${week}.\n\nWhat's got you stuck? Tell me what's going on and I'll help you get unstuck.`
+        content: `Hey! I'm your Cash Machine QuickStart coach. You're on Week ${week}.\n\nWhat's got you stuck? Tell me what's going on and I'll help you get unstuck.`
       }]);
     }
     scrollToBottom();
@@ -46,7 +55,7 @@ export default function StuckChat() {
     setLoading(true);
 
     try {
-      const systemPrompt = `You are the Income-First support coach helping a student who is stuck.
+      const systemPrompt = `You are the Cash Machine QuickStart support coach helping a student who is stuck.
 
 Context:
 - Current Week: ${week}
@@ -73,21 +82,18 @@ The student replied "STUCK" to this week's check-in. Your job:
 
 6. **Keep responses focused** - 2-3 short paragraphs max, actionable guidance
 
-Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Income-First by CKO Global LLC.`;
+Be conversational, supportive, and specific. You're their accountability partner who knows their plan inside-out. Program is Cash Machine QuickStart by CKO Global Inc.`;
 
-      const res = await fetch('/api/chat', {
+      // Anthropic takes the system prompt separately, and the conversation must start with the student
+      const history = [...messages, userMessage];
+      const firstUser = history.findIndex(m => m.role === 'user');
+      const res = await authFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages,
-            userMessage
-          ]
-        })
+        body: JSON.stringify({ system: systemPrompt, messages: history.slice(firstUser) })
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       console.error('Chat error:', err);
@@ -105,9 +111,8 @@ Be conversational, supportive, and specific. You're their accountability partner
         .map(m => `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`)
         .join('\n\n');
 
-      await fetch('/api/stuck-escalation', {
+      const res = await authFetch('/api/stuck-escalation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contact_id: contactId,
           week: parseInt(week),
@@ -115,6 +120,7 @@ Be conversational, supportive, and specific. You're their accountability partner
           business_idea: context?.selectedIdea?.title || 'Unknown',
         })
       });
+      if (!res.ok) throw new Error((await res.json()).error);
 
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -135,11 +141,16 @@ Be conversational, supportive, and specific. You're their accountability partner
     }
   };
 
+  if (access.status === 'checking') {
+    return <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Checking your access...</div>;
+  }
+  if (access.status !== 'ok') return <LockedScreen reason={access.status === 'error' ? 'error' : undefined} />;
+
   return (
     <div style={{ minHeight: '100vh', background: '#06091A', color: '#fff', fontFamily: "'IBM Plex Mono', monospace", display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
         <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#D8FF2C', marginBottom: '5px' }}>
-          🤝 Income-First Coach — Week {week}
+          🤝 Cash Machine QuickStart Coach — Week {week}
         </div>
         <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
           {context?.selectedIdea?.title || 'Your Business Idea'}
