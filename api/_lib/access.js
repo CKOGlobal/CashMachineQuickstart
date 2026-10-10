@@ -59,7 +59,7 @@ export function verifyAccessToken(token) {
 
 // Refunds / chargebacks: add the buyer's email to CMQS_BLOCKED_EMAILS (comma-separated)
 // and redeploy. Their link — and any copy they shared — stops working immediately.
-function isBlocked(email) {
+export function isBlocked(email) {
   return (process.env.CMQS_BLOCKED_EMAILS || '')
     .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
     .includes(String(email).toLowerCase());
@@ -139,4 +139,73 @@ export async function sendEmail({ to, subject, html }) {
     body: JSON.stringify({ from: 'Kelli Owens <kelli@proactively-lazy.com>', to: [to], subject, html }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+}
+
+// Email that delivers a buyer's personal login link (used by grant-access and login).
+export function accessEmailHtml(firstName, link) {
+  const name = escapeHtml(firstName || 'there');
+  const href = escapeHtml(link);
+  return `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 20px;">
+    <div style="background:#0d1117;border-radius:10px 10px 0 0;padding:28px 32px;text-align:center;">
+      <p style="color:#C9A84C;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">Cash Machine QuickStart</p>
+      <h1 style="color:#ffffff;font-size:24px;margin:0;">You're in, ${name}. 🎉</h1>
+    </div>
+    <div style="background:#ffffff;border-radius:0 0 10px 10px;padding:28px 32px;">
+      <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 20px;">Here's your personal login link — tap it to open your 90-day plan and AI coach.</p>
+      <p style="text-align:center;margin:0 0 24px;">
+        <a href="${href}" style="display:inline-block;padding:14px 28px;background:#C9A84C;color:#0d1117;font-weight:700;text-decoration:none;border-radius:8px;font-size:16px;">Open My Program →</a>
+      </p>
+      <p style="font-size:13px;color:#666;line-height:1.6;margin:0 0 8px;">Save this email. The link is yours for 12 months and works on any device. Please don't share it — it's tied to your enrollment.</p>
+      <p style="font-size:12px;color:#999;line-height:1.6;margin:0;word-break:break-all;">If the button doesn't work, paste this into your browser:<br>${href}</p>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#9CA3AF;margin:16px 0 0;">Questions? <a href="mailto:kelli@proactively-lazy.com" style="color:#C9A84C;">kelli@proactively-lazy.com</a></p>
+  </div>
+</body></html>`;
+}
+
+// ── GHL purchase check ──────────────────────────────────────────────────────
+// Asks GHL (outbound — not affected by Vercel's firewall) whether this email has a
+// successful payment of at least CMQS_MIN_PAYMENT (default 97).
+// Env: GHL_API_TOKEN (Private Integration token: View Contacts + View Payment
+// Transactions), GHL_LOCATION_ID.
+const GHL_API = 'https://services.leadconnectorhq.com';
+const PAID_STATUSES = ['succeeded', 'paid', 'completed', 'success'];
+
+async function ghlGet(path) {
+  const res = await fetch(`${GHL_API}${path}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.GHL_API_TOKEN}`,
+      Version: '2021-07-28',
+      Accept: 'application/json',
+    },
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`GHL ${res.status} on ${path.split('?')[0]}: ${text.slice(0, 300)}`);
+  return JSON.parse(text);
+}
+
+// Returns { paid, contactId, firstName } — throws if GHL isn't configured or errors.
+export async function findPaidPurchase(email) {
+  const locationId = process.env.GHL_LOCATION_ID;
+  if (!process.env.GHL_API_TOKEN || !locationId) throw new Error('GHL_API_TOKEN / GHL_LOCATION_ID not set');
+
+  const found = await ghlGet(`/contacts/search/duplicate?locationId=${encodeURIComponent(locationId)}&email=${encodeURIComponent(email)}`);
+  const contact = found?.contact || found?.contacts?.[0] || null;
+  if (!contact?.id) return { paid: false };
+
+  const tx = await ghlGet(`/payments/transactions?altId=${encodeURIComponent(locationId)}&altType=location&contactId=${encodeURIComponent(contact.id)}&limit=100`);
+  const list = tx?.data || tx?.transactions || [];
+  const minAmount = Number(process.env.CMQS_MIN_PAYMENT || 97);
+  const paid = list.some(t =>
+    PAID_STATUSES.includes(String(t.status || '').toLowerCase()) && Number(t.amount) >= minAmount
+  );
+  if (!paid) {
+    console.log('[purchase-check] no qualifying payment', {
+      contactId: contact.id,
+      transactions: list.map(t => ({ status: t.status, amount: t.amount, source: t.entitySourceName })),
+    });
+  }
+  return { paid, contactId: contact.id, firstName: contact.firstName || contact.firstNameRaw || '' };
 }
