@@ -352,6 +352,10 @@ const PaymentGate = ({ onReferralCodeChange }) => {
         </p>
       </div>
 
+      <p style={{ textAlign: 'center', fontSize: '0.95rem', margin: '0 0 16px' }}>
+        <a href="/login" style={{ color: '#D8FF2C', fontWeight: '600', textDecoration: 'none' }}>Already purchased? Log in →</a>
+      </p>
+
       <div style={{ textAlign: 'center', marginTop: '10px' }}>
         <a href="/terms" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none', marginRight: '15px', fontSize: '0.85rem' }}>Terms of Service</a>
         <a href="/privacy" target="_blank" style={{ color: '#D8FF2C', textDecoration: 'none', fontSize: '0.85rem' }}>Privacy Policy</a>
@@ -678,6 +682,9 @@ No preamble.`);
       {/* ── HEADER ── */}
       <div style={styles.header}>
         <div style={styles.brandLine}>Cash Machine QuickStart · CKO Global Inc</div>
+        <div style={{ textAlign: 'right', maxWidth: '900px', margin: '-8px auto 8px' }}>
+          <a href="/login" style={{ color: '#D8FF2C', fontSize: '0.9rem', fontWeight: '600', textDecoration: 'none' }}>Student log in →</a>
+        </div>
         <h1 style={styles.hero}>You already have what it takes.<br />Let's build <span style={{ color: '#D8FF2C' }}>your business.</span></h1>
         <p style={styles.tagline}>Find a business idea built around what you know. Get your 90-day plan. Start making income. No MBA required.</p>
 

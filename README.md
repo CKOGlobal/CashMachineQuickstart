@@ -2,6 +2,10 @@
 
 React + Vite front end with Vercel serverless functions in `/api`. AI by Anthropic, email by Resend, CRM in GoHighLevel (GHL).
 
+## How buyers log in
+
+Buyers log in at **/login** (also linked from the home page and checkout): they enter the email they paid with, the app asks GHL whether that contact has a succeeded payment of at least $97, and if so emails a one-tap login link. The link is never shown in the browser, so knowing someone's email doesn't get you in. This path is outbound from the app to GHL, so Vercel's firewall can't block it.
+
 ## How access works
 
 The free part (intake → business ideas) is open to everyone. Everything after the paywall needs a **personal access link**:
@@ -31,6 +35,9 @@ The server re-checks the link on every paid call: AI coach/plan (`/api/chat`), e
 | `GHL_STUCK_WEBHOOK_URL` | yes | GHL inbound webhook for "I'm stuck" (unchanged) |
 | `GHL_ACCESS_WEBHOOK_URL` | recommended | GHL inbound webhook that receives `email, contact_id, cmqs_access_link, cmqs_access_token` |
 | `CMQS_BLOCKED_EMAILS` | optional | Comma-separated buyer emails to cut off (refunds, chargebacks). Their link and any shared copy stop working after redeploy. |
+| `GHL_API_TOKEN` | yes (login) | GHL Private Integration token with **View Contacts** and **View Payment Transactions** scopes |
+| `GHL_LOCATION_ID` | yes (login) | GHL sub-account (location) ID |
+| `CMQS_MIN_PAYMENT` | optional | Minimum succeeded payment that counts as a purchase. Default `97` |
 | `CMQS_FREE_CODES` | optional | Comma-separated free codes, e.g. `BETA2026,VIPFRIENDS`. Unset = no free codes. |
 | `CMQS_SITE_URL` | yes | `https://cashmachine.proactively-lazy.com` — the address used in access links |
 
